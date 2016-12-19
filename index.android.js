@@ -16,11 +16,13 @@ import {
 } from 'react-native';
 import { LoginButton } from 'react-native-fbsdk';
 
+import Profile from './app/screens/Profile/index.js';
+
 class noteableMobile extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { screen: 'Recorder' };
+        this.state = { screen: 'Profile' };
     }
 
     updateScreen = (screen) => {
@@ -29,6 +31,8 @@ class noteableMobile extends Component {
 
     renderCurrentScreen = (screen) => {
         switch(screen) {
+            case 'Profile':
+                return(<Profile />);
             case 'Recorder':
                 return(<AudioRecorder />);
             case 'List':
@@ -46,26 +50,9 @@ class noteableMobile extends Component {
                     <Text style={styles.welcome}>
                     Notable
                     </Text>
-                    <LoginButton
-                        publishPermissions={[]}
-                        onLoginFinished={
-                            (error, result) => {
-                                if (error) {
-                                    alert("Login failed with error: " + result.error);
-                                } else if (result.isCancelled) {
-                                    alert("Login was cancelled");
-                                } else {
-                                    alert("Login was successful with permissions: " + result.grantedPermissions)
-                                }
-                            }
-                        }
-                        onLogoutFinished={() => alert("User logged out")}/>
                 </View>
                 <View style={styles.screen}>
                     { screen }
-                </View>
-                <View style={styles.menu}>
-                    <Menu updateSelected={ this.updateScreen } selected={ this.state.screen } />
                 </View>
             </View>
         );
@@ -106,3 +93,24 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent('noteableMobile', () => noteableMobile);
+
+/*
+                <View style={styles.menu}>
+                    <Menu updateSelected={ this.updateScreen } selected={ this.state.screen } />
+                </View>
+                
+                                    <LoginButton
+                        publishPermissions={["publish_actions"]}
+                        onLoginFinished={
+                            (error, result) => {
+                                if (error) {
+                                    alert("Login failed with error: " + result.error);
+                                } else if (result.isCancelled) {
+                                    alert("Login was cancelled");
+                                } else {
+                                    alert("Login was successful with permissions: " + result.grantedPermissions)
+                                }
+                            }
+                        }
+                        onLogoutFinished={() => alert("User logged out")}/>
+*/

@@ -11,5 +11,6 @@ export const RecordingSchema = {
         duration: 'string',
         description: 'string',
         isSynced: 'bool',
+        id: 'string',
     }
 };
