@@ -9,8 +9,8 @@ import {
     ScrollView,
 } from 'react-native';
 
-import ProfileInfo from '../../app/components/ProfileInfo/index.js';
-import Interests from '../../app/components/Interests/index.js';
+import ProfileInfo from '../../components/ProfileInfo/index.js';
+import Interests from '../../components/Interests/index.js';
 
 export default class Profile extends Component {
     constructor(props) {
@@ -27,7 +27,7 @@ export default class Profile extends Component {
     }
     
     render() {
-        const { coverImage, profileImage, name, description, interests, instruments } = this.state;
+        const { coverImage, profileImage, name, description, interests, instruments } = this.state.profile;
         return(
             <ScrollView style={styles.container}>
                 <View style={styles.screen}>
