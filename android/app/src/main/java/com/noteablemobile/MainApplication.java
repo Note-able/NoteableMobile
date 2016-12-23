@@ -5,6 +5,7 @@ import android.util.Log;
 
 //React Native
 import com.facebook.react.ReactApplication;
+import com.BV.LinearGradient.LinearGradientPackage;
 import io.realm.react.RealmReactPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
@@ -50,6 +51,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
+            new LinearGradientPackage(),
                     new RealmReactPackage(),
                     new ReactNativeAudioPackage(),
                     new RNFSPackage(),

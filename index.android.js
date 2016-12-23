@@ -16,81 +16,40 @@ import {
 } from 'react-native';
 import { LoginButton } from 'react-native-fbsdk';
 
+import { Actions, Router, Scene } from 'react-native-router-flux';
+import { Provider, connect } from 'react-redux';
+import { compose, createStore } from 'redux';
+import { appReducer } from './app/reducers';
+
 import Profile from './app/screens/Profile/index.js';
+import Home from './app/screens/Home/index.js';
+
+const ConnectedRouter = connect()(Router);
+const store = compose()(createStore)(appReducer);
+
+const Scenes = Actions.create(
+    <Scene key='root'>
+        <Scene key='home'component={Home}></Scene>
+        <Scene key='profile' component={Profile}></Scene>
+        <Scene key='music'component={RecordingList}></Scene>
+        <Scene key='recorder'component={AudioRecorder}></Scene>
+    </Scene>
+);
+
 
 class noteableMobile extends Component {
     constructor(props) {
         super(props);
-
-        this.state = { screen: 'Profile' };
-    }
-
-    updateScreen = (screen) => {
-        this.setState({ screen });
-    }
-
-    renderCurrentScreen = (screen) => {
-        switch(screen) {
-            case 'Profile':
-                return(<Profile />);
-            case 'Recorder':
-                return(<AudioRecorder />);
-            case 'List':
-                return(<RecordingList />);
-            default:
-                return(<AudioRecorder />);
-        }
     }
 
     render() {
-        const screen = this.renderCurrentScreen(this.state.screen);
         return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.welcome}>
-                    Notable
-                    </Text>
-                </View>
-                <View style={styles.screen}>
-                    { screen }
-                </View>
-            </View>
+            <Provider store={store}>
+                <ConnectedRouter scenes={Scenes}></ConnectedRouter>
+            </Provider>
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        backgroundColor: 'black',
-    },
-    header: {
-        alignSelf: 'stretch',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        flexDirection: 'row',
-        marginLeft: 20
-    },
-    welcome: {
-        fontSize: 30,
-        textAlign: 'center',
-        margin: 10,
-        color: '#F5FCFF',
-    },
-    menu: {
-        alignSelf: 'flex-end',
-        backgroundColor: '#000'
-    },
-    screen: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'stretch',
-    }
-});
 
 AppRegistry.registerComponent('noteableMobile', () => noteableMobile);
 
@@ -113,4 +72,18 @@ AppRegistry.registerComponent('noteableMobile', () => noteableMobile);
                             }
                         }
                         onLogoutFinished={() => alert("User logged out")}/>
+                        
+                        ------------------------------
+                        
+                        
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.welcome}>
+                    Notable
+                    </Text>
+                </View>
+                <View style={styles.screen}>
+                    { screen }
+                </View>
+            </View>
 */
