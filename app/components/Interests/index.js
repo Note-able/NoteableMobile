@@ -1,5 +1,5 @@
 
-import React, { PureComponent } from 'react';
+import React, { PropTypes, PureComponent } from 'react';
 import {
     StyleSheet,
     Text,
@@ -9,6 +9,10 @@ import {
 } from 'react-native';
 
 export default class Interests extends PureComponent {    
+    static propTypes ={
+        instruments: PropTypes.arrayOf(PropTypes.string).isRequired,
+        onLayout: PropTypes.func.isRequired,
+    };
     getImageForInstrument = (instrument) => 'http://beginnersguitarstudio.com/wp-content/uploads/2015/11/acoustic-guitar-tips.jpg';
     
     renderInterestTile = (instrument) => {
@@ -24,9 +28,9 @@ export default class Interests extends PureComponent {
     }
     
     render() {
-        const { instruments } = this.props;
+        const { instruments, onLayout } = this.props;
         return(
-            <View style={styles.interests}>
+            <View style={styles.interests} onLayout={(event) => onLayout(event, 'interests')}>
                 <View style={styles.interestsHeader}>
                     <View style={[styles.interestHeaderView, styles.selectedInterestCategory]}>
                         <Text style={styles.interestHeader}>Instruments</Text>

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 import {
     StyleSheet,
     Text,
@@ -7,9 +7,9 @@ import {
     Dimensions,
 } from 'react-native';
 
-export default function ProfileInfo({coverImage, profileImage, name, description}) {
+export default function ProfileInfo({coverImage, profileImage, name, description, onLayout}) {
     return(
-        <View>
+        <View onLayout={(event) => onLayout(event, 'about')}>
             <View style={styles.coverImageView}>
                 <Image source={{uri: coverImage }} 
                     style={styles.coverImage}/>
@@ -27,6 +27,14 @@ export default function ProfileInfo({coverImage, profileImage, name, description
             </View>
         </View>
     );
+}
+
+ProfileInfo.propTypes= {
+    coverImage: PropTypes.string.isRequired,
+    profileImage: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    onLayout: PropTypes.func.isRequired,
 }
 
 const windowWidth = Dimensions.get('window').width;

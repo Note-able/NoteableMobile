@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
+import { Actions } from 'react-native-router-flux';
+import { connect } from 'react-redux';
 import {
     StyleSheet,
     Text,
     View,
     Image,
-    ListView,
-    Dimensions,
+    TouchableHighlight,
     ScrollView,
 } from 'react-native';
 
 import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
 
-export default class Profile extends Component {
+const mapStateToProps = (state) => state;
+
+const mapDispatchToProps = () => ({
+    navigateback: () => {
+        Actions.pop();
+    },
+});
+
+class Profile extends Component {
     constructor(props) {
         super(props);
         const profile = {
@@ -23,46 +32,72 @@ export default class Profile extends Component {
             interests: [],
             instruments: ['Guitar', 'Bass', 'Drums', 'Flute', 'Didgeridoo'],
         }
+        this._views = {};
+        this._scrollView = {};
         this.state = { profile };
+    }
+    
+    setViewY = (event, view) => {
+        this._views[view] = { y: event.nativeEvent.layout.y };
+    }
+    
+    scrollToView = (view) => {
+        this._scrollView.scrollTo({y: this._views[view].y});
     }
     
     render() {
         const { coverImage, profileImage, name, description, interests, instruments } = this.state.profile;
         return(
-            <ScrollView style={styles.container}>
-                <View style={styles.screen}>
-                    <View style={styles.navBar}>
-                        <Text style={styles.navTitle}>About</Text>
-                        <Text style={styles.navTitle}>Interest</Text>
-                        <Text style={styles.navTitle}>Music</Text>
-                    </View>
-                    <ProfileInfo  coverImage={coverImage} profileImage={profileImage} name={name} description={description} />
-                    <Interests instruments={instruments} />
-                </View>
-            </ScrollView>
+            <View style={styles.container}>
+                { ProfileNavBar({ scrollTo: this.scrollToView, navigate: this.props.navigateback }) }
+                <ScrollView ref={ ref => {this._scrollView = ref;} }>
+                    <ProfileInfo 
+                        coverImage={coverImage}
+                        profileImage={profileImage}
+                        name={name}
+                        description={description}
+                        onLayout={this.setViewY} />
+                    <Interests
+                        instruments={instruments}
+                        onLayout={this.setViewY} />
+                </ScrollView>
+            </View>
         );
     }
-}
+};
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+const ProfileNavBar = ({scrollTo, navigate}) => (
+    <View style={styles.navBar}> 
+        <TouchableHighlight style={{ position: 'absolute', top: 0, left: 10, height: 45, justifyContent: 'center', alignItems: 'center' }}onPress={() => { navigate(); }}>
+            <Text style={{ color: 'white' }}>back</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => { scrollTo('about'); }}>
+            <Text style={styles.navTitle}>About</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => { scrollTo('interests'); }}>
+        <Text style={styles.navTitle}>Interests</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => { scrollTo('music'); }}>
+        <Text style={styles.navTitle}>Music</Text>
+        </TouchableHighlight>
+    </View>
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const styles = {
     container: {
         backgroundColor: 'white',
-    },
-    screen: {
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        width: windowWidth,
+        flex: 1,
     },
     navBar: {
+        top: 0,
+        right: 0,
+        left: 0,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#D93A64',
-        width: windowWidth,
         height: 45,
     },
     navTitle: {

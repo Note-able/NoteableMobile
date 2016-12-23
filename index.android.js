@@ -27,15 +27,28 @@ import Home from './app/screens/Home/index.js';
 const ConnectedRouter = connect()(Router);
 const store = compose()(createStore)(appReducer);
 
+const style = {
+    tabBarStyle: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#D93A64',
+        height: 45,       
+    }
+};
+
 const Scenes = Actions.create(
     <Scene key='root'>
-        <Scene key='home'component={Home}></Scene>
-        <Scene key='profile' component={Profile}></Scene>
+        <Scene key='home'component={Home} hideNavBar></Scene>
+        <Scene key='profile' component={Profile} tabs tabBarStyle={style.tabBarStyle}>
+            <Scene key='about' title='About'></Scene>
+            <Scene key='interests' title='Interests'></Scene>
+            <Scene key='music' title='Music'></Scene>
+        </Scene>
         <Scene key='music'component={RecordingList}></Scene>
         <Scene key='recorder'component={AudioRecorder}></Scene>
     </Scene>
 );
-
 
 class noteableMobile extends Component {
     constructor(props) {

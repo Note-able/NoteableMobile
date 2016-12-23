@@ -44,7 +44,6 @@ const styles = {
         alignItems: 'center',
         alignSelf: 'stretch',
         flex: 1,
-        marginBottom: 20,
     },
     option: {
         flex: 1,
