@@ -15,6 +15,16 @@ const sceneReducer = (state = DEFAULT_STATE, {type, scene}) => {
   }
 };
 
+const recordingsReducer = (state = { recordings: [] }, {type, recordings}) => {
+    switch(type) {
+        case 'GET_RECORDINGS':
+            return { ...state, recordings };
+        default:
+            return state;
+    } 
+};
+
 export const appReducer = combineReducers({
     sceneReducer,
+    recordingsReducer,
 });

@@ -12,10 +12,11 @@ import {
 
 import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
+import RecordingList from '../../components/RecordingList/index.js';
 
 const mapStateToProps = (state) => state;
 
-const mapDispatchToProps = () => ({
+const mapDispatchToProps = (dispatch) => ({
     navigateback: () => {
         Actions.pop();
     },
@@ -59,6 +60,8 @@ class Profile extends Component {
                         onLayout={this.setViewY} />
                     <Interests
                         instruments={instruments}
+                        onLayout={this.setViewY} />
+                    <RecordingList
                         onLayout={this.setViewY} />
                 </ScrollView>
             </View>

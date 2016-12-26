@@ -31,7 +31,7 @@ const Home = ({navigateScene}) => {
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const views = {
-    nearby: { colors: ['rgba(49,203,148, 0.5)','rgba(53,116,218,0.5)'], name: 'Nearby', scene: () => {Actions.nearby()} },
+    nearby: { colors: ['rgba(49,203,148, 0.5)','rgba(53,116,218,0.5)'], name: 'Nearby', scene: () => {Actions.recorder()} },
     people: { colors: ['rgba(49,12,148, 0.5)','rgba(5,116,218,0.5)'], name: 'People', scene: () => {Actions.profile()} },
     messages: { colors: ['rgba(12,54,65, 0.5)','rgba(53,14,100,0.5)'], name: 'Messages', scene: () => {Actions.messages()} },
     events: { colors: ['rgba(156,203,148, 0.5)','rgba(68,150,199,0.5)'], name: 'Events', scene: () => {Actions.events()} },

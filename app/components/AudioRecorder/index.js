@@ -12,29 +12,24 @@ import {
 
 import Audio from './Audio.js';
 import Realm from 'realm';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import { addRecording } from '../../actions/recordingActions';
 import { RecordingSchema } from '../../realmSchemas';
 
-export default class AudioRecorder extends Component {
-    addRecording = (name, date, duration) => {
-        const realm = new Realm({schema: [RecordingSchema]});
-        // Create Realm objects and write to local storage
-        realm.write(() => {
-            let recording = realm.create('Recording', {
-                name,
-                date,
-                duration,
-                path: `${name}.aac`,
-                description: 'some description',
-                isSynced: false,
-            });
-        });
-    }
+const mapDispatchToProps = (dispatch) => ({
+    addRecording: (name, date, duration) => dispatch(addRecording(name, date, duration)),
+});
 
+class AudioRecorder extends Component {
     render () {
         return (
-            <View>
-                <Audio addRecording={this.addRecording} />
+            <View style={{flex: 1}}>
+                <Audio addRecording={this.props.addRecording} />
             </View>
         );
     }
 }
+
+export default connect(null, mapDispatchToProps)(AudioRecorder)

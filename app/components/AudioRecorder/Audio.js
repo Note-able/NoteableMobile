@@ -104,7 +104,7 @@ export default class Audio extends Component {
         RNFS.moveFile(`${this._recordingLocation}/${this.state.datedFilePath}.aac`, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
             this.props.addRecording(this.state.fileName, dateCreated.format('LLL'), this.state.duration);
             this.setState({fileModalVisible: false});               
-        });
+        }).catch(error => console.warn(error));
     }
     
     deleteRecording = () => {
@@ -164,7 +164,7 @@ export default class Audio extends Component {
 
     var styles = StyleSheet.create({
         container: {
-            flex: 4
+            flex: 1
         },
         controls: {
             justifyContent: 'center',
@@ -174,7 +174,7 @@ export default class Audio extends Component {
         progressText: {
             paddingTop: 50,
             fontSize: 50,
-            color: "#fff"
+            color: "#000"
         },
         button: {
             padding: 20
@@ -184,7 +184,7 @@ export default class Audio extends Component {
         },
         buttonText: {
             fontSize: 20,
-            color: "#fff"
+            color: "#000"
         },
         activeButtonText: {
             fontSize: 20,

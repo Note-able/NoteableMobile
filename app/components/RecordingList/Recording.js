@@ -1,71 +1,45 @@
-import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TouchableHighlight,
-    Image,
-    Dimensions,
-} from 'react-native';
+import React, { Component, PropTypes } from 'react';
+import { StyleSheet, Text, View, TouchableHighlight, Image } from 'react-native';
+import { connect } from 'react-redux';
 
-import Sound from 'react-native-sound';
-import RNFS from 'react-native-fs';
+const Recording = ({name, date, duration, play}) => (
+    <View style={styles.container}>
+        <TouchableHighlight onPress={() => { play(); }}>
+            <View style={styles.recordingInfo}>
+                <Text style={styles.text}>{name}</Text>
+                <Text style={styles.text}>{date}</Text>
+            </View>
+        </TouchableHighlight>
+        <Text style={styles.text}>{duration}</Text>
+        <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you play')}}>
+            <Image source={require('../../img/list2.png')} style={styles.icon}></Image>
+        </TouchableHighlight>
+    </View>);
 
-export default class Recording extends Component {
-    constructor(props) {
-        super(props);
-        
-        this.state = { };
-        this.audio = new Sound(`${this.props.recording.name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
-            if (error) {
-                console.warn(this.setState({ error: true }), error);
-            }
-        });
-    }
-    
-    play = () => {
-        this.audio.play();
-    }
-    
-    render() {
-        return (
-            <View style={styles.container}>
-                <TouchableHighlight onPress={() => { this.play(); }}>
-                    <View style={styles.playButton}></View>
-                </TouchableHighlight>
-                <View style={styles.recordingInfo}>
-                    <Text style={styles.text}>{this.props.recording.name}</Text>
-                    <Text style={styles.text}>{this.props.recording.date}</Text>
-                </View>
-                <Text style={styles.text}>{this.props.recording.duration}</Text>
-                <TouchableHighlight style={styles.syncButton} onPress={this.props.toggleSync}>
-                    { this.props.recording.isSynced ?
-                    <Image source={require('../../img/sync_green.png')} style={styles.icon}></Image> :
-                    <Image source={require('../../img/sync_white.png')} style={styles.icon}></Image>}
-                </TouchableHighlight>
-            </View>);
-    }
-}
+Recording.propTypes = { 
+    name: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    play: PropTypes.func.isRequired,
+};
 
-const windowWidth = Dimensions.get('window').width;
+export default Recording;
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        width: windowWidth,
     },
     text : {
         color: '#F5FCFF',
     },
     recordingInfo: {
+        flexDirection: 'column',
+        flex: 1,
+        alignSelf: 'flex-start',
     },
-    syncButton: {
-        alignSelf: 'flex-end',
-        marginRight: 30
-    },
-    playButton: {
+    moreButton: {
         backgroundColor: "#00e19e",
         width: 30,
         height: 30,

@@ -9,11 +9,12 @@
     "moment": "^2.15.2",
     "react": "15.3.1",
     "react-native": "0.33.0",
-    "react-native-audio": "^2.1.0",
+    "react-native-audio": "^3.0.0",
     "react-native-fbsdk": "^0.4.0",
     "react-native-fs": "^2.0.1-rc.2",
     "react-native-router-flux": "^3.37.0",
     "react-native-sound": "^0.8.3",
-    "realm": "^0.14.3"
+    "realm": "^0.14.3",
+    "redux-thunk": "^2.1.0"
   }
 }

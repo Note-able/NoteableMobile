@@ -18,14 +18,15 @@ import { LoginButton } from 'react-native-fbsdk';
 
 import { Actions, Router, Scene } from 'react-native-router-flux';
 import { Provider, connect } from 'react-redux';
-import { compose, createStore } from 'redux';
-import { appReducer } from './app/reducers';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 
+import { appReducer } from './app/reducers';
 import Profile from './app/screens/Profile/index.js';
 import Home from './app/screens/Home/index.js';
 
 const ConnectedRouter = connect()(Router);
-const store = compose()(createStore)(appReducer);
+const store = createStore(appReducer, applyMiddleware(thunk));
 
 const style = {
     tabBarStyle: {
@@ -40,11 +41,7 @@ const style = {
 const Scenes = Actions.create(
     <Scene key='root'>
         <Scene key='home'component={Home} hideNavBar></Scene>
-        <Scene key='profile' component={Profile} tabs tabBarStyle={style.tabBarStyle}>
-            <Scene key='about' title='About'></Scene>
-            <Scene key='interests' title='Interests'></Scene>
-            <Scene key='music' title='Music'></Scene>
-        </Scene>
+        <Scene key='profile' component={Profile}></Scene>
         <Scene key='music'component={RecordingList}></Scene>
         <Scene key='recorder'component={AudioRecorder}></Scene>
     </Scene>
