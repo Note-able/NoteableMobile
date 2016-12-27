@@ -39,12 +39,20 @@ class RecordingList extends Component {
     }
     
     play = (name) => {
-        const audio = new Sound(`${this.props.recording.name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
+        const audio = new Sound(`${name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
             if (error) {
                 console.warn(this.setState({ error: true }), error);
+            } else {
+                this.playSound(audio);
             }
         });
-        audio.play();
+    }
+    
+    playSound = (audio) => {
+        audio.play((success) => {
+            if(!success)
+                console.warn('FAILED');
+        });
     }
     
     render () {

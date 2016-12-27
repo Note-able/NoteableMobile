@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 
 const Recording = ({name, date, duration, play}) => (
     <View style={styles.container}>
-        <TouchableHighlight style={{flex: 3}} onPress={() => { play(); }}>
+        <TouchableHighlight style={{flex: 3}} onPress={() => { play(name); }}>
             <View style={styles.recordingInfo}>
                 <Text style={styles.largeText} ellipsizeMode="tail" numberOfLines={1}>{name}</Text>
                 <Text style={styles.text}>{date}</Text>
             </View>
         </TouchableHighlight>
         <Text style={[styles.text, {flex: 1}]}>{duration}</Text>
-        <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you play')}}>
+        <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you show more')}}>
             <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
         </TouchableHighlight>
     </View>);
