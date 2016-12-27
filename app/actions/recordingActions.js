@@ -32,3 +32,7 @@ export const addRecording = (name, date, duration) => {
         dispatch({type: 'GET_RECORDINGS', recordings});
     };
 }
+
+export const initializePlayer = (currentRecording, audio) => {
+    return {type: 'INITIALIZE_PLAYER', currentRecording, audio };
+}

@@ -15,16 +15,28 @@ const sceneReducer = (state = DEFAULT_STATE, {type, scene}) => {
   }
 };
 
-const recordingsReducer = (state = { recordings: [] }, {type, recordings}) => {
+const recordingsReducer = (state = { recordings: [] }, {type, recordings, audio, currentRecording}) => {
     switch(type) {
         case 'GET_RECORDINGS':
             return { ...state, recordings };
+        case 'INITIALIZE_PLAYER':
+            return { ...state, audio, currentRecording };
         default:
             return state;
     } 
 };
 
+const profileReducer = (state = { showPlayer: false }, {type}) => {
+    switch(type) {
+        case 'INITIALIZE_PLAYER':
+            return { ...state, showPlayer: true };
+        default:
+            return { ...state };
+    }  
+};
+
 export const appReducer = combineReducers({
     sceneReducer,
     recordingsReducer,
+    profileReducer,
 });

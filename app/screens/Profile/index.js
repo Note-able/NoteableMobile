@@ -13,8 +13,11 @@ import {
 import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
 import RecordingList from '../../components/RecordingList/index.js';
+import Player from '../../components/RecordingList/Player';
 
-const mapStateToProps = (state) => state;
+const mapStateToProps = (state) => ({
+    showPlayer: state.profileReducer.showPlayer, 
+});
 
 const mapDispatchToProps = (dispatch) => ({
     navigateback: () => {
@@ -48,6 +51,7 @@ class Profile extends Component {
     
     render() {
         const { coverImage, profileImage, name, description, interests, instruments } = this.state.profile;
+        const { showPlayer } = this.props;
         return(
             <View style={styles.container}>
                 { ProfileNavBar({ scrollTo: this.scrollToView, navigate: this.props.navigateback }) }
@@ -64,6 +68,7 @@ class Profile extends Component {
                     <RecordingList
                         onLayout={this.setViewY} />
                 </ScrollView>
+                { showPlayer ? <Player /> : null }
             </View>
         );
     }

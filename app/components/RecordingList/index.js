@@ -8,12 +8,16 @@ import Sound from 'react-native-sound';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { fetchRecordings } from '../../actions/recordingActions';
+import { fetchRecordings, initializePlayer } from '../../actions/recordingActions';
 
-const mapStateToProps = (state) => ({ recordings: mapRealmResults(state.recordingsReducer.recordings) });
+const mapStateToProps = (state) => ({
+    recordings: mapRealmResults(state.recordingsReducer.recordings),
+    currentRecording: state.recordingsReducer.currentRecording,
+});
 
 const mapDispatchToProps = (dispatch) => ({
     getRecordings: () => dispatch(fetchRecordings()),
+    initializePlayer: (currentRecording, audio) => dispatch(initializePlayer(currentRecording, audio))
 });
 
 class RecordingList extends Component { 
@@ -38,20 +42,14 @@ class RecordingList extends Component {
         this.getRecordings();
     }
     
-    play = (name) => {
+    loadRecording = (name) => {
+        const { initializePlayer, recordings } = this.props
         const audio = new Sound(`${name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
             if (error) {
                 console.warn(this.setState({ error: true }), error);
             } else {
-                this.playSound(audio);
+                initializePlayer(recordings[name], audio);
             }
-        });
-    }
-    
-    playSound = (audio) => {
-        audio.play((success) => {
-            if(!success)
-                console.warn('FAILED');
         });
     }
     
@@ -77,7 +75,7 @@ class RecordingList extends Component {
                                 name={name}
                                 date={date}
                                 duration={duration}
-                                play={(name) => {this.play(name);}}
+                                loadRecording={(name) => {this.loadRecording(name);}}
                                 toggleSync={() => { this.toggleSync(name, date); }} />
                         </View>)}
                 />
