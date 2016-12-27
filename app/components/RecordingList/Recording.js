@@ -1,18 +1,18 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, Text, View, TouchableHighlight, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight, Image, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 
 const Recording = ({name, date, duration, play}) => (
     <View style={styles.container}>
-        <TouchableHighlight onPress={() => { play(); }}>
+        <TouchableHighlight style={{flex: 3}} onPress={() => { play(); }}>
             <View style={styles.recordingInfo}>
-                <Text style={styles.text}>{name}</Text>
+                <Text style={styles.largeText} ellipsizeMode="tail" numberOfLines={1}>{name}</Text>
                 <Text style={styles.text}>{date}</Text>
             </View>
         </TouchableHighlight>
-        <Text style={styles.text}>{duration}</Text>
+        <Text style={[styles.text, {flex: 1}]}>{duration}</Text>
         <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you play')}}>
-            <Image source={require('../../img/list2.png')} style={styles.icon}></Image>
+            <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
         </TouchableHighlight>
     </View>);
 
@@ -24,26 +24,35 @@ Recording.propTypes = {
 
 export default Recording;
 
+const windowWidth = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-between',
+        height: 50,
+        width: windowWidth,
+        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
+        marginVertical: 5,
+        marginHorizontal: 20,
     },
-    text : {
-        color: '#F5FCFF',
+    largeText: {
+        fontSize: 16,
+        color: '#32302f',
+    },
+    text: {
+        color: '#7a7b86',
     },
     recordingInfo: {
-        flexDirection: 'column',
         flex: 1,
-        alignSelf: 'flex-start',
+        flexDirection: 'column',
+        justifyContent: 'center',
     },
     moreButton: {
-        backgroundColor: "#00e19e",
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        marginLeft: 30
+        flex: 1,
+        marginVertical: 15,
+        height: 20,
+        alignSelf: 'flex-end',
     },
 });

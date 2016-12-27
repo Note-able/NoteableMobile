@@ -13,7 +13,6 @@ import {
 import Audio from './Audio.js';
 import Realm from 'realm';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import { addRecording } from '../../actions/recordingActions';
 import { RecordingSchema } from '../../realmSchemas';

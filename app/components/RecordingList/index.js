@@ -93,10 +93,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        alignSelf: 'stretch',
-        backgroundColor: 'black',
     },
     text : {     
-        color: '#F5FCFF',
+        color: 'black',
     }
 });
