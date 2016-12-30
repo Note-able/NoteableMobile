@@ -15,12 +15,15 @@ const sceneReducer = (state = DEFAULT_STATE, {type, scene}) => {
   }
 };
 
-const recordingsReducer = (state = { recordings: [] }, {type, recordings, audio, currentRecording}) => {
+const recordingsReducer = (state = { recordings: [], shouldPlay: false }, {type, recordings, audio, currentRecording}) => {
     switch(type) {
         case 'GET_RECORDINGS':
             return { ...state, recordings };
         case 'INITIALIZE_PLAYER':
-            return { ...state, audio, currentRecording };
+            return { ...state, audio, currentRecording, shouldPlay: true };
+        case 'TOGGLE_PLAY_FLAG':
+            const { shouldPlay } = state;
+            return { ...state, shouldPlay: !shouldPlay };
         default:
             return state;
     } 

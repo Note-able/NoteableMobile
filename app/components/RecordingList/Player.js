@@ -2,13 +2,16 @@ import React, { Component, PropTypes } from 'react';
 import { View, TouchableHighlight, Image, Text, Animated, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 
+import { togglePlayFlag } from '../../actions/recordingActions';
+
 mapStateToProps = state => ({
     recording: state.recordingsReducer.currentRecording,
-    audio: state.recordingsReducer.audio
+    audio: state.recordingsReducer.audio,
+    shouldPlay: state.recordingsReducer.shouldPlay,
 });
 
 mapDispatchToProps = (dispatch) => ({
-    
+    removePlayFlag: () => { dispatch(togglePlayFlag()) },
 });
 
 class Player extends Component {
@@ -19,9 +22,45 @@ class Player extends Component {
     state = {
         playing: true,
         timingBarWidth: new Animated.Value(0),
+        shouldPlay: this.props.shouldPlay,
     }
     
     componentDidMount() {
+        const { shouldPlay } = this.state;
+        const { removePlayFlag } = this.props;
+        if (shouldPlay) {
+           this.startPlay();
+           removePlayFlag();
+        }
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        const { shouldPlay, removePlayFlag } = nextProps;
+        const { audio } = this.props;
+        let { timingBarWidth } = this.state;
+        if (shouldPlay) {
+            audio.stop();
+            audio.release();
+            timingBarWidth = new Animated.Value(0);
+            removePlayFlag();
+        }        
+        this.setState({shouldPlay, timingBarWidth});
+    }
+    
+    componentDidUpdate() {
+        const { shouldPlay } = this.state;
+        if (shouldPlay) {
+           this.startPlay();
+        }
+    }
+    
+    componentWillUnmount() {
+        const { audio } = this.props;
+        audio.stop();
+        audio.release();
+    }
+    
+    startPlay = () => {
         const { audio } = this.props;
         Animated.timing(
             this.state.timingBarWidth,
@@ -38,7 +77,7 @@ class Player extends Component {
             if(!success)
                 console.warn('FAILED');
             else
-                console.warn('DONE');
+                this.setState({ paused: true })
         });
     }
     
@@ -53,7 +92,7 @@ class Player extends Component {
                         <Text style={styles.largeText} ellipsizeMode="tail" numberOfLines={1}>{recording.name}</Text>
                         <Text style={styles.text}>{recording.date}</Text>
                     </View>
-                    <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you show more')}}>
+                    <TouchableHighlight style={styles.moreButton} onPress={() => { this.startPlay() }}>
                         <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
                     </TouchableHighlight>
                 </View>

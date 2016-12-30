@@ -36,3 +36,7 @@ export const addRecording = (name, date, duration) => {
 export const initializePlayer = (currentRecording, audio) => {
     return {type: 'INITIALIZE_PLAYER', currentRecording, audio };
 }
+
+export const togglePlayFlag = () => {
+    return {type: 'TOGGLE_PLAY_FLAG' };
+}

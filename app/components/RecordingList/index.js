@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     getRecordings: () => dispatch(fetchRecordings()),
-    initializePlayer: (currentRecording, audio) => dispatch(initializePlayer(currentRecording, audio))
+    initializePlayer: (currentRecording, audio) => dispatch(initializePlayer(currentRecording, audio)),
 });
 
 class RecordingList extends Component { 
@@ -30,6 +30,10 @@ class RecordingList extends Component {
     
     componentDidMount() {
         this.props.getRecordings();        
+    }
+    
+    componentWillUnmount() {
+        
     }
     
     toggleSync = (name, date) => {
