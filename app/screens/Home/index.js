@@ -31,11 +31,11 @@ const Home = ({navigateScene}) => {
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const views = {
-    nearby: { colors: ['rgba(49,203,148, 0.5)','rgba(53,116,218,0.5)'], name: 'Nearby', scene: () => {Actions.recorder()} },
-    people: { colors: ['rgba(49,12,148, 0.5)','rgba(5,116,218,0.5)'], name: 'People', scene: () => {Actions.profile()} },
-    messages: { colors: ['rgba(12,54,65, 0.5)','rgba(53,14,100,0.5)'], name: 'Messages', scene: () => {Actions.messages()} },
-    events: { colors: ['rgba(156,203,148, 0.5)','rgba(68,150,199,0.5)'], name: 'Events', scene: () => {Actions.events()} },
-    music: { colors: ['rgba(49,203,100, 0.5)','rgba(53,90,17,0.5)'], name: 'Music', scene: () => {Actions.music()} },
+    nearby: { colors: ['rgba(49,203,148, 0.5)','rgba(24,117,220,0.5)'], name: 'Nearby', scene: () => {Actions.recorder()} },
+    people: { colors: ['rgba(138,50,217, 0.5)','rgba(217,58,100,0.5)'], name: 'People', scene: () => {Actions.profile()} },
+    messages: { colors: ['rgba(53,116,218, 0.5)','rgba(138,50,217,0.5)'], name: 'Messages', scene: () => {Actions.messages()} },
+    events: { colors: ['rgba(240,166,62, 0.5)','rgba(234,207,63,0.5)'], name: 'Events', scene: () => {Actions.events()} },
+    music: { colors: ['rgba(217,58,100, 0.5)','rgba(240,166,62,0.5)'], name: 'Music', scene: () => {Actions.music()} },
 };
 
 const styles = {
@@ -44,6 +44,7 @@ const styles = {
         alignItems: 'center',
         alignSelf: 'stretch',
         flex: 1,
+        backgroundColor: '#D0D1D5',
     },
     option: {
         flex: 1,
