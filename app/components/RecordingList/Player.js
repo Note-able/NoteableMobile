@@ -40,6 +40,7 @@ class Player extends Component {
         if (shouldPlay) {
             audio.stop();
             audio.release();
+            timingBarWidth = new Animated.Value(0);
             removePlayFlag();
         }        
         this.setState({shouldPlay, timingBarWidth});
@@ -109,14 +110,22 @@ class Player extends Component {
                         <Text style={styles.largeText} ellipsizeMode="tail" numberOfLines={1}>{recording.name}</Text>
                         <Text style={styles.text}>{recording.date}</Text>
                     </View>
-                    <TouchableHighlight style={styles.moreButton} onPress={() => { 
-                        if(this.state.isPlaying)
-                            this.pausePlay();
-                        else
-                            this.startPlay(); 
-                    }}>
-                        <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
-                    </TouchableHighlight>
+                    <View style={styles.playControls}>
+                        <TouchableHighlight>
+                            <Image style={styles.secondaryIcon} source={require('../../img/rewind.png')}></Image>
+                        </TouchableHighlight>
+                        <TouchableHighlight onPress={() => { 
+                            if(this.state.isPlaying)
+                                this.pausePlay();
+                            else
+                                this.startPlay(); 
+                        }}>
+                            <Image source={this.state.isPlaying ? require('../../img/pause.png') : require('../../img/play.png')} style={styles.primaryIcon}></Image>
+                        </TouchableHighlight>
+                        <TouchableHighlight>
+                            <Image style={styles.secondaryIcon} source={require('../../img/fast_forward.png')}></Image>
+                        </TouchableHighlight>
+                    </View>
                 </View>
             </View>);
     }
@@ -135,7 +144,6 @@ const styles = {
         alignItems: 'center',
         flexDirection: 'row',
         marginVertical: 5,
-        marginHorizontal: 20,
     },
     timingBar: {
         alignSelf: 'flex-start',
@@ -161,11 +169,24 @@ const styles = {
         flex: 3,
         flexDirection: 'column',
         justifyContent: 'center',
+        alignSelf: 'stretch',
+        marginLeft: 20,
     },
-    moreButton: {
+    primaryIcon: {
+        height: 40,
+        width: 40,
+        marginHorizontal: 8,
+    },
+    secondaryIcon: {
+        height: 24,
+        width: 24,
+    },
+    playControls: {
         flex: 1,
-        marginVertical: 15,
-        height: 20,
-        alignSelf: 'flex-end',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 20,
+        alignSelf: 'stretch',
     },
 };
