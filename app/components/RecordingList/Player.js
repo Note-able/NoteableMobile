@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { View, TouchableHighlight, Image, Text, Animated, Dimensions } from 'react-native';
+import { View, TouchableHighlight, Image, Text, Animated, Easing, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 
 import { togglePlayFlag } from '../../actions/recordingActions';
@@ -20,7 +20,6 @@ class Player extends Component {
     }
     
     state = {
-        playing: true,
         timingBarWidth: new Animated.Value(0),
         shouldPlay: this.props.shouldPlay,
     }
@@ -41,7 +40,6 @@ class Player extends Component {
         if (shouldPlay) {
             audio.stop();
             audio.release();
-            timingBarWidth = new Animated.Value(0);
             removePlayFlag();
         }        
         this.setState({shouldPlay, timingBarWidth});
@@ -60,16 +58,35 @@ class Player extends Component {
         audio.release();
     }
     
+    pausePlay = () => {
+        const { audio } = this.props;
+        this.timingAnimation.stop();
+        audio.pause();
+        this.setState({ shouldPlay: false, isPlaying: false, isPaused: true });
+    }
+    
     startPlay = () => {
         const { audio } = this.props;
-        Animated.timing(
-            this.state.timingBarWidth,
-            {
-              toValue: windowWidth,
-              duration: audio.getDuration() * 1000,
-            },
-          ).start();
-        this.playSound(audio);
+        const timingBarWidth = this.state.isPaused ? this.state.timingBarWidth : new Animated.Value(0);
+        this.setState({ timingBarWidth, shouldPlay: false, isPlaying: true }, () => {
+            this.playAndAnimate(audio);
+        });
+    }
+    
+    playAndAnimate(audio) {
+        audio.getCurrentTime((time) => {
+            const duration = (audio.getDuration() - time) * 1000;
+            this.timingAnimation = Animated.timing(
+                this.state.timingBarWidth,
+                {
+                    easing: Easing.linear,
+                    toValue: windowWidth,
+                    duration
+                },
+            );
+            this.timingAnimation.start();
+            this.playSound(audio); 
+        });  
     }
     
     playSound = (audio) => {
@@ -92,7 +109,12 @@ class Player extends Component {
                         <Text style={styles.largeText} ellipsizeMode="tail" numberOfLines={1}>{recording.name}</Text>
                         <Text style={styles.text}>{recording.date}</Text>
                     </View>
-                    <TouchableHighlight style={styles.moreButton} onPress={() => { this.startPlay() }}>
+                    <TouchableHighlight style={styles.moreButton} onPress={() => { 
+                        if(this.state.isPlaying)
+                            this.pausePlay();
+                        else
+                            this.startPlay(); 
+                    }}>
                         <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
                     </TouchableHighlight>
                 </View>
