@@ -6,7 +6,6 @@
 
 import React, { Component } from 'react';
 import RecordingList from './app/components/RecordingList/index.js';
-import AudioRecorder from './app/components/AudioRecorder/index.js';
 import Menu from './app/components/Menu/index.js';
 import {
   AppRegistry,
@@ -24,6 +23,7 @@ import thunk from 'redux-thunk';
 import { appReducer } from './app/reducers';
 import Profile from './app/screens/Profile/index.js';
 import Home from './app/screens/Home/index.js';
+import AudioRecorder from './app/screens/AudioRecorder/index.js';
 
 const ConnectedRouter = connect()(Router);
 const store = createStore(appReducer, applyMiddleware(thunk));

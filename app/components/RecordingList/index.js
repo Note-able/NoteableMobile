@@ -29,13 +29,9 @@ class RecordingList extends Component {
     }
     
     componentDidMount() {
-        this.props.getRecordings();        
+        this.props.getRecordings();   
     }
-    
-    componentWillUnmount() {
-        
-    }
-    
+
     toggleSync = (name, date) => {
         const realm = new Realm({schema: [RecordingSchema]});
         const recordings = realm.objects('Recording');

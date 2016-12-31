@@ -5,6 +5,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { ActionConst, Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 
+import RecordingButton from '../../components/RecordingButton.js';
+
 const mapStateToProps = (state) => state;
 
 const mapDispatchToProps = (dispatch) => ({
@@ -24,6 +26,7 @@ const Home = ({navigateScene}) => {
                     </LinearGradient>
                 </TouchableHighlight>
             )}
+            <RecordingButton />
         </View>
     );
 }
@@ -56,9 +59,6 @@ const styles = {
         fontSize: 50,
         color: 'white',
         backgroundColor: 'transparent',
-    },
-    nearby: {
-        
     },
     gradient: {
         flex: 1,
