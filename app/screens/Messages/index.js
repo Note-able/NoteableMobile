@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 
 import MessageList from '../../components/MessageList';
+import UserSearch from '../../components/UserSearch';
 
 const mapStateToProps = state => state;
 
@@ -62,11 +63,31 @@ class Messages extends Component {
         }
     }
     
+    onHeaderInputFocus = () => {
+        this.setState({userSearch: true});
+    }
+    
+    onHeaderInputTextChange = (text) => {
+        this.setState({headerInputValue: text});
+    }
+    
+    onSelectUser = () => {
+        console.warn('user selected');
+    }
+    
     render() {
         return (
             <View style={styles.container}>
-                <MessagesHeader />
-                <MessageList conversations={this.state.conversations} userId={this.state.userId} />
+                <MessagesHeader
+                    onFocus={this.onHeaderInputFocus}
+                    onChangeText={this.onHeaderInputTextChange}
+                    inputValue={this.state.headerInputValue}
+                    focused={this.state.userSearch}
+                    closeSearch={() => {this.setState({userSearch: false});}}
+                    newMessage={() => {console.warn('new message');}}/>
+                {this.state.userSearch ?
+                <UserSearch users={users} handleUserPress={this.onSelectUser} />:
+                <MessageList conversations={this.state.conversations} userId={this.state.userId} />}
             </View>
         );
     }
@@ -74,13 +95,29 @@ class Messages extends Component {
 
 export default connect(mapStateToProps, null)(Messages);
 
-const MessagesHeader = () => (
+const MessagesHeader = ({onFocus, onChangeText, inputValue, focused, closeSearch, newMessage}) => (
     <View style={styles.navBar}>
-        <TouchableHighlight onPress={() => {Actions.pop()}}>
+        { focused ? null : 
+        (<TouchableHighlight onPress={() => {Actions.pop()}}>
             <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow}/>
+        </TouchableHighlight>)
+        }
+
+        <TextInput
+            style={styles.navInput}
+            value={inputValue}
+            onFocus={()=>{onFocus();}} 
+            onChangeText={()=>{onChangeText();}}/>
+        <TouchableHighlight onPress={() => {
+            if(focused)
+                closeSearch();
+            else
+                newMessage();
+        }}>
+            {focused ? 
+            <Image source={require('../../img/close.png')} style={styles.navClose}/> :
+            <Image source={require('../../img/new_message.png')} style={styles.navNewMessage}/>}
         </TouchableHighlight>
-        <TextInput style={styles.navInput} value="text" />
-        <Image source={require('../../img/new_message.png')} style={styles.navNewMessage}/>
     </View>
 );
 
@@ -115,6 +152,23 @@ const styles = {
         height: 30,
         width: 30,
         marginRight: 16,
+    },
+    navClose: {
+        height: 30,
+        width: 30,
+        marginHorizontal: 16,
     }
 };
 
+const users = {
+    123: {
+        id: 123,
+        name: 'Ian Mundy',
+        profileImage: 'https://en.gravatar.com/userimage/68360943/7295595f4b0523e5e4442c022fc60352.jpeg',
+    },
+    234: {
+        id: 234,
+        name: 'Sportnak',
+        profileImage: 'https://avatars.logoscdn.com/2383/5112383_large_1aed4286212c43a9ae74010dbc9a7be0.jpg',
+    },
+};
