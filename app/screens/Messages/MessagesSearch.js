@@ -1,12 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { View, Text, Image, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
+import { Actions } from 'react-native-router-flux';
 
 import MessageList from '../../components/MessageList';
+import UserSearch from '../../components/UserSearch';
 
 const mapStateToProps = state => state;
 
-class Messages extends Component {
+class MessagesSearch extends Component {
     constructor(props) {
         super(props);
         // This probably isn't what the api data will look like, but it's a good start to style things
@@ -61,16 +63,20 @@ class Messages extends Component {
         }
     }
     
+    onSelectUser = () => {
+        console.warn('user selected');
+    }
+    
     render() {
         return (
             <View style={styles.container}>
-                <MessageList conversations={this.state.conversations} userId={this.state.userId} />
+                <UserSearch users={users} handleUserPress={this.onSelectUser} />
             </View>
         );
     }
 }
 
-export default connect(mapStateToProps, null)(Messages);
+export default connect(mapStateToProps, null)(MessagesSearch);
 
 const styles = {
     container: {

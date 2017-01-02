@@ -38,8 +38,25 @@ const profileReducer = (state = { showPlayer: false }, {type}) => {
     }  
 };
 
+const DEFAULT_MESSAGES_STATE = {
+    nav: {
+        search: false,
+    }
+}
+const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type}) => {
+    switch(type) {
+        case 'HEADER_SEARCH':
+            return { ...state, nav: { search: true} };
+        case 'HEADER_LIST':
+            return { ...state, nav: { list: true } };
+        default:
+            return state;
+    }
+}
+
 export const appReducer = combineReducers({
     sceneReducer,
     recordingsReducer,
     profileReducer,
+    messagesReducer,
 });
