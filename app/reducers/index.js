@@ -40,15 +40,17 @@ const profileReducer = (state = { showPlayer: false }, {type}) => {
 
 const DEFAULT_MESSAGES_STATE = {
     nav: {
-        search: false,
+        list: true,
     }
 }
-const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type}) => {
+const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type, conversation, userName}) => {
     switch(type) {
         case 'HEADER_SEARCH':
             return { ...state, nav: { search: true} };
         case 'HEADER_LIST':
             return { ...state, nav: { list: true } };
+        case 'OPEN_CONVERSATION':
+            return { ...state, nav: { conversation: true, name: userName }, selectedConversation: conversation };
         default:
             return state;
     }

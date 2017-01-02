@@ -7,6 +7,8 @@ import { searchNav, listNav } from '../../actions/messagesActions';
 mapStateToProps = state => ({
     search: state.messagesReducer.nav.search,
     list: state.messagesReducer.nav.list,
+    name: state.messagesReducer.nav.name,
+    conversation: state.messagesReducer.nav.conversation,
 })
 
 mapDispatchToProps = (dispatch) => ({
@@ -48,7 +50,15 @@ class MessagesNavBar extends Component{
         Actions.messages_create();
     }
     
-    render() {
+    closeConversation = () => {
+        const {conversation, listNav} = this.props;
+        if(conversation) {
+            listNav();
+            Actions.pop();
+        }
+    }
+    
+    renderSearchListNav = () => {
         const { search } = this.props;
         const { inputValue } = this.state;
         return(
@@ -76,6 +86,26 @@ class MessagesNavBar extends Component{
                     <Image source={require('../../img/new_message.png')} style={styles.navNewMessage}/>}
                 </TouchableHighlight>
             </View>);
+    }
+    
+    renderConversationNav = () => {
+        return(
+            <View style={styles.navBar}>
+                <Text style={styles.navTitle}>{this.props.name}</Text>
+                <TouchableHighlight onPress={() => {this.closeConversation()}}>
+                    <Image source={require('../../img/close.png')} style={styles.navClose}/>
+                </TouchableHighlight>
+            </View>);
+    }
+    
+    render() {
+        if(this.props.search || this.props.list) {
+            return this.renderSearchListNav();
+        } else if(this.props.conversation) {
+            return this.renderConversationNav();
+        }
+        
+        return null;
     }
 };
 
@@ -118,5 +148,11 @@ const styles = {
         height: 30,
         width: 30,
         marginHorizontal: 16,
+    },
+    navTitle: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 20,
+        color: 'white'
     }
 };

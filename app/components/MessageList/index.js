@@ -1,19 +1,21 @@
 import React from 'react';
 import { ScrollView, View, Text, TouchableHighlight, Image } from 'react-native';
 
-const MessageList = ({conversations, userId}) => {
+const MessageList = ({conversations, userId, onSelectConversation}) => {
     const list = Object.keys(conversations).map((id) => {
         const conversation = conversations[id];
         const user = conversation.users[0].id !== userId ? conversation.users[0] : conversation.users[1];
         return (
-            <View key={id} style={styles.messageContainer}>
-                <Image source={{uri: user.profileImage }} style={styles.messagePicture}></Image>
-                <View style={styles.messageInfo}>
-                    <Text numberOflines={1} ellipsizeMode="tail" style={styles.messageName}>{user.name}</Text>
-                    <Text numberOflines={1} ellipsizeMode="tail">{conversation.messages[0].content}</Text>
+            <TouchableHighlight key={id} onPress={() => {onSelectConversation(id, user.id)}}>
+                <View style={styles.messageContainer}>
+                    <Image source={{uri: user.profileImage }} style={styles.messagePicture}></Image>
+                    <View style={styles.messageInfo}>
+                        <Text numberOflines={1} ellipsizeMode="tail" style={styles.messageName}>{user.name}</Text>
+                        <Text numberOflines={1} ellipsizeMode="tail">{conversation.messages[0].content}</Text>
+                    </View>
+                    <Text>Now</Text>
                 </View>
-                <Text>Now</Text>
-            </View>);
+            </TouchableHighlight>);
     });
     return (
         <ScrollView>
