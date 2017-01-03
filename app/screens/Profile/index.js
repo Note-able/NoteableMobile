@@ -77,7 +77,7 @@ class Profile extends Component {
 const ProfileNavBar = ({scrollTo, navigate}) => (
     <View style={styles.navBar}> 
         <TouchableHighlight style={{ position: 'absolute', top: 0, left: 10, height: 45, justifyContent: 'center', alignItems: 'center' }}onPress={() => { navigate(); }}>
-            <Text style={{ color: 'white' }}>back</Text>
+            <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow}/>
         </TouchableHighlight>
         <TouchableHighlight onPress={() => { scrollTo('about'); }}>
             <Text style={styles.navTitle}>About</Text>
@@ -114,6 +114,11 @@ const styles = {
         fontSize: 20,
         marginLeft: 10,
         marginRight: 10,
+    },
+    navBackArrow: {
+        height: 30,
+        width: 30,
+        marginLeft: 16,
     },
     green: {
         backgroundColor: '#31CB94'

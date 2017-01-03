@@ -56,9 +56,20 @@ const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type, conversation, us
     }
 }
 
+
+const newsFeedReducer = (state = {events: []}, {type, events}) => {
+    switch(type) {
+        case 'GET_NEARBY': 
+            return { ...state, events };
+        default:
+            return state;
+    }
+}
+
 export const appReducer = combineReducers({
     sceneReducer,
     recordingsReducer,
     profileReducer,
     messagesReducer,
+    newsFeedReducer,
 });

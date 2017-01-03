@@ -21,9 +21,10 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
 import { appReducer } from './app/reducers';
-import Profile from './app/screens/Profile/index.js';
-import Home from './app/screens/Home/index.js';
-import AudioRecorder from './app/screens/AudioRecorder/index.js';
+import Profile from './app/screens/Profile';
+import Home from './app/screens/Home';
+import AudioRecorder from './app/screens/AudioRecorder';
+import Nearby from './app/screens/Nearby';
 
 //Messages
 import MessagesNavBar from './app/screens/Messages/MessagesNavBar';
@@ -49,6 +50,7 @@ const style = {
 const Scenes = Actions.create(
     <Scene key='root'>
         <Scene key='home'component={Home} hideNavBar></Scene>
+        <Scene key='nearby' component={Nearby} ></Scene>
         <Scene key='profile' component={Profile}></Scene>
         <Scene key='messages' navBar={MessagesNavBar}>
             <Scene key='messages_list' component={Messages}></Scene>

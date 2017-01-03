@@ -1,10 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import { View, Text, Image, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
+import { Actions } from 'react-native-router-flux';
 
+import { openConversation } from '../../actions/messagesActions';
 import MessageList from '../../components/MessageList';
 
 const mapStateToProps = state => state;
+
+mapDispatchToProps = (dispatch) => ({
+    openConversation: (currentUserId, userId, conversationId) => {dispatch(openConversation(currentUserId, userId, conversationId));},
+})
 
 class Messages extends Component {
     constructor(props) {
@@ -61,16 +67,22 @@ class Messages extends Component {
         }
     }
     
+    selectConversation = (conversationId, userId) => {
+        const {openConversation} = this.props;
+        openConversation(this.state.userId, userId, conversationId);
+        Actions.messages_conversation();
+    }
+    
     render() {
         return (
             <View style={styles.container}>
-                <MessageList conversations={this.state.conversations} userId={this.state.userId} />
+                <MessageList conversations={this.state.conversations} userId={this.state.userId} onSelectConversation={this.selectConversation} />
             </View>
         );
     }
 }
 
-export default connect(mapStateToProps, null)(Messages);
+export default connect(mapStateToProps, mapDispatchToProps)(Messages);
 
 const styles = {
     container: {
