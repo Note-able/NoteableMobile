@@ -12,7 +12,7 @@ const Recording = ({name, date, duration, loadRecording}) => (
         </TouchableHighlight>
         <Text style={[styles.text, {flex: 1}]}>{duration}</Text>
         <TouchableHighlight style={styles.moreButton} onPress={() => {console.warn('this is where you show more')}}>
-            <Image source={require('../../img/more_horiz.png')} style={styles.icon}></Image>
+            <Image source={require('../../img/more_horiz.png')}></Image>
         </TouchableHighlight>
     </View>);
 

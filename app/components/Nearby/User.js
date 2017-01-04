@@ -27,6 +27,7 @@ const styles= {
         fontWeight: 'bold',
     },
     messageText: {
+        flex: 1,
         fontSize: 18,
         marginLeft: 16,
     }

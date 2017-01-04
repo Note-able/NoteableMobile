@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import { View, Text, Image, TextInput, TouchableHighlight } from 'react-native';
+import { View, ScrollView, Text, Image, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
-import { Action } from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
 
 import EventCard from '../../components/Nearby/EventCard';
 import JamCard from '../../components/Nearby/JamCard';
@@ -48,7 +48,9 @@ class Nearby extends Component {
         return (
             <View style={styles.container}>
                 <NearbyHeader />
-                { events.map((card) => this.renderCard(card)) }
+                <ScrollView>
+                    { events.map((card) => this.renderCard(card)) }
+                </ScrollView>
             </View>
         );
     }

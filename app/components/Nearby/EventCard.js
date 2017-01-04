@@ -21,15 +21,14 @@ export default EventCard;
 
 const styles= {
     container: {
-        flex: 1,
-        maxHeight: 250,
         margin: 8,
         padding: 16,
         borderRadius: 5,
         backgroundColor: 'white',
     },
     eventCard: {
-        flex: 3,
+        flex: 5,
+        marginTop: 24,
         flexDirection: 'row',
         borderRadius: 5,
         borderWidth: 1,
