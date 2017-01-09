@@ -5,6 +5,8 @@ import android.util.Log;
 
 //React Native
 import com.facebook.react.ReactApplication;
+import com.airbnb.android.react.maps.MapsPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import io.realm.react.RealmReactPackage;
 import com.facebook.react.ReactInstanceManager;
@@ -18,7 +20,6 @@ import java.util.List;
 //External Dependencies
 import com.rnfs.RNFSPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
-import com.zmxv.RNSound.RNSoundPackage;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -51,7 +52,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
-            new LinearGradientPackage(),
+                    new MapsPackage(),
+                    new LinearGradientPackage(),
                     new RealmReactPackage(),
                     new ReactNativeAudioPackage(),
                     new RNFSPackage(),

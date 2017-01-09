@@ -25,6 +25,7 @@ import Profile from './app/screens/Profile';
 import Home from './app/screens/Home';
 import AudioRecorder from './app/screens/AudioRecorder';
 import Nearby from './app/screens/Nearby';
+import Events from './app/screens/Events';
 
 //Messages
 import MessagesNavBar from './app/screens/Messages/MessagesNavBar';
@@ -58,6 +59,7 @@ const Scenes = Actions.create(
             <Scene key='messages_conversation' component={MessagesConversation}></Scene>
             <Scene key='messages_search' component={MessagesSearch}></Scene>
         </Scene>
+        <Scene key='events' component={Events}></Scene>
         <Scene key='music'component={RecordingList}></Scene>
         <Scene key='recorder'component={AudioRecorder}></Scene>
     </Scene>

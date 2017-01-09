@@ -56,10 +56,26 @@ const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type, conversation, us
     }
 }
 
-
 const newsFeedReducer = (state = {events: []}, {type, events}) => {
     switch(type) {
         case 'GET_NEARBY': 
+            return { ...state, events };
+        default:
+            return state;
+    }
+}
+
+const defaultRegion = {
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+}
+const eventsReducer = (state = {location: defaultRegion, events: []}, {type, events}) => {
+    switch(type) {
+        case 'CHANGE_LOCATION':
+            return state;
+        case 'GET_EVENTS':
             return { ...state, events };
         default:
             return state;
@@ -72,4 +88,5 @@ export const appReducer = combineReducers({
     profileReducer,
     messagesReducer,
     newsFeedReducer,
+    eventsReducer,
 });
