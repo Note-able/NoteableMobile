@@ -1,8 +1,13 @@
 import React from 'react';
 import { View, Text, Image, TouchableHighlight } from 'react-native';
 
-const Event = ({event, containerStyles}) => (
+const Event = ({event, containerStyles, closeEvent}) => (
     <View style={[styles.container, containerStyles]}>
+        { closeEvent ? 
+            (<TouchableHighlight style={styles.closeButton} onPress={closeEvent}>
+                <Image source={require('../../img/close.png')} /> 
+            </TouchableHighlight>) : null 
+        }
         <Image source={{uri: event.image}} style={styles.eventImage}></Image>
         <View style={styles.eventInfoContainer}>
             <Text style={styles.eventTitle}>{event.title}</Text>
@@ -80,5 +85,13 @@ const styles = {
     },
     buttonText: {
         color: 'white'
+    },
+    closeButton: {
+        position: 'absolute',
+        backgroundColor: 'black',
+        top: 5,
+        right: 5,
+        height: 20,
+        width: 20,
     }
 }

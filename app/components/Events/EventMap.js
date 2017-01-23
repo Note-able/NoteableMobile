@@ -28,6 +28,10 @@ class EventMap extends Component {
         this.setState({ selectedEvent: event, showEvent: true });
     }
     
+    closeEvent = () => {
+        this.setState({ showEvent: false });
+    }
+    
     render() {
         const { location, changeLocation, events } = this.props;
         const { selectedEvent, showEvent } = this.state;
@@ -46,7 +50,7 @@ class EventMap extends Component {
 
                 ]}
                 </MapView>
-                { showEvent ? <Event containerStyles={styles.selectedEvent} event={selectedEvent} /> : null }
+                { showEvent ? <Event containerStyles={styles.selectedEvent} event={selectedEvent} closeEvent={this.closeEvent} /> : null }
             </View>
         );
     }

@@ -1,36 +1,28 @@
 import React, { Component, PropTypes } from 'react';
 import { View, ScrollView, Text, TextInput, Image, TouchableHighlight } from 'react-native';
-import { connect } from 'react-redux';
-import { sendMessage } from '../../actions/messagesActions';
 
-mapStateToProps = (state) => ({
-    conversation: state.messagesReducer.selectedConversation,
-    userId: 123,
-});
-
-mapDispatchToProps = (dispatch) => ({
-    sendMessage: (message, userId, conversationId) => {dispatch(sendMessage(message, userId, conversationId));}
-});
-
-class Conversation extends Component {
+export default class Conversation extends Component {
     state = {
         message: '',
     }
 
     render() {
-        const {userId, conversation, sendMessage} = this.props;
+        const {user, conversation, sendMessage} = this.props;
+        if (!conversation)
+            return null;
+
         return(
             <View style={styles.container}>
                 <ScrollView>
                     { conversation.messages.map((message) => {
-                        return message.userId === userId ? 
+                        return message.userId === user.id ? 
                             <CurrentUserMessage key={message.id} user={conversation.users[message.userId]} message={message.content}/> :
                             <OtherMessage key={message.id} user={conversation.users[message.userId]} message={message.content} />
                     }) }
                 </ScrollView>
                 <View style={styles.sendContainer}>
-                    <TextInput style={styles.sendInput} />
-                    <TouchableHighlight onPress={() => {sendMessage(this.state.message, userId, conversation.conversationId )}} >
+                    <TextInput style={styles.sendInput} onChangeText={text => this.setState({message: text})} value={this.state.message} />
+                    <TouchableHighlight onPress={() => {sendMessage(user, conversation.id, this.state.message)}} >
                         <Image source={require('../../img/new_message.png')} style={styles.sendButton}/>
                     </TouchableHighlight>
                 </View>
@@ -39,11 +31,9 @@ class Conversation extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Conversation);
-
 const OtherMessage = ({user, message}) => (
     <View style={styles.messageContainer}>
-        <Image source={{uri: user.profileImage}} style={styles.messageImage} />
+        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} />
         <View style={[styles.messageContent, styles.otherMessage]}>
             <Text style={[styles.messageText, styles.otherText]}>{message}</Text>
         </View>
@@ -55,7 +45,7 @@ const CurrentUserMessage = ({user, message}) => (
         <View style={[styles.messageContent, styles.currentUserMessage]}>
             <Text style={[styles.messageText, styles.currentUserText]}>{message}</Text>
         </View>
-        <Image source={{uri: user.profileImage}} style={styles.messageImage} />
+        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} />
     </View>
 );
 

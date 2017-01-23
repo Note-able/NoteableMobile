@@ -43,14 +43,24 @@ const DEFAULT_MESSAGES_STATE = {
         list: true,
     }
 }
-const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type, conversation, userName}) => {
+const messagesReducer = (state = DEFAULT_MESSAGES_STATE, {type, conversation, userName, conversations, message}) => {
     switch(type) {
         case 'HEADER_SEARCH':
             return { ...state, nav: { search: true} };
         case 'HEADER_LIST':
             return { ...state, nav: { list: true } };
-        case 'OPEN_CONVERSATION':
-            return { ...state, nav: { conversation: true, name: userName }, selectedConversation: conversation };
+        case 'MESSAGES/OPEN_CONVERSATION':
+            conversations = { ...state.conversations };
+            conversations[conversation.id].messages = conversation.messages;
+            return { ...state, nav: { conversation: true, name: userName }, conversations, selectedConversationId: conversation.id };
+        case 'MESSAGES/GET_CONVERSATIONS':
+            return { ...state, conversations };
+        case 'MESSAGES/SEND_MESSAGE':
+            conversations = { ...state.conversations };
+            conversation = { ...conversations[state.selectedConversationId] };
+            conversation.messages.push(message);
+            conversations[conversation.id] = conversation;
+            return { ...state, conversations };
         default:
             return state;
     }
@@ -82,6 +92,17 @@ const eventsReducer = (state = {location: defaultRegion, events: []}, {type, eve
     }
 }
 
+const userReducer = (state = {}, {type, user}) => {
+    switch(type) {
+        case 'USER/SIGNIN':
+            return {...state, user };
+        case 'USER/SIGNOUT':
+            return { ...state, user: null };
+        default:
+            return state;
+    }
+}
+
 export const appReducer = combineReducers({
     sceneReducer,
     recordingsReducer,
@@ -89,4 +110,5 @@ export const appReducer = combineReducers({
     messagesReducer,
     newsFeedReducer,
     eventsReducer,
+    userReducer,
 });

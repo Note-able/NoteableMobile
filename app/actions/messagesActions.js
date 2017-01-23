@@ -1,8 +1,11 @@
 
 //this will be a thunk eventually
-export const sendMessage = (message, userId, conversationId) => {
-    console.warn(`send ${message}`);
-    return {type: 'SEND_MESSAGE', content: message, userId, conversationId};
+export const sendMessage = (user, conversationId, content) => {
+    return (dispatch) => {
+        postMessage(user, conversationId, content, (message) => {
+            dispatch({type: 'MESSAGES/SEND_MESSAGE', message});
+        })
+    }
 }
 
 export const searchNav = () => {
@@ -13,44 +16,79 @@ export const listNav = () => {
     return {type: 'HEADER_LIST'}
 }
 
-//faking a thunk here to return data...
-export const openConversation = (currentUserId, userId, conversationId) => {
+export const getConversations = (currentUser) => {
     return (dispatch) => {
-        const conversation = getConversation(userId, conversationId);
-        const users = conversation.users.reduce((map, user) => {map[user.id] = user; return map;}, {});
-        conversation.users = users;
-        const userName = users[userId].name;
-        dispatch({type: 'OPEN_CONVERSATION', conversation, userName});
+        fetchConversations(currentUser, (conversations) => {
+            conversations = conversations.reduce((map, c) => { 
+                const users = [ ...c.users ].reduce((users, user) => { users[user.id] = user; return users; }, {});
+                c.users = users;
+                map[c.id] = c;
+                return map; 
+            }, {});
+            dispatch({ type: 'MESSAGES/GET_CONVERSATIONS', conversations });
+        })
     }
+};
+
+export const openConversation = (currentUser, userId, conversationId) => {
+    return (dispatch) => {
+        fetchConversation(currentUser, conversationId, (conversation) => {
+            const users = conversation.users.reduce((map, user) => {map[user.id] = user; return map;}, {});
+            conversation.users = users;
+            const userName = `${users[userId].firstName} ${users[userId].lastName}`;
+            dispatch({ type: 'MESSAGES/OPEN_CONVERSATION', conversation, userName });
+        })
+    }
+};
+
+const fetchConversation = (user, id, next) => {
+    return fetch(`http://beta.noteable.me/conversation/${id}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': user.jwt,
+        },
+    })
+    .then((response) => { return response.json(); })
+    .then((conversation) => {
+        next(conversation);
+    })
 }
 
-const getConversation = (userId, conversationId) => {
-    return {
-        conversationId: 1,
-        users: [{
-                id: 123,
-                name: 'Ian Mundy',
-                profileImage: 'https://en.gravatar.com/userimage/68360943/7295595f4b0523e5e4442c022fc60352.jpeg',
-            },{
-                id: 234,
-                name: 'Sportnak',
-                profileImage: 'https://avatars.logoscdn.com/2383/5112383_large_1aed4286212c43a9ae74010dbc9a7be0.jpg',
-            }],
-        messages: [
-            {
-                id: '1',
-                content: 'The assyrian came down like a wolf on the fold', 
-                userId: 123,
-            },
-            {
-                id: '2',
-                content: 'The assyrian came down like a wolf on the fold', 
-                userId: 234,
-            },
-            {
-                id: '3',
-                content: 'The assyrian came down like a wolf on the fold', 
-                userId: 123,
-            }],
-    }
+const fetchConversations = (user, next) => {
+    return fetch(`http://beta.noteable.me/conversations`, {
+        method: 'GET',
+        headers: {
+            'Authorization': user.jwt,
+        },
+    })
+    .then((response) => {
+        return response.json();
+    })
+    .then((conversations) => {
+        next(conversations);
+    })
+    .catch(error => console.warn(error))
+}
+
+const postMessage = (user, conversationId, content, next) => {
+    return fetch(`http://beta.noteable.me/messages`, {
+        method: 'POST',
+        headers: {
+            'Authorization': user.jwt,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userId: user.id,
+            conversationId,
+            content
+        }),
+    })
+    .then((response) => {
+        return response.json();
+    })
+    .then(({messageId}) => {
+        next({ id: messageId, userId: user.id, conversationId, content });
+    })
 }

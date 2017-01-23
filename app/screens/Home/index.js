@@ -6,6 +6,7 @@ import { ActionConst, Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 
 import RecordingButton from '../../components/RecordingButton.js';
+import SignIn from '../../components/SignIn';
 
 const mapStateToProps = (state) => state;
 
@@ -19,6 +20,7 @@ const mapDispatchToProps = (dispatch) => ({
 const Home = ({navigateScene}) => {
     return(
         <View style={styles.container}>
+            <HomeHeader />
             {Object.keys(views).map((view) =>        
                 <TouchableHighlight key={view} style={styles.option} onPress={() => {navigateScene(views[view].scene)}}>
                     <LinearGradient colors={views[view].colors} start={[0, 0]} end={[1, 0]} style={styles.gradient}>
@@ -32,6 +34,13 @@ const Home = ({navigateScene}) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
+
+const HomeHeader = () => (
+    <View style={{backgroundColor: 'black', maxHeight: 45, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        <Text style={{flex: 1, color: 'white'}}>Noteable</Text>
+        <SignIn />
+    </View>
+);
 
 const views = {
     nearby: { colors: ['rgba(49,203,148, 0.5)','rgba(24,117,220,0.5)'], name: 'Nearby', scene: () => {Actions.nearby()} },
