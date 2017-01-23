@@ -14,10 +14,11 @@ export default class Conversation extends Component {
         return(
             <View style={styles.container}>
                 <ScrollView>
-                    { conversation.messages.map((message) => {
+                    { conversation.messages.map((message, i) => {
+                        const differentUser = i === 0 || conversation.messages[i - 1].userId !== message.userId;
                         return message.userId === user.id ? 
-                            <CurrentUserMessage key={message.id} user={conversation.users[message.userId]} message={message.content}/> :
-                            <OtherMessage key={message.id} user={conversation.users[message.userId]} message={message.content} />
+                            <CurrentUserMessage key={message.id} user={conversation.users[message.userId]} message={message.content} showProfileImage={differentUser} /> :
+                            <OtherMessage key={message.id} user={conversation.users[message.userId]} message={message.content} showProfileImage={differentUser} />
                     }) }
                 </ScrollView>
                 <View style={styles.sendContainer}>
@@ -31,21 +32,25 @@ export default class Conversation extends Component {
     }
 }
 
-const OtherMessage = ({user, message}) => (
-    <View style={styles.messageContainer}>
-        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} />
+const OtherMessage = ({user, message, showProfileImage}) => (
+    <View style={showProfileImage ? styles.messageContainer : styles.otherUserMessageContainer}>
+        { showProfileImage ?
+        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} /> :
+        null }
         <View style={[styles.messageContent, styles.otherMessage]}>
             <Text style={[styles.messageText, styles.otherText]}>{message}</Text>
         </View>
     </View>
 );
 
-const CurrentUserMessage = ({user, message}) => (
-    <View style={styles.messageContainer}>
+const CurrentUserMessage = ({user, message, showProfileImage}) => (
+    <View style={showProfileImage ? styles.messageContainer : styles.currentUserMessageContainer}>
         <View style={[styles.messageContent, styles.currentUserMessage]}>
             <Text style={[styles.messageText, styles.currentUserText]}>{message}</Text>
         </View>
-        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} />
+        { showProfileImage ?
+        <Image source={{uri: user.avatarUrl}} style={styles.messageImage} /> :
+        null }
     </View>
 );
 
@@ -74,6 +79,16 @@ const styles = {
         marginTop: 20,
         flexDirection: 'row',
     },
+    otherUserMessageContainer: {
+        flex: 1,
+        marginLeft: 40,
+        flexDirection: 'row',
+    },
+    currentUserMessageContainer: {
+        flex: 1,
+        marginRight: 40,
+        flexDirection: 'row',
+    },
     messageContent: {
         flex: 1,
         borderRadius: 5,
@@ -98,9 +113,6 @@ const styles = {
     },
     messageText: {
         fontSize: 16,
-    },
-    otherText: {
-        
     },
     currentUserText: {
         color: 'white',
