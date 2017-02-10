@@ -14,33 +14,30 @@ import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
 import RecordingList from '../../components/RecordingList/index.js';
 import Player from '../../components/RecordingList/Player';
+import { getUser } from '../../actions/accountActions';
 
 const mapStateToProps = (state) => ({
     showPlayer: state.profileReducer.showPlayer, 
+    profile: state.userReducer.profile,
+    user: state.userReducer.user,
 });
 
 const mapDispatchToProps = (dispatch) => ({
     navigateback: () => {
         Actions.pop();
     },
+    getCurrentUser: (user) => { dispatch(getUser(user)); }
 });
 
 class Profile extends Component {
-    constructor(props) {
-        super(props);
-        const profile = {
-            name: 'Ian Mundy',
-            coverImage: 'http://www.ourdunya.com/wp-content/uploads/2014/10/Be-Yourself-fb-cover.jpg',
-            profileImage: 'https://en.gravatar.com/userimage/68360943/7295595f4b0523e5e4442c022fc60352.jpeg',
-            description: `The Assyrian came down like the wolf on the fold, And his cohorts were gleaming in purple and gold; And the sheen of their spears was like stars on the sea, When the blue wave rolls nightly on deep Galilee.`,
-            interests: [],
-            instruments: ['Guitar', 'Bass', 'Drums', 'Flute', 'Didgeridoo'],
-        }
-        this._views = {};
-        this._scrollView = {};
-        this.state = { profile };
-    }
+    _views = {};
+    _scrollView = {};
     
+    componentDidMount() {
+        const { getCurrentUser, user } = this.props;
+        getCurrentUser(user);
+    }
+
     setViewY = (event, view) => {
         this._views[view] = { y: event.nativeEvent.layout.y };
     }
@@ -50,20 +47,23 @@ class Profile extends Component {
     }
     
     render() {
-        const { coverImage, profileImage, name, description, interests, instruments } = this.state.profile;
-        const { showPlayer } = this.props;
+        const { showPlayer, user, profile } = this.props;
+        if(!profile)
+            return null;
+        const { coverImage, avatarUrl, firstName, lastName, bio, preferences } = profile;
+        const name = `${firstName} ${lastName}`;
         return(
             <View style={styles.container}>
                 { ProfileNavBar({ scrollTo: this.scrollToView, navigate: this.props.navigateback }) }
                 <ScrollView ref={ ref => {this._scrollView = ref;} }>
                     <ProfileInfo 
-                        coverImage={coverImage}
-                        profileImage={profileImage}
+                        coverImage={coverImage || 'default'}
+                        profileImage={avatarUrl || 'default'}
                         name={name}
-                        description={description}
+                        bio={bio}
                         onLayout={this.setViewY} />
                     <Interests
-                        instruments={instruments}
+                        instruments={preferences.instruments}
                         onLayout={this.setViewY} />
                     <RecordingList
                         onLayout={this.setViewY} />
@@ -124,3 +124,24 @@ const styles = {
         backgroundColor: '#31CB94'
     }
 }
+
+/*
+profile = {
+            id: 1,
+            email: 'sportnak@gmail.com',
+            firstName: 'Ian',
+            lastName: 'Mundy',
+            location: 'Bellingham, WA',
+            profession: 'shipping',
+            coverImage: 'http://www.ourdunya.com/wp-content/uploads/2014/10/Be-Yourself-fb-cover.jpg',
+            avatarUrl: 'https://en.gravatar.com/userimage/68360943/7295595f4b0523e5e4442c022fc60352.jpeg',
+            bio: `The Assyrian came down like the wolf on the fold, And his cohorts were gleaming in purple and gold; And the sheen of their spears was like stars on the sea, When the blue wave rolls nightly on deep Galilee.`,
+            preferences: {
+                instruments: ['Guitar', 'Bass', 'Drums', 'Flute', 'Didgeridoo'],
+                isLooking: true,
+                displayLocation: false,
+                preferredGenres: null,
+            },
+            zipCode: 98225,
+        }
+*/

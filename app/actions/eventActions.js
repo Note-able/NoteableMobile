@@ -1,10 +1,26 @@
 export const getEvents = () => {
     return (dispatch) => {
-        dispatch({ type: 'GET_EVENTS', events });
+        fetchEvents((events) => {
+            dispatch({ type: 'GET_EVENTS', events });
+        });
     }
 }
 
-const events = [
+const fetchEvents = (next) => {
+    fetch(`http://beta.noteable.me/api/events`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then((events) => {
+        next(events);
+    });
+}
+
+/*const events = [
     {
         id: 1,
         user: {
@@ -68,4 +84,4 @@ const events = [
             latitude: 37.78825,
             longitude: -122.4424,
         }    
-    }];
+    }];*/

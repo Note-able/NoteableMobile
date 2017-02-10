@@ -76,8 +76,8 @@ const newsFeedReducer = (state = {events: []}, {type, events}) => {
 }
 
 const defaultRegion = {
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 48.7153382,
+    longitude: -122.34007580000002,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
 }
@@ -92,12 +92,14 @@ const eventsReducer = (state = {location: defaultRegion, events: []}, {type, eve
     }
 }
 
-const userReducer = (state = {}, {type, user}) => {
+const userReducer = (state = {}, {type, user, profile}) => {
     switch(type) {
         case 'USER/SIGNIN':
             return {...state, user };
         case 'USER/SIGNOUT':
             return { ...state, user: null };
+        case 'USER/CURRENT_PROFILE':
+            return { ...state, profile };
         default:
             return state;
     }

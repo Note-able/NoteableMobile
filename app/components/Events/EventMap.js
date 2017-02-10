@@ -38,14 +38,20 @@ class EventMap extends Component {
         return (
             <View style={styles.container}>
                 <MapView initialRegion={location} style={styles.map} provider={PROVIDER_GOOGLE}>
-                { !events ? null : events.map((event) => (
-                    <MapView.Marker
+                { !events ? null : events.map((event) => {
+                    const { latitude, longitude } = event.location;
+                    const location = {
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude),
+                    };
+
+                    return <MapView.Marker
                         key={event.id}
-                        coordinate={event.location}
+                        coordinate={location}
                         title={event.title}
                         onPress={() => { this.handleMarkerPress(event); }}
                     />
-                )) }
+                }) }
                 {[
 
                 ]}

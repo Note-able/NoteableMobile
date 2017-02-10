@@ -7,7 +7,7 @@ import {
     Dimensions,
 } from 'react-native';
 
-export default function ProfileInfo({coverImage, profileImage, name, description, onLayout}) {
+export default function ProfileInfo({coverImage, profileImage, name, bio, onLayout}) {
     return(
         <View onLayout={(event) => onLayout(event, 'about')}>
             <View style={styles.coverImageView}>
@@ -23,7 +23,7 @@ export default function ProfileInfo({coverImage, profileImage, name, description
             </View>
             <View style={styles.bio}>
                 <Text style={styles.header}>About</Text>
-                <Text style={styles.description}>{description}</Text>
+                <Text style={styles.description}>{bio}</Text>
             </View>
         </View>
     );
@@ -33,7 +33,7 @@ ProfileInfo.propTypes= {
     coverImage: PropTypes.string.isRequired,
     profileImage: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
     onLayout: PropTypes.func.isRequired,
 }
 

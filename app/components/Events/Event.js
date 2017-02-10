@@ -8,10 +8,10 @@ const Event = ({event, containerStyles, closeEvent}) => (
                 <Image source={require('../../img/close.png')} /> 
             </TouchableHighlight>) : null 
         }
-        <Image source={{uri: event.image}} style={styles.eventImage}></Image>
+        <Image source={{uri: event.imageUrl}} style={styles.eventImage}></Image>
         <View style={styles.eventInfoContainer}>
-            <Text style={styles.eventTitle}>{event.title}</Text>
-            <Text>{event.dateTime}</Text>
+            <Text style={styles.eventTitle}>{event.name}</Text>
+            <Text>{event.startDateTime}</Text>
             <Text numberOfLines={5} ellipsizeMode='tail' style={styles.eventDescription}>{event.description}</Text>
             <View style={styles.buttons}>
                 <TouchableHighlight style={styles.attendingButton}>

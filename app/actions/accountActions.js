@@ -1,5 +1,15 @@
 import { AsyncStorage } from 'react-native';
 
+const USER = '@ACCOUNTS:CURRENT_USER';
+
+export const getUser = (user) => {
+    return (dispatch) => {
+        fetchCurrentProfile(user, (profile) => {
+            dispatch({ type: 'USER/CURRENT_PROFILE', profile });
+        });
+    }
+}
+
 export const onSignIn = (token) => {
     return async function (dispatch) {
         const currentUser = await AsyncStorage.getItem(USER);
@@ -47,4 +57,18 @@ const signIn = (token, next) => {
     .catch(error => console.warn(error));
 }
 
-const USER = '@ACCOUNTS:CURRENT_USER';
+const fetchCurrentProfile = (user, next) => {
+    fetch(`http://beta.noteable.me/user/me`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': user.jwt,
+        },
+    })
+    .then((response) => { return response.json(); })
+    .then((profile) => {
+        next(profile);
+    })
+    .catch(error => console.warn(error));
+}
