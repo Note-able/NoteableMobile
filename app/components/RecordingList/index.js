@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Recording from './Recording.js';
 import { StyleSheet, Text, View, ListView } from 'react-native';
 
@@ -21,11 +21,12 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 class RecordingList extends Component { 
-        constructor(props) {
-        super(props);
-        
-        const recordingLocation = `${RNFS.DocumentDirectoryPath}/${recordingsDirectory}`;        
-
+    static propTypes = {
+        recordings: PropTypes.object.isRequired,
+        getRecordings: PropTypes.func.isRequired,
+        initializePlayer: PropTypes.func.isRequired,
+        currentRecording: PropTypes.object,
+        onLayout: PropTypes.func
     }
     
     componentDidMount() {
@@ -54,7 +55,7 @@ class RecordingList extends Component {
     }
     
     render () {
-        const {onLayout, recordings} = this.props;
+        const {onLayout = () => {}, recordings} = this.props;
         if(Object.keys(recordings).length === 0) {
             return (
                 <View style={styles.container}>

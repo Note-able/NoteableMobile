@@ -3,6 +3,7 @@ import { View, Text, Image, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import { searchNav, listNav } from '../../actions/messagesActions';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 mapStateToProps = state => ({
     search: state.messagesReducer.nav.search,
@@ -65,7 +66,7 @@ class MessagesNavBar extends Component{
             <View style={styles.navBar}>
                 { search ? null : 
                 (<TouchableHighlight onPress={() => {Actions.pop()}}>
-                    <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow}/>
+                    <Icon name="keyboard-arrow-left" style={styles.navBackArrow} color="#FFF" />
                 </TouchableHighlight>)
                 }
 
@@ -82,8 +83,8 @@ class MessagesNavBar extends Component{
                         this.newMessage();
                 }}>
                     {search ? 
-                    <Image source={require('../../img/close.png')} style={styles.navClose}/> :
-                    <Image source={require('../../img/new_message.png')} style={styles.navNewMessage}/>}
+                    <Icon name="close" style={styles.navClose} color="#FFF" /> :
+                    <Icon name="chat" style={styles.navNewMessage} color="#FFF" />}
                 </TouchableHighlight>
             </View>);
     }
@@ -93,7 +94,7 @@ class MessagesNavBar extends Component{
             <View style={styles.navBar}>
                 <Text style={styles.navTitle}>{this.props.name}</Text>
                 <TouchableHighlight onPress={() => {this.closeConversation()}}>
-                    <Image source={require('../../img/close.png')} style={styles.navClose}/>
+                    <Icon name="close" style={styles.navClose} color="#FFF" />
                 </TouchableHighlight>
             </View>);
     }
@@ -135,21 +136,24 @@ const styles = {
         backgroundColor: 'white'
     },
     navBackArrow: {
-        height: 30,
-        width: 30,
-        marginLeft: 16,
+        height: 40,
+        width: 40,
+        fontSize: 40,
     },
     navNewMessage: {
         height: 30,
         width: 30,
+        fontSize: 30,
         marginRight: 16,
     },
     navClose: {
         height: 30,
         width: 30,
+        fontSize: 30,
         marginHorizontal: 16,
     },
     navTitle: {
+        marginLeft: 62,
         flex: 1,
         textAlign: 'center',
         fontSize: 20,

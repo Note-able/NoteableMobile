@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { View, ScrollView, Text, TextInput, Image, TouchableHighlight } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default class Conversation extends Component {
     state = {
@@ -24,7 +25,7 @@ export default class Conversation extends Component {
                 <View style={styles.sendContainer}>
                     <TextInput style={styles.sendInput} onChangeText={text => this.setState({message: text})} value={this.state.message} />
                     <TouchableHighlight onPress={() => {sendMessage(user, conversation.id, this.state.message)}} >
-                        <Image source={require('../../img/new_message.png')} style={styles.sendButton}/>
+                        <Icon name="chat-bubble-outline" style={styles.sendButton} color="#3574DA" />
                     </TouchableHighlight>
                 </View>
             </View>
@@ -69,6 +70,7 @@ const styles = {
     sendButton: {
         height: 40,
         width: 40,
+        fontSize: 40,
         marginHorizontal: 16,
     },
     sendInput: {
