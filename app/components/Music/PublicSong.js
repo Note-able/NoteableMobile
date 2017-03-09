@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { StyleSheet, Text, View, TouchableHighlight, Image, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 
-const Recording = ({name, date, duration, loadRecording}) => (
+const PublicSong = ({name, date, duration, loadRecording}) => (
     <View style={styles.container}>
         <TouchableHighlight style={{flex: 3}} onPress={() => { loadRecording(name); }}>
             <View style={styles.recordingInfo}>
@@ -16,13 +16,13 @@ const Recording = ({name, date, duration, loadRecording}) => (
         </TouchableHighlight>
     </View>);
 
-Recording.propTypes = { 
+PublicSong.propTypes = { 
     name: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     loadRecording: PropTypes.func.isRequired,
 };
 
-export default Recording;
+export default PublicSong;
 
 const windowWidth = Dimensions.get('window').width;
 

@@ -20,7 +20,7 @@ const mapDispatchToProps = (dispatch) => ({
     initializePlayer: (currentRecording, audio) => dispatch(initializePlayer(currentRecording, audio)),
 });
 
-class RecordingList extends Component { 
+class PublicSongList extends Component { 
     static propTypes = {
         recordings: PropTypes.object.isRequired,
         getRecordings: PropTypes.func.isRequired,
@@ -92,7 +92,7 @@ const mapRealmResults = (results) => {
     }, {});
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecordingList);
+export default connect(mapStateToProps, mapDispatchToProps)(PublicSongList);
 
 const styles = StyleSheet.create({
     container: {

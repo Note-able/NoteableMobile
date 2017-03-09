@@ -12,8 +12,8 @@ import {
 
 import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
-import RecordingList from '../../components/RecordingList/index.js';
-import Player from '../../components/RecordingList/Player';
+import PublicSongList from '../../components/Music/PublicSongList.js';
+import Player from '../../components/Music/Player';
 import { getUser } from '../../actions/accountActions';
 
 const mapStateToProps = (state) => ({
@@ -65,7 +65,7 @@ class Profile extends Component {
                     <Interests
                         instruments={preferences.instruments}
                         onLayout={this.setViewY} />
-                    <RecordingList
+                    <PublicSongList
                         onLayout={this.setViewY} />
                 </ScrollView>
                 { showPlayer ? <Player /> : null }

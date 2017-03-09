@@ -5,7 +5,6 @@
  */
 
 import React, { Component } from 'react';
-import RecordingList from './app/components/RecordingList/index.js';
 import Menu from './app/components/Menu/index.js';
 import {
   AppRegistry,
@@ -27,6 +26,7 @@ import Home from './app/screens/Home';
 import AudioRecorder from './app/screens/AudioRecorder';
 import Nearby from './app/screens/Nearby';
 import Events from './app/screens/Events';
+import Music from './app/screens/Music/index.js';
 
 //Messages
 import MessagesNavBar from './app/screens/Messages/MessagesNavBar';
@@ -60,7 +60,7 @@ const Scenes = Actions.create(
             <Scene key='messages_search' component={MessagesSearch}></Scene>
         </Scene>
         <Scene key='events' component={Events}></Scene>
-        <Scene key='music'component={RecordingList}></Scene>
+        <Scene key='music'component={Music}></Scene>
         <Scene key='recorder'component={AudioRecorder}></Scene>
     </Scene>
 );
