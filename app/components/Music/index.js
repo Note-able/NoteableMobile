@@ -1,19 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 import Recording from './Recording.js';
 import { StyleSheet, Text, View, ListView, Dimensions } from 'react-native';
-
-import { dbName, recordingsDirectory } from '../../constants';
-import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
 import moment from 'moment';
-import { PrimaryAction, SecondaryAction } from '../Buttons';
 import LinearGradient from 'react-native-linear-gradient';
+import Realm from 'realm';
+
+import { PrimaryAction, SecondaryAction } from '../Buttons';
 import { colors, gradients } from '../../styles';
+import { dbName, recordingLocation } from '../../constants';
+import { RecordingSchema } from '../../realmSchemas';
 
 export default class MusicList extends Component { 
     static propTypes = {
         recordings: PropTypes.object.isRequired,
-        initializePlayer: PropTypes.func.isRequired
+        initializePlayer: PropTypes.func.isRequired,
+        syncRecording: PropTypes.func.isRequired
     }
 
     state = {
@@ -21,18 +23,19 @@ export default class MusicList extends Component {
         selectedRecordings: {},
     }
 
-    toggleSync = (name, date) => {
+    toggleSync = (recording) => {
         const realm = new Realm({schema: [RecordingSchema]});
-        const recordings = realm.objects('Recording');
-        const recording = recordings.filtered(`name = "${name}" AND date = "${date}" `)[0];
         realm.write(() => {
             recording.isSynced = !recording.isSynced;
         });
+        if (!recording.id) {
+            this.props.syncRecording(recording);
+        }
     }
     
     loadRecording = (name) => {
         const { initializePlayer, recordings } = this.props
-        const audio = new Sound(`${name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
+        const audio = new Sound(`${name}.aac`, recordingLocation, (error) => {
             if (error) {
                 console.warn(this.setState({ error: true }), error);
             } else {
@@ -46,7 +49,18 @@ export default class MusicList extends Component {
         selectedRecordings[name] = !selectedRecordings[name];
         this.setState({ selectedRecordings, multiSelect: true });
     }
-    
+
+    syncSelectedRecordings = () => {
+        const selectedRecordings = { ...this.state.selectedRecordings }
+        const recordings = { ...this.props.recordings };
+        Object.keys(selectedRecordings).map((id) => {
+            if(selectedRecordings[id]) {
+                const recording = recordings[id];
+                this.toggleSync(recording);
+            }
+        })
+    }
+
     render () {        
         const { recordings } = this.props;
         if(Object.keys(recordings).length === 0) {
@@ -80,7 +94,7 @@ export default class MusicList extends Component {
                                 toggleSync={() => { this.toggleSync(name, date); }} />
                         </View>)}
                 />
-                { multiSelect ? <SyncSongButtons onSave={() => {}} onCancel={() => {}} /> : null }
+                { multiSelect ? <SyncSongButtons onSave={this.syncSelectedRecordings} onCancel={() => {}} /> : null }
             </View>
         );
     }
@@ -91,10 +105,10 @@ const SyncSongButtons = ({ onSave, onCancel }) => (
         <LinearGradient colors={gradients.redToOrange} start={[0, 0]} end={[1, 0]} style={styles.buttonsBorder} />
         <View style={styles.buttons}>
             <View style={{ marginHorizontal: 10 }}>
-                <SecondaryAction onPress={onCancel} text="Cancel" color={colors.orange} width={500} height={50} />
+                <SecondaryAction onPress={onCancel} text="Cancel" color={colors.orange} width={150} height={50} />
             </View>
             <View style={{ marginHorizontal: 10 }}>
-                <PrimaryAction onPress={onSave} text="Sync" color={colors.orange} width={500} height={50} />
+                <PrimaryAction onPress={onSave} text="Sync" color={colors.orange} width={150} height={50} />
             </View>
         </View>
     </View>

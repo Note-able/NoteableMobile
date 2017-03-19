@@ -3,6 +3,8 @@ import { TouchableHighlight, Text } from 'react-native';
 
 import { colors } from '../../styles';
 
+// TODO need to pass through height+width OR flex properties
+
 const PrimaryAction = ({ onPress, text, color, width, height }) => (
     <TouchableHighlight onPress={onPress} style={[styles.buttonContainer, { backgroundColor: color, width: width, height }]}>
         <Text style={styles.text}>{text}</Text>
@@ -13,8 +15,8 @@ PrimaryAction.propTypes = {
     onPress: PropTypes.func.isRequired,
     text: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
-    width: PropTypes.string.isRequired,
-    height: PropTypes.string.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
 }
 
 export default PrimaryAction;

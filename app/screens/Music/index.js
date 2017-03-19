@@ -15,7 +15,7 @@ import { colors, gradients } from '../../styles';
 import MusicList from '../../components/Music/index.js';
 import Player from '../../components/Music/Player';
 import { getUser } from '../../actions/accountActions';
-import { fetchRecordings, initializePlayer } from '../../actions/recordingActions';
+import { fetchRecordings, initializePlayer, uploadSong } from '../../actions/recordingActions';
 
 const mapStateToProps = (state) => ({
     showPlayer: state.profileReducer.showPlayer, 
@@ -32,6 +32,7 @@ const mapDispatchToProps = (dispatch) => ({
     getCurrentUser: (user) => { dispatch(getUser(user)); },
     getRecordings: () => dispatch(fetchRecordings()),
     initializePlayer: (currentRecording, audio) => dispatch(initializePlayer(currentRecording, audio)),
+    syncRecording: (recording, user) => dispatch(uploadSong(recording, user)), 
 });
 
 class Music extends Component {    
@@ -45,11 +46,11 @@ class Music extends Component {
     }
     
     render() {
-        const { showPlayer, recordings, initializePlayer } = this.props;
+        const { user, showPlayer, recordings, initializePlayer, syncRecording } = this.props;
         return(
             <View style={styles.container}>
                 <MusicNavBar updateView={this.updateView} navigate={this.props.navigateback} />
-                <MusicList recordings={recordings || {}} initializePlayer={initializePlayer} />
+                <MusicList recordings={recordings || {}} initializePlayer={initializePlayer} syncRecording={(recording) => { syncRecording(recording, user); }} />
                 { showPlayer ? <Player /> : null }
             </View>
         );

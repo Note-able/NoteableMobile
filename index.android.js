@@ -28,6 +28,7 @@ import Nearby from './app/screens/Nearby';
 import Events from './app/screens/Events';
 import Music from './app/screens/Music/index.js';
 
+
 //Messages
 import MessagesNavBar from './app/screens/Messages/MessagesNavBar';
 import Messages from './app/screens/Messages';

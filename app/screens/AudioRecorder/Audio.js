@@ -16,7 +16,7 @@ import {AudioRecorder, AudioUtils} from 'react-native-audio';
 import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
 
-import { dbName, recordingsDirectory } from '../../constants';
+import { dbName, recordingLocation } from '../../constants';
 
 export default class Audio extends Component {
     constructor(props) {
@@ -30,7 +30,6 @@ export default class Audio extends Component {
             finished: false,
             fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
         };
-        const recordingLocation = `${RNFS.DocumentDirectoryPath}/recordings`;
         RNFS.mkdir(recordingLocation);
         this.state = state;
         this._recordingLocation = recordingLocation;

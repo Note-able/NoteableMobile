@@ -11,8 +11,8 @@ SecondaryAction.propTypes = {
     onPress: PropTypes.func.isRequired,
     text: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
-    width: PropTypes.string.isRequired,
-    height: PropTypes.string.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
 }
 
 export default SecondaryAction;
