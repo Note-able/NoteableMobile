@@ -18,6 +18,7 @@ const sceneReducer = (state = DEFAULT_STATE, {type, scene}) => {
 const recordingsReducer = (state = { recordings: [], shouldPlay: false }, {type, recordings, audio, currentRecording}) => {
     switch(type) {
         case 'GET_RECORDINGS':
+        case 'RECORDING_SYNCED':
             return { ...state, recordings };
         case 'INITIALIZE_PLAYER':
             return { ...state, audio, currentRecording, shouldPlay: true };

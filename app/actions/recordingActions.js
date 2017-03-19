@@ -72,9 +72,15 @@ export const uploadSong = (recording, user) => {
                         },
                         body : form
                     })
-                    .then((res) => {
-                        console.log(res.text())
-                        dispatch({ type: 'nothing' });
+                    .then((res) => res.json())
+                    .then((song) => {
+                        const realm = new Realm({schema: [RecordingSchema]});
+                        realm.write(() => {
+                            recording.isSynced = true;
+                            recording.id = song.id;
+                        });
+                        const recordings = getRecordingsFromRealm(realm);
+                        dispatch({ type: 'RECORDING_SYNCED', recordings });
                     });
                 })
             })

@@ -24,10 +24,6 @@ export default class MusicList extends Component {
     }
 
     toggleSync = (recording) => {
-        const realm = new Realm({schema: [RecordingSchema]});
-        realm.write(() => {
-            recording.isSynced = !recording.isSynced;
-        });
         if (!recording.id) {
             this.props.syncRecording(recording);
         }
