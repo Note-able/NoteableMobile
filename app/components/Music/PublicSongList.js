@@ -3,7 +3,7 @@ import Recording from './Recording.js';
 import { StyleSheet, Text, View, ListView } from 'react-native';
 
 import { dbName, recordingsDirectory } from '../../constants';
-import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-fetch-blob';
 import Sound from 'react-native-sound';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -45,7 +45,7 @@ class PublicSongList extends Component {
     
     loadRecording = (name) => {
         const { initializePlayer, recordings } = this.props
-        const audio = new Sound(`${name}.aac`, `${RNFS.DocumentDirectoryPath}/recordings`, (error) => {
+        const audio = new Sound(`${name}.aac`, `${RNFetchBlob.fs.dirs.DocumentDir}/recordings`, (error) => {
             if (error) {
                 console.warn(this.setState({ error: true }), error);
             } else {

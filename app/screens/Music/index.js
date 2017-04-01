@@ -58,7 +58,7 @@ class Music extends Component {
 };
 
 const MusicNavBar = ({navigate, updateView}) => (
-    <LinearGradient colors={gradients.redToOrange} start={[0, 0]} end={[1, 0]} style={styles.gradient}>
+    <LinearGradient colors={gradients.redToOrange} start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={styles.gradient}>
         <View style={styles.navBar}> 
             <TouchableHighlight style={styles.navBackArrow} onPress={() => { navigate(); }}>
                 <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow}/>

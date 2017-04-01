@@ -98,7 +98,7 @@ export default class MusicList extends Component {
 
 const SyncSongButtons = ({ onSave, onCancel }) => (
     <View>
-        <LinearGradient colors={gradients.redToOrange} start={[0, 0]} end={[1, 0]} style={styles.buttonsBorder} />
+        <LinearGradient colors={gradients.redToOrange} start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={styles.buttonsBorder} />
         <View style={styles.buttons}>
             <View style={{ marginHorizontal: 10 }}>
                 <SecondaryAction onPress={onCancel} text="Cancel" color={colors.orange} width={150} height={50} />

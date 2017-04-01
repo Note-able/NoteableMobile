@@ -1,4 +1,4 @@
-import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 export const dbName = 'noteable';
-export const recordingLocation = `${RNFS.DocumentDirectoryPath}/recordings`;
+export const recordingLocation = `${RNFetchBlob.fs.dirs.DocumentDir}/recordings`;

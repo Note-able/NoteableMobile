@@ -13,8 +13,8 @@ import {
 import moment from 'moment';
 
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
-import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 import { dbName, recordingLocation } from '../../constants';
 
@@ -30,7 +30,7 @@ export default class Audio extends Component {
             finished: false,
             fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
         };
-        RNFS.mkdir(recordingLocation);
+        RNFetchBlob.fs.mkdir(recordingLocation);
         this.state = state;
         this._recordingLocation = recordingLocation;
     }
@@ -141,7 +141,7 @@ export default class Audio extends Component {
     saveAudio = () => {
         const dateCreated = moment(this.state.datedFilePath, 'YYYY-MM-DD HH:mm:ss');
         
-        RNFS.moveFile(`${this._recordingLocation}/${this.state.datedFilePath}.aac`, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
+        RNFetchBlob.fs.mv(`${this._recordingLocation}/${this.state.datedFilePath}.aac`, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
             this.props.addRecording(this.state.fileName, dateCreated.format('LLL'), this.state.duration);
             this.setState({ reviewMode: false });          
         }).catch(error => console.warn(error));
