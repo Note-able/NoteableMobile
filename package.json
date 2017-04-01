@@ -13,11 +13,21 @@
     "react-native-fbsdk": "^0.4.0",
     "react-native-fetch-blob": "^0.10.2",
     "react-native-fs": "^2.0.1-rc.2",
+    "react-native-linear-gradient": "^2.0.0",
     "react-native-maps": "^0.12.2",
-    "react-native-router-flux": "^3.37.0",
+    "react-native-router-flux": "^3.38.0",
     "react-native-sound": "^0.8.3",
     "react-native-vector-icons": "^4.0.0",
+    "react-redux": "^5.0.3",
     "realm": "^0.14.3",
-    "redux-thunk": "^2.1.0"
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.3"
   }
 }
