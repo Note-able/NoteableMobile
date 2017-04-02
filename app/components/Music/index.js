@@ -1,12 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import Recording from './Recording.js';
-import { StyleSheet, Text, View, ListView, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, TouchableHighlight } from 'react-native';
 import Sound from 'react-native-sound';
 import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
 import Realm from 'realm';
 
-import { PrimaryAction, SecondaryAction } from '../Buttons';
 import { colors, gradients } from '../../styles';
 import { dbName, recordingLocation } from '../../constants';
 import { RecordingSchema } from '../../realmSchemas';
@@ -46,6 +45,10 @@ export default class MusicList extends Component {
         this.setState({ selectedRecordings, multiSelect: true });
     }
 
+    hideMultiSelect = () => {
+        this.setState({ selectedRecordings: {}, multiSelect: false });
+    }
+
     syncSelectedRecordings = () => {
         const selectedRecordings = { ...this.state.selectedRecordings }
         const recordings = { ...this.props.recordings };
@@ -74,6 +77,7 @@ export default class MusicList extends Component {
 
         return (
             <View style={styles.container}>
+                { multiSelect ? <SyncSongButtons onSave={this.syncSelectedRecordings} onCancel={this.hideMultiSelect} /> : null }
                 <ListView
                     dataSource={dataSource}
                     renderRow={({name, date, duration, isSynced}) => (
@@ -90,23 +94,22 @@ export default class MusicList extends Component {
                                 toggleSync={() => { this.toggleSync(name, date); }} />
                         </View>)}
                 />
-                { multiSelect ? <SyncSongButtons onSave={this.syncSelectedRecordings} onCancel={() => {}} /> : null }
             </View>
         );
     }
 }
 
-const SyncSongButtons = ({ onSave, onCancel }) => (
-    <View>
-        <LinearGradient colors={gradients.redToOrange} start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={styles.buttonsBorder} />
-        <View style={styles.buttons}>
-            <View style={{ marginHorizontal: 10 }}>
-                <SecondaryAction onPress={onCancel} text="Cancel" color={colors.orange} width={150} height={50} />
-            </View>
-            <View style={{ marginHorizontal: 10 }}>
-                <PrimaryAction onPress={onSave} text="Sync" color={colors.orange} width={150} height={50} />
-            </View>
-        </View>
+const SyncSongButtons = ({ onSave, onDelete, onCancel }) => (
+    <View style={styles.buttons}>
+        <TouchableHighlight onPress={onSave} style={styles.actionTextContainer}>
+            <Text style={styles.sync}>Sync</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={onDelete} style={styles.actionTextContainer}>
+            <Text style={styles.delete}>Delete</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={onCancel} style={[styles.actionTextContainer, { flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }]}>
+            <Text style={styles.cancel}>Cancel</Text>
+        </TouchableHighlight>
     </View>
 );
 
@@ -121,18 +124,32 @@ const styles = StyleSheet.create({
     },
     buttons: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         width: windowWidth,
-        height: 70,
-    },
-    buttonsBorder: {
-        height: 2,
-        marginBottom: 4,
-        width: windowWidth,
+        height: 45,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.dark,
+        elevation: 5,
+        backgroundColor: colors.white,
     },
     text : {     
         color: 'black',
+    },
+    sync: {
+        color: colors.green,
+        fontSize: 20,
+    },
+    delete: {
+        color: colors.red,
+        fontSize: 20,
+    },
+    cancel: {
+        color: 'black',
+        fontSize: 16,
+    },
+    actionTextContainer: {
+        marginHorizontal: 10,
     }
 });
 

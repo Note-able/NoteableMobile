@@ -63,15 +63,10 @@ const MusicNavBar = ({navigate, updateView}) => (
             <TouchableHighlight style={styles.navBackArrow} onPress={() => { navigate(); }}>
                 <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow}/>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => { updateView('discover'); }}>
-                <Text style={styles.navTitle}>Discover</Text>
+            <TouchableHighlight onPress={() => { updateView('mymusic'); }} style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                <Text style={styles.navTitle}>Recordings</Text>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => { updateView('mymusic'); }}>
-                <Text style={styles.navTitle}>My Music</Text>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => { updateView('favorites'); }}>
-                <Text style={styles.navTitle}>Favorites</Text>
-            </TouchableHighlight>
+            <View style={{ width: 30, marginRight: 10 }} />
         </View>
     </LinearGradient>
 );

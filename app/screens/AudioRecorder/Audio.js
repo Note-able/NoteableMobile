@@ -9,6 +9,7 @@ import {
     Animated,
     Dimensions,
     Easing,
+    PermissionsAndroid,
 } from 'react-native';
 import moment from 'moment';
 
@@ -215,11 +216,6 @@ export default class Audio extends Component {
     }
 }
 
-/*
-            {this.renderButton("PLAY", () => {this.play()}, this.state.playing )}
-            {this.renderButton("PAUSE", () => {this.pause()} )}
-*/
-
 const windowWidth = Dimensions.get('window').width;
 const styles = {
     container: {
@@ -257,7 +253,6 @@ const styles = {
         color: "#000"
     },
     recordButton: {
-        flex: 1,
         width: 100,
         height: 100,
         borderRadius: 50

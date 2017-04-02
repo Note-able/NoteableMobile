@@ -50,11 +50,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         height: 50,
-        width: windowWidth - 20,
+        width: windowWidth,
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        marginHorizontal: 20,
+        paddingLeft: 10,
     },
     largeText: {
         fontSize: 16,
@@ -75,8 +75,9 @@ const styles = StyleSheet.create({
         height: 20,
     },
     checkBox: {
-        height: 40,
-        width: 40,
+        height: 30,
+        width: 30,
+        marginHorizontal: 5,
     },
     syncBorder: {
         flex: 0,
