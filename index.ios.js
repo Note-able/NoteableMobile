@@ -9,7 +9,7 @@ import { AppRegistry } from 'react-native';
 
 import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
-import Profile from './app/screens/Profile';
+import Profile from './app/screens/Profile/index.js';
 import Home from './app/screens/Home';
 import AudioRecorder from './app/screens/AudioRecorder';
 import Nearby from './app/screens/Nearby';
@@ -30,7 +30,7 @@ const store = createStore(appReducer, applyMiddleware(thunk));
 /* eslint-disable */
 const Scenes = Actions.create(
   <Scene key="root">
-    <Scene key="home"component={Home} hideNavBar />
+    <Scene key="home" component={Home} hideNavBar />
     <Scene key="nearby" component={Nearby} />
     <Scene key="profile" component={Profile} />
     <Scene key="messages" navBar={MessagesNavBar}>

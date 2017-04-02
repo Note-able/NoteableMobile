@@ -8,14 +8,14 @@ import {
 } from 'react-native';
 import { LoginButton } from 'react-native-fbsdk';
 
-import { Actions, ActionConst, Router, Scene } from 'react-native-router-flux';
+import { Actions, Router, Scene } from 'react-native-router-flux';
 import { Provider, connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
 import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
-import Profile from './app/screens/Profile';
+import { Profile } from './app/screens/Profile';
 import Home from './app/screens/Home';
 import AudioRecorder from './app/screens/AudioRecorder';
 import Nearby from './app/screens/Nearby';
