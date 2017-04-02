@@ -15,7 +15,7 @@ import thunk from 'redux-thunk';
 
 import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
-import { Profile } from './app/screens/Profile';
+import Profile from './app/screens/Profile';
 import Home from './app/screens/Home';
 import AudioRecorder from './app/screens/AudioRecorder';
 import Nearby from './app/screens/Nearby';

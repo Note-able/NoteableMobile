@@ -1,14 +1,7 @@
 package com.noteablemobile;
 
+import android.content.Intent;
 import com.facebook.react.ReactActivity;
-import io.realm.react.RealmReactPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
-import com.zmxv.RNSound.RNSoundPackage;
-import com.airbnb.android.react.maps.MapsPackage;
-import com.BV.LinearGradient.LinearGradientPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import com.facebook.reactnative.androidsdk.FBSDKPackage;
-import com.rnim.rn.audio.ReactNativeAudioPackage;
 
 public class MainActivity extends ReactActivity {
 
@@ -19,5 +12,11 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "noteableMobile";
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        MainApplication.getCallbackManager().onActivityResult(requestCode, resultCode, data);
     }
 }
