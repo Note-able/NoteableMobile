@@ -5,17 +5,19 @@ const WINDOW_WIDTH = Dimensions.get('window').width;
 export default StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    height: '100%',
+    paddingBottom: 44,
   },
   timingBar: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     backgroundColor: '#31CB94',
     height: 3,
     marginTop: -1,
   },
   timingBarShadow: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     borderBottomColor: '#31CB94',
     width: WINDOW_WIDTH,
     borderBottomWidth: 1,
