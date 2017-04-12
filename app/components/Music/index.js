@@ -10,6 +10,9 @@ import { colors, gradients } from '../../styles';
 import { dbName, recordingLocation } from '../../constants';
 import { RecordingSchema } from '../../realmSchemas';
 
+//TODO: use an RFC compliant date format
+const recordingsDateFormat = 'MMMM D, YYYY h:mm a';
+
 export default class MusicList extends Component { 
     static propTypes = {
         recordings: PropTypes.object.isRequired,
@@ -88,7 +91,7 @@ export default class MusicList extends Component {
                                 selected={!!selectedRecordings[name]}
                                 showSelect={multiSelect}
                                 name={name}
-                                date={moment(date).format('D/M/YY')}
+                                date={moment(date, recordingsDateFormat).format('D/M/YY')}
                                 duration={duration}
                                 loadRecording={(name) => {this.loadRecording(name);}}
                                 toggleSync={() => { this.toggleSync(name, date); }} />
