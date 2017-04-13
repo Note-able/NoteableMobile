@@ -22,9 +22,6 @@ import { recordingLocation } from '../../constants';
 import styles from './audio-styles.js';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
-// /Users/MichaelNakayama/Library/Developer/CoreSimulator/Devices
-// 7367BBA6-F432-45C2-ABAD-266283F9633E/data/Containers/Data/Application/
-// E1AC6520-2237-405B-A69E-6703072D3584/Documents/test.aac
 
 export default class Audio extends Component {
   static propTypes = {
@@ -54,8 +51,8 @@ export default class Audio extends Component {
     };
   }
 
-  prepareRecordingPath = (audioPath) => {
-    AudioRecorder.prepareRecordingAtPath(audioPath, {
+  async prepareRecordingPath(audioPath) {
+    await AudioRecorder.prepareRecordingAtPath(audioPath, {
       SampleRate: 22050,
       Channels: 1,
       AudioQuality: 'Low',
@@ -140,20 +137,22 @@ export default class Audio extends Component {
     if (!isRecording) {
       const datedFilePath = `${moment().format('HHmmss')}`;
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
-      this.prepareRecordingPath(audioPath);
+      await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
-      await AudioRecorder.startRecording();
+      try {
+        await AudioRecorder.startRecording();
+      } catch (error) {
+        console.error(error);
+      }
     } else {
-      // this.stop();
       await AudioRecorder.stopRecording();
-      this.setState({ stoppedRecording: true, recording: false });
+      this.setState({ stoppedRecording: true, recording: false, reviewMode: true });
     }
   }
 
   saveAudio = () => {
-    const dateCreated = moment(this.state.datedFilePath, 'YYYY-MM-DD HH:mm:ss');
-    RNFetchBlob.fs.mv(`${this._recordingLocation}/${this.state.datedFilePath}.aac`, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
-      this.props.addRecording(this.state.fileName, dateCreated.format('LLL'), this.state.duration);
+    RNFetchBlob.fs.mv(this.state.audioPath, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
+      this.props.addRecording(this.state.fileName, moment().format('LLL'), this.state.currentTime.toString());
       this.setState({ reviewMode: false });
     }).catch(error => console.warn(error));
   }
