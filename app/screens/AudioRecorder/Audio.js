@@ -19,6 +19,7 @@ import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 
 import { recordingLocation } from '../../constants';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './audio-styles.js';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -36,6 +37,7 @@ export default class Audio extends Component {
     reviewMode: false,
     finished: false,
     fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
+    recordingLeft: 0,
   };
 
   componentDidMount() {
@@ -139,11 +141,15 @@ export default class Audio extends Component {
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
       await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
-      try {
-        await AudioRecorder.startRecording();
-      } catch (error) {
-        console.error(error);
-      }
+      this.trackingAnimation = Animated.timing(
+        this.state.recordingLeft,
+        {
+          easing: Easing.linear,
+          toValue: 250,
+        },
+      );
+      this.trackingAnimation.start();
+      await AudioRecorder.startRecording();
     } else {
       await AudioRecorder.stopRecording();
       this.setState({ stoppedRecording: true, recording: false, reviewMode: true });
@@ -174,18 +180,20 @@ export default class Audio extends Component {
   }
 
   renderRecordingButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }}>
+    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
       <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
         { this.state.recording ?
           <View style={styles.stopButton} /> :
-          <Image source={require('../../img/record.png')} style={styles.recordButton} />
+          <View style={styles.recordButton}>
+            <Icon name="mic" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'white'} />
+          </View>
         }
       </TouchableHighlight>
     </View>
   );
 
   renderPlayButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }}>
+    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
       <TouchableHighlight onPress={this.startPlay}>
         <Image source={require('../../img/play.png')} style={styles.playPauseIcon} />
       </TouchableHighlight>
@@ -193,7 +201,7 @@ export default class Audio extends Component {
   );
 
   renderPauseButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }}>
+    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
       <TouchableHighlight onPress={this.pausePlay}>
         <Image source={require('../../img/pause.png')} style={styles.playPauseIcon} />
       </TouchableHighlight>
@@ -214,7 +222,9 @@ export default class Audio extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{ fontSize: 20 }}>Recording Time</Text>
+        {this.state.timingBarWidth ? <Animated.View style={[{ width: this.state.timingBarWidth }, styles.timingBar]} /> : null}
+        <View style={styles.timingBarShadow} />
+        <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
         <Text style={styles.progressText}>{this.state.currentTime}s</Text>
         { this.renderRecordingButton() }
         <View style={styles.fileName}>
@@ -227,8 +237,6 @@ export default class Audio extends Component {
         </View>
         {this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()}
         { this.state.reviewMode ? this.renderSaveCancelButtons() : null }
-        <View style={styles.timingBarShadow} />
-        {this.state.timingBarWidth ? <Animated.View style={[{ width: this.state.timingBarWidth }, styles.timingBar]} /> : null}
       </View>
     );
   }

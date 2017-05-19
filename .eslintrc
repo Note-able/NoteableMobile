@@ -23,6 +23,7 @@
     "react/require-default-props": 0,
     "global-require": 0,
     "import/extensions": 0,
-    "react/jsx-filename-extension": 0
+    "react/jsx-filename-extension": 0,
+    "react/prop-types": 0,
   }
 }

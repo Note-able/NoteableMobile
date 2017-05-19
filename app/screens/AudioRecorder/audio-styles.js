@@ -4,17 +4,22 @@ const WINDOW_WIDTH = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   container: {
+    backgroundColor: '#1B1F20',
     flex: 1,
-    justifyContent: 'flex-end',
     alignItems: 'center',
     height: '100%',
-    paddingBottom: 44,
+    paddingTop: 100,
   },
   timingBar: {
     alignSelf: 'flex-end',
     backgroundColor: '#31CB94',
     height: 3,
-    marginTop: -1,
+  },
+  recordingBar: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#31CB94',
+    height: 3,
+    width: 1,
   },
   timingBarShadow: {
     alignSelf: 'flex-end',
@@ -27,9 +32,11 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 28,
     marginTop: 100,
   },
   fileNameInput: {
+    color: 'white',
     flex: 1,
     fontSize: 18,
     textAlign: 'center',
@@ -37,25 +44,25 @@ export default StyleSheet.create({
   },
   progressText: {
     fontSize: 50,
-    color: '#000',
+    color: 'white',
   },
   recordButton: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    backgroundColor: '#E8163E',
+    borderRadius: 30,
+    height: 60,
+    width: 60,
   },
   playPauseIcon: {
     flex: 1,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignSelf: 'center',
   },
   stopButton: {
-    flex: 1,
     backgroundColor: '#E8163E',
-    width: 80,
-    height: 80,
+    height: 60,
+    width: 60,
   },
   saveButton: {
     backgroundColor: '#31CB94',
@@ -87,5 +94,22 @@ export default StyleSheet.create({
     color: '#E8163E',
     textAlign: 'center',
     fontSize: 18,
+  },
+  navBar: {
+    top: 0,
+    right: 0,
+    left: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E8163E',
+    height: 50,
+  },
+  navTitle: {
+    padding: 10,
+    color: 'white',
+    fontSize: 20,
+    marginLeft: 10,
+    marginRight: 10,
   },
 });
