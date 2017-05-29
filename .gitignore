@@ -29,6 +29,9 @@ build/
 .gradle
 local.properties
 *.iml
+signed-release-key-.keystore
+fabric.properties
+gradle.properties
 
 # node.js
 #

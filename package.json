@@ -3,15 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "deploy-crashlytics": "cd android && ./gradlew assembleRelease crashlyticsUploadDistributionRelease"
   },
   "dependencies": {
     "moment": "^2.15.2",
     "prop-types": "^15.5.8",
-    "react": "^15.4.2",
-    "react-native": "0.42.0",
+    "react": "16.0.0-alpha.6",
+    "react-native": "0.44.0",
     "react-native-audio": "^3.1.0",
-    "react-native-fbsdk": "^0.5.0",
+    "react-native-fbsdk": "^0.6.0",
     "react-native-fetch-blob": "^0.10.2",
     "react-native-linear-gradient": "^2.0.0",
     "react-native-maps": "^0.13.0",

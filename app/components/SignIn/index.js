@@ -13,7 +13,7 @@ class SignIn extends Component {
     state ={
         modalVisible: false,
     }
-    
+
     showModal = () => {
         this.setState({ modalVisible: true });
     }
@@ -21,11 +21,11 @@ class SignIn extends Component {
     hideModal = () => {
         this.setState({ modalVisible: false });
     }
-    
+
     render() {
         return (
             <View>
-                <TouchableHighlight onPress={this.showModal}>
+                <TouchableHighlight style={{flex: 1}} onPress={this.showModal}>
                     <Text style={{flex: 1, color: 'white'}}>Sign In</Text>
                 </TouchableHighlight>
                 <SignInModal onSuccess={this.props.onSignIn} close={this.hideModal} visible={this.state.modalVisible} />
@@ -41,7 +41,7 @@ const SignInModal = ({ onSuccess, close, visible }) => (
         onRequestClose={close}
         visible={visible}
         style={styles.signInModal}
-    >                    
+    >
         <LoginButton
             publishPermissions={["publish_actions"]}
             onLoginFinished={
