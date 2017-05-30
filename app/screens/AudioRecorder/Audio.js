@@ -17,12 +17,16 @@ import moment from 'moment';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
+import Realm from 'realm';
 
-import { recordingLocation } from '../../constants';
+import Schemas from '../../realmSchemas';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RecentRecordings } from '../../components/Shared';
 import styles from './audio-styles.js';
 
+const realm = new Realm(Schemas.RecordingSchema);
 const WINDOW_WIDTH = Dimensions.get('window').width;
+const SAMPLE_RATE = 22050;
 
 export default class Audio extends Component {
   static propTypes = {
@@ -38,24 +42,66 @@ export default class Audio extends Component {
     finished: false,
     fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
     recordingLeft: 0,
+    recentRecordings: [],
+    didSave: false,
+    stopTiming: true,
+    displayTime: '00:00:00.0',
   };
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
+    RNFetchBlob.fs.lstat(AudioUtils.DocumentDirectoryPath).then((result) => {
+      this.setState({
+        recentRecordings: result.filter(x => x.type === 'file').sort((a, b) => b.lastModified - a.lastModified).slice(0, 5),
+      });
+    });
 
     AudioRecorder.onProgress = (data) => {
-      console.log(data.currentTime);
-      this.setState({ currentTime: Math.floor(data.currentTime) });
+
     };
 
-    AudioRecorder.onFinished = (data) => {
-      console.log(data);
+    AudioRecorder.onFinished = () => {
+      this.toggleTiming();
     };
+  }
+
+  componentWillUnmount() {
+    if (!this.state.didSave) {
+      RNFetchBlob.fs.unlink(this.state.audioPath);
+    }
+  }
+
+  toggleTiming = () => {
+    if (this.state.isTiming) {
+      clearInterval(this.interval);
+      this.setState({
+        isTiming: false,
+      });
+
+      return;
+    }
+
+    this.setState({
+      start: new Date(),
+      isTiming: true,
+    });
+
+    console.time('start');
+
+    this.interval = setInterval(() => {
+      const currentTime = (new Date() - this.state.start);
+      console.timeEnd('start');
+      console.log(new Date() - this.state.start);
+      this.setState({
+        currentTime,
+        displayTime: this.displayTime(currentTime),
+      });
+    }, 90);
   }
 
   async prepareRecordingPath(audioPath) {
     await AudioRecorder.prepareRecordingAtPath(audioPath, {
-      SampleRate: 22050,
+      SampleRate: SAMPLE_RATE,
       Channels: 1,
       AudioQuality: 'Low',
       AudioEncoding: 'aac',
@@ -93,6 +139,16 @@ export default class Audio extends Component {
         this.setState({ isPlaying: false, isPaused: true });
       });
   }
+
+  chooseRecording = recording => new Promise((resolve) => {
+    const audio = new Sound(recording.path, '', (error) => {
+      if (error) {
+        console.warn(error.message);
+      }
+
+      resolve(audio);
+    });
+  })
 
   startPlay = () => {
     this.getAudio()
@@ -141,15 +197,12 @@ export default class Audio extends Component {
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
       await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
-      this.trackingAnimation = Animated.timing(
-        this.state.recordingLeft,
-        {
-          easing: Easing.linear,
-          toValue: 250,
-        },
-      );
-      this.trackingAnimation.start();
-      await AudioRecorder.startRecording();
+      try {
+        await AudioRecorder.startRecording();
+        this.toggleTiming();
+      } catch (err) {
+        console.warn(err);
+      }
     } else {
       await AudioRecorder.stopRecording();
       this.setState({ stoppedRecording: true, recording: false, reviewMode: true });
@@ -157,14 +210,20 @@ export default class Audio extends Component {
   }
 
   saveAudio = () => {
-    RNFetchBlob.fs.mv(this.state.audioPath, `${this._recordingLocation}/${this.state.fileName}.aac`).then(() => {
-      this.props.addRecording(this.state.fileName, moment().format('LLL'), this.state.currentTime.toString());
-      this.setState({ reviewMode: false });
-    }).catch(error => console.warn(error));
+    realm.write(() => {
+      realm.create(Schemas.RecordingSchema.schema[0].name, {
+
+      });
+    });
   }
 
   deleteRecording = () => {
-    this.setState({ reviewMode: false });
+    RNFetchBlob.fs.unlink(this.state.audioPath);
+    this.setState({
+      audioPath: '',
+      currentTime: 0,
+      reviewMode: false,
+    });
   }
 
   renderButton = (title, onPress, active) => {
@@ -180,7 +239,7 @@ export default class Audio extends Component {
   }
 
   renderRecordingButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
+    <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
       <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
         { this.state.recording ?
           <View style={styles.stopButton} /> :
@@ -193,31 +252,65 @@ export default class Audio extends Component {
   );
 
   renderPlayButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
+    <View style={styles.buttonContainer}>
       <TouchableHighlight onPress={this.startPlay}>
-        <Image source={require('../../img/play.png')} style={styles.playPauseIcon} />
+        <Icon name="play-arrow" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
       </TouchableHighlight>
     </View>
   );
 
   renderPauseButton = () => (
-    <View style={{ justifyContent: 'center', alignItems: 'center', height: 80, width: 80 }}>
+    <View style={styles.buttonContainer}>
       <TouchableHighlight onPress={this.pausePlay}>
-        <Image source={require('../../img/pause.png')} style={styles.playPauseIcon} />
+        <Icon name="pause" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
+      </TouchableHighlight>
+    </View>
+  );
+
+  renderDeleteButton = () => (
+    <View style={styles.buttonContainer}>
+      <TouchableHighlight onPress={this.deleteRecording}>
+        <Icon name="delete" size={40} style={{ width: 40, height: 40, margin: 15 }} color={'#31CB94'} />
       </TouchableHighlight>
     </View>
   )
 
-  renderSaveCancelButtons = () => (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-      <TouchableHighlight style={styles.cancelButton} onPress={() => { this.deleteRecording(); }}>
-        <Text style={styles.cancelText}>Delete</Text>
-      </TouchableHighlight>
-      <TouchableHighlight style={styles.saveButton} onPress={() => { this.saveAudio(); }}>
+  renderSaveButton = () => (
+    <View style={[styles.buttonContainer, styles.saveContainer]}>
+      <TouchableHighlight style={styles.saveButton} onPress={() => this.setState({ detailsModal: true })}>
         <Text style={styles.saveText}>Save</Text>
       </TouchableHighlight>
     </View>
     );
+
+  displayTime = (currentTime) => {
+    let hour = Math.floor((currentTime / 360000)) % 24;
+    let minute = Math.floor((currentTime / 60000)) % 60;
+    let second = Math.floor((currentTime / 1000)) % 60;
+    const tenth = Math.floor((currentTime / 100)) % 10;
+
+    if (hour < 10) {
+      hour = `0${hour}`;
+    }
+
+    if (minute < 10) {
+      minute = `0${minute}`;
+    }
+
+    if (second < 10) {
+      second = `0${second}`;
+    }
+
+    return `${hour}:${minute}:${second}.${tenth}`;
+  }
+
+  renderModal() {
+    return (
+      <TouchableHighlight style={styles.modalContainer} onPress={() => this.setState({ detailsModal: false })}>
+        <View style={styles.modal} />
+      </TouchableHighlight>
+    );
+  }
 
   render() {
     return (
@@ -225,8 +318,15 @@ export default class Audio extends Component {
         {this.state.timingBarWidth ? <Animated.View style={[{ width: this.state.timingBarWidth }, styles.timingBar]} /> : null}
         <View style={styles.timingBarShadow} />
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
-        <Text style={styles.progressText}>{this.state.currentTime}s</Text>
+        <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
+          { this.state.reviewMode ? this.renderDeleteButton() : null}
+          <View style={styles.progressTextContainer}>
+            <Text style={styles.progressText}>{this.state.displayTime}</Text>
+          </View>
+          { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null}
+        </View>
         { this.renderRecordingButton() }
+        {true ? null :
         <View style={styles.fileName}>
           <TextInput
             underlineColorAndroid="transparent"
@@ -235,8 +335,10 @@ export default class Audio extends Component {
             value={this.state.fileName}
           />
         </View>
-        {this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()}
-        { this.state.reviewMode ? this.renderSaveCancelButtons() : null }
+        }
+        {this.state.reviewMode ? this.renderSaveButton() : null }
+        { this.state.detailsModal ? this.renderModal() : null }
+        <RecentRecordings sampleRate={SAMPLE_RATE} chooseRecording={this.chooseRecording} recentRecordings={this.state.recentRecordings} />
       </View>
     );
   }
