@@ -10,6 +10,7 @@
     "moment": "^2.15.2",
     "prop-types": "^15.5.8",
     "react": "16.0.0-alpha.6",
+    "react-addons-pure-render-mixin": "^15.5.2",
     "react-native": "0.44.0",
     "react-native-audio": "^3.1.0",
     "react-native-fbsdk": "^0.6.0",

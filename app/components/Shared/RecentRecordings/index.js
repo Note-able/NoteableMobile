@@ -19,6 +19,7 @@ export default class RecentRecordings extends Component {
   };
 
   render() {
+    console.log(this.props.recentRecordings);
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -29,9 +30,9 @@ export default class RecentRecordings extends Component {
           {this.props.recentRecordings.map(recording =>
             <TouchableHighlight onPress={this.props.chooseRecording}>
               <View style={styles.row}>
-                <Text style={styles.rowTitle}>{recording.filename}</Text>
-                <Text style={styles.rowTitle}>{(recording.size * 8) / this.props.sampleRate}</Text>
-                <Text style={styles.rowTitle}>{recording.size}</Text>
+                <Text style={styles.rowTitle}>{recording.name}</Text>
+                <Text style={styles.rowTitle}>{recording.duration}</Text>
+                <Text style={styles.rowTitle}>{recording.description}</Text>
               </View>
             </TouchableHighlight>,
           )}

@@ -1,16 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 
 import {
-    Text,
-    View,
-    TouchableHighlight,
-    Image,
-    TextInput,
-    Animated,
-    Dimensions,
-    Easing,
-    Platform,
-    PermissionsAndroid,
+  Button,
+  Text,
+  View,
+  TouchableHighlight,
+  Image,
+  TextInput,
+  Animated,
+  Dimensions,
+  Easing,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import moment from 'moment';
 
@@ -42,7 +43,7 @@ export default class Audio extends Component {
     finished: false,
     fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
     recordingLeft: 0,
-    recentRecordings: [],
+    recentRecordings: [...realm.objects('Recording').sorted('id', true)],
     didSave: false,
     stopTiming: true,
     displayTime: '00:00:00.0',
@@ -50,19 +51,16 @@ export default class Audio extends Component {
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
-    RNFetchBlob.fs.lstat(AudioUtils.DocumentDirectoryPath).then((result) => {
-      this.setState({
-        recentRecordings: result.filter(x => x.type === 'file').sort((a, b) => b.lastModified - a.lastModified).slice(0, 5),
-      });
-    });
+    this._recentRecordings = realm.objects('Recording').sorted('id', true);
 
-    AudioRecorder.onProgress = (data) => {
+    // RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath  }/recordings`).then((result) => {
+    //   console.log(result);
+    //   result.forEach(r => r.type === 'file' ? RNFetchBlob.fs.unlink(r.path) : () => {});
+    // });
+    realm.addListener('change', this.recordingsChange);
 
-    };
-
-    AudioRecorder.onFinished = () => {
-      this.toggleTiming();
-    };
+    AudioRecorder.onProgress = () => {};
+    AudioRecorder.onFinished = () => this.toggleTiming();
   }
 
   componentWillUnmount() {
@@ -70,6 +68,10 @@ export default class Audio extends Component {
       RNFetchBlob.fs.unlink(this.state.audioPath);
     }
   }
+
+  recordingsChange = () => this.setState({
+    recentRecordings: [...this._recentRecordings],
+  });
 
   toggleTiming = () => {
     if (this.state.isTiming) {
@@ -86,12 +88,8 @@ export default class Audio extends Component {
       isTiming: true,
     });
 
-    console.time('start');
-
     this.interval = setInterval(() => {
       const currentTime = (new Date() - this.state.start);
-      console.timeEnd('start');
-      console.log(new Date() - this.state.start);
       this.setState({
         currentTime,
         displayTime: this.displayTime(currentTime),
@@ -210,9 +208,28 @@ export default class Audio extends Component {
   }
 
   saveAudio = () => {
-    realm.write(() => {
-      realm.create(Schemas.RecordingSchema.schema[0].name, {
+    const audio = new Sound(this.state.audioPath, '', (error) => {
+      if (error || audio.getDuration === -1) {
+        console.warn(`${error.message}`);
+        return;
+      }
 
+      realm.write(() => {
+        realm.create(Schemas.RecordingSchema.schema[0].name, {
+          name: this.state.fileName,
+          path: this.state.audioPath,
+          date: moment.utc().format(),
+          duration: audio.getDuration(),
+          description: '',
+          isSynced: false,
+          id: Schemas.GetId(realm.objects('Recording')).toString(),
+        });
+        this.setState({
+          audioPath: '',
+          currentTime: 0,
+          reviewMode: false,
+          displayTime: '00:00:00.0',
+        });
       });
     });
   }
@@ -223,6 +240,7 @@ export default class Audio extends Component {
       audioPath: '',
       currentTime: 0,
       reviewMode: false,
+      displayTime: '00:00:00.0',
     });
   }
 
@@ -306,9 +324,23 @@ export default class Audio extends Component {
 
   renderModal() {
     return (
-      <TouchableHighlight style={styles.modalContainer} onPress={() => this.setState({ detailsModal: false })}>
-        <View style={styles.modal} />
-      </TouchableHighlight>
+      <View style={styles.modalContainer}>
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>Details</Text>
+          <Text style={styles.inputLabel}>Name</Text>
+          <TextInput style={styles.inputField} onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />
+          <Text style={styles.inputLabel}>Tags</Text>
+          <TextInput style={styles.inputField} onChangeText={tags => this.setState({ tags })} value={this.state.tags} />
+          <View style={styles.buttonRow}>
+            <TouchableHighlight style={styles.buttonOption} onPress={() => this.setState({ detailsModal: false })}>
+              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Cancel</Text>
+            </TouchableHighlight>
+            <TouchableHighlight style={styles.buttonOption} onPress={this.saveAudio}>
+              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Done</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
     );
   }
 
