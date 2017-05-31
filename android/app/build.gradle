@@ -143,7 +143,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-fabric')
     compile project(':realm')
     compile project(':react-native-vector-icons')
     compile project(':react-native-sound')

@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
-import com.smixx.fabric.FabricPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import io.fabric.sdk.android.Fabric;
 import io.realm.react.RealmReactPackage;
@@ -38,7 +37,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new FabricPackage(),
             new FBSDKPackage(mCallbackManager),
             new RealmReactPackage(),
             new VectorIconsPackage(),
