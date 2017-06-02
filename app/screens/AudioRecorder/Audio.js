@@ -22,18 +22,23 @@ import Realm from 'realm';
 
 import Schemas from '../../realmSchemas';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { RecentRecordings } from '../../components/Shared';
+import { Modal, RecentRecordings } from '../../components/Shared';
+import { DisplayTime, MapRecordingFromDB } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
+
+// RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath}`).then((result) => {
+//   console.log(result.filename);
+//   result.forEach(r => RNFetchBlob.fs.unlink(r.path));
+// });
 
 const realm = new Realm(Schemas.RecordingSchema);
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
+const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
+let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1;
+console.log([...untitled].filter(x => x.name.split(' ').length === 2));
 
 export default class Audio extends Component {
-  static propTypes = {
-    addRecording: PropTypes.func.isRequired,
-  }
-
   state = {
     currentTime: 0.0,
     recording: false,
@@ -41,22 +46,17 @@ export default class Audio extends Component {
     isPlaying: false,
     reviewMode: false,
     finished: false,
-    fileName: `${moment().format('YYYY-MM-DD HHmmss')}`,
+    fileName: `Untitled ${untitledTitle}`,
     recordingLeft: 0,
-    recentRecordings: [...realm.objects('Recording').sorted('id', true)],
+    recentRecordings: [...(realm.objects('Recording').sorted('id', true)).map(x => MapRecordingFromDB(x))],
     didSave: false,
     stopTiming: true,
-    displayTime: '00:00:00.0',
+    displayTime: DisplayTime(0),
   };
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this._recentRecordings = realm.objects('Recording').sorted('id', true);
-
-    // RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath  }/recordings`).then((result) => {
-    //   console.log(result);
-    //   result.forEach(r => r.type === 'file' ? RNFetchBlob.fs.unlink(r.path) : () => {});
-    // });
     realm.addListener('change', this.recordingsChange);
 
     AudioRecorder.onProgress = () => {};
@@ -70,7 +70,7 @@ export default class Audio extends Component {
   }
 
   recordingsChange = () => this.setState({
-    recentRecordings: [...this._recentRecordings],
+    recentRecordings: [...this._recentRecordings.map(x => MapRecordingFromDB(x))],
   });
 
   toggleTiming = () => {
@@ -92,7 +92,7 @@ export default class Audio extends Component {
       const currentTime = (new Date() - this.state.start);
       this.setState({
         currentTime,
-        displayTime: this.displayTime(currentTime),
+        displayTime: DisplayTime(currentTime),
       });
     }, 90);
   }
@@ -137,16 +137,6 @@ export default class Audio extends Component {
         this.setState({ isPlaying: false, isPaused: true });
       });
   }
-
-  chooseRecording = recording => new Promise((resolve) => {
-    const audio = new Sound(recording.path, '', (error) => {
-      if (error) {
-        console.warn(error.message);
-      }
-
-      resolve(audio);
-    });
-  })
 
   startPlay = () => {
     this.getAudio()
@@ -222,13 +212,22 @@ export default class Audio extends Component {
           duration: audio.getDuration(),
           description: '',
           isSynced: false,
-          id: Schemas.GetId(realm.objects('Recording')).toString(),
+          id: Schemas.GetId(realm.objects('Recording')) + 1,
         });
+
+        if (this.state.fileName === `Untitled ${untitledTitle}`) {
+          untitledTitle += 1;
+          this.setState({
+            fileName: `Untitled ${untitledTitle}`,
+          });
+        }
+
         this.setState({
           audioPath: '',
           currentTime: 0,
           reviewMode: false,
-          displayTime: '00:00:00.0',
+          displayTime: DisplayTime(0),
+          detailsModal: false,
         });
       });
     });
@@ -240,7 +239,7 @@ export default class Audio extends Component {
       audioPath: '',
       currentTime: 0,
       reviewMode: false,
-      displayTime: '00:00:00.0',
+      displayTime: DisplayTime(0),
     });
   }
 
@@ -295,52 +294,41 @@ export default class Audio extends Component {
 
   renderSaveButton = () => (
     <View style={[styles.buttonContainer, styles.saveContainer]}>
-      <TouchableHighlight style={styles.saveButton} onPress={() => this.setState({ detailsModal: true })}>
+      <TouchableHighlight style={styles.saveButton} onPress={() => this.showModal()}>
         <Text style={styles.saveText}>Save</Text>
       </TouchableHighlight>
     </View>
     );
 
-  displayTime = (currentTime) => {
-    let hour = Math.floor((currentTime / 360000)) % 24;
-    let minute = Math.floor((currentTime / 60000)) % 60;
-    let second = Math.floor((currentTime / 1000)) % 60;
-    const tenth = Math.floor((currentTime / 100)) % 10;
-
-    if (hour < 10) {
-      hour = `0${hour}`;
-    }
-
-    if (minute < 10) {
-      minute = `0${minute}`;
-    }
-
-    if (second < 10) {
-      second = `0${second}`;
-    }
-
-    return `${hour}:${minute}:${second}.${tenth}`;
+  renderModal = (acceptText, cancelText, onAccept, onCancel, title, children) => {
+    this.setState({
+      modal: (
+        <Modal
+          acceptText={acceptText}
+          cancelText={cancelText}
+          onAccept={onAccept}
+          onCancel={() => { this.setState({ modal: null }); onCancel(); }}
+          title={title}
+        >
+          {children}
+        </Modal>
+      ),
+    });
   }
 
-  renderModal() {
-    return (
-      <View style={styles.modalContainer}>
-        <View style={styles.modal}>
-          <Text style={styles.modalTitle}>Details</Text>
-          <Text style={styles.inputLabel}>Name</Text>
-          <TextInput style={styles.inputField} onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />
-          <Text style={styles.inputLabel}>Tags</Text>
-          <TextInput style={styles.inputField} onChangeText={tags => this.setState({ tags })} value={this.state.tags} />
-          <View style={styles.buttonRow}>
-            <TouchableHighlight style={styles.buttonOption} onPress={() => this.setState({ detailsModal: false })}>
-              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Cancel</Text>
-            </TouchableHighlight>
-            <TouchableHighlight style={styles.buttonOption} onPress={this.saveAudio}>
-              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Done</Text>
-            </TouchableHighlight>
-          </View>
-        </View>
-      </View>
+  showModal = () => {
+    this.renderModal(
+      'Save',
+      'Cancel',
+      this.saveAudio,
+      () => {},
+      'Details',
+      [
+        <Text style={styles.inputLabel} key="name">Name</Text>,
+        <TextInput style={styles.inputField} key="name-input" onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />,
+        <Text style={styles.inputLabel} key="tags">Tags</Text>,
+        <TextInput style={styles.inputField} key="tags-input" onChangeText={tags => this.setState({ tags })} value={this.state.tags} />,
+      ],
     );
   }
 
@@ -353,24 +341,18 @@ export default class Audio extends Component {
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
           { this.state.reviewMode ? this.renderDeleteButton() : null}
           <View style={styles.progressTextContainer}>
-            <Text style={styles.progressText}>{this.state.displayTime}</Text>
+            <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 125 } : null]}>{this.state.displayTime}</Text>
           </View>
           { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null}
         </View>
         { this.renderRecordingButton() }
-        {true ? null :
-        <View style={styles.fileName}>
-          <TextInput
-            underlineColorAndroid="transparent"
-            style={styles.fileNameInput}
-            onChangeText={fileName => this.setState({ fileName })}
-            value={this.state.fileName}
-          />
-        </View>
-        }
         {this.state.reviewMode ? this.renderSaveButton() : null }
-        { this.state.detailsModal ? this.renderModal() : null }
-        <RecentRecordings sampleRate={SAMPLE_RATE} chooseRecording={this.chooseRecording} recentRecordings={this.state.recentRecordings} />
+        <RecentRecordings
+          sampleRate={SAMPLE_RATE}
+          recentRecordings={this.state.recentRecordings}
+          renderModal={this.renderModal}
+        />
+        {this.state.modal}
       </View>
     );
   }

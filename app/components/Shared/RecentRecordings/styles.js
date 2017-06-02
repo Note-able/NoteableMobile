@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     height: 200,
+    width: '100%',
   },
   header: {
     backgroundColor: '#1B1F20',
@@ -30,22 +31,45 @@ export default StyleSheet.create({
   },
   recentRecordings: {
     backgroundColor: 'transparent',
-    height: 250,
-    justifyContent: 'center',
+    maxHeight: 250,
+    justifyContent: 'flex-start',
     overflow: 'scroll',
     width: '100%',
   },
   row: {
     backgroundColor: '#252626',
-    flexDirection: 'row',
+    borderBottomColor: '#1B1F20',
+    borderBottomWidth: 2,
     height: 48,
-    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  rowContent: {
+    flexDirection: 'row',
+    overflow: 'hidden',
     alignItems: 'center',
     marginTop: 2,
+    justifyContent: 'space-between',
     paddingVertical: 8,
     paddingHorizontal: 20,
+    width: '100%',
   },
   rowTitle: {
-    color: 'white',
+    color: '#95989A',
+    width: 100,
+  },
+  name: {
+    width: 150,
+  },
+  icon: {
+    color: '#95989A',
+  },
+  rowOptions: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    marginTop: 2,
   },
 });

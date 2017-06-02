@@ -4,6 +4,7 @@
 
 const RecordingSchema = {
   name: 'Recording',
+  primaryKey: 'id',
   properties: {
     name: 'string',
     path: 'string',
@@ -11,7 +12,7 @@ const RecordingSchema = {
     duration: 'double',
     description: 'string',
     isSynced: 'bool',
-    id: 'string',
+    id: 'int',
   },
 };
 

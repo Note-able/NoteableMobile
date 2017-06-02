@@ -50,7 +50,7 @@ export default StyleSheet.create({
   progressText: {
     fontSize: 24,
     color: 'white',
-    width: 125,
+    width: 87,
   },
   recordButton: {
     backgroundColor: '#E8163E',
@@ -172,8 +172,10 @@ export default StyleSheet.create({
   },
   inputField: {
     backgroundColor: '#2D2E2E',
+    color: '#DDDDDA',
     height: 32,
     marginVertical: 4,
+    paddingHorizontal: 4,
     width: '100%',
   },
   inputLabel: {
@@ -186,12 +188,9 @@ export default StyleSheet.create({
     height: 40,
     alignItems: 'center',
     marginTop: 12,
-    textAlign: 'center',
     width: '100%',
   },
   buttonOption: {
     flex: 1,
-    fontSize: 18,
-    textAlign: 'center',
   },
 });
