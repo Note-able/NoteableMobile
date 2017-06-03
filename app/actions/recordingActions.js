@@ -2,7 +2,14 @@ import Realm from 'realm';
 import RNFetchBlob from 'react-native-fetch-blob';
 
 import { RecordingSchema } from '../realmSchemas';
-import { recordingLocation } from '../constants'
+import { recordingLocation } from '../constants';
+import { fetchUtil, logErrorToCrashlytics } from '../util';
+
+const RECORDINGS_FETCHED = 'RECORDINGS_FETCHED';
+const GET_RECORDINGS_FROM_REALM = 'GET_RECORDINGS_FROM_REALM';
+const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
+const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
+const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
 const getRecordingsFromRealm = (realm) => realm.objects('Recording');
 
@@ -10,7 +17,7 @@ export const fetchRecordings = () => {
     return (dispatch) => {
         const realm = new Realm({schema: [RecordingSchema]});
         const recordings = getRecordingsFromRealm(realm);
-        return dispatch({type: 'GET_RECORDINGS', recordings});
+        return dispatch({type: GET_RECORDINGS_FROM_REALM, recordings});
     };
 }
 
@@ -29,9 +36,9 @@ export const addRecording = (name, date, duration) => {
                 id: '',
             });
         });
-        
+
         const recordings = getRecordingsFromRealm(realm);        
-        dispatch({type: 'GET_RECORDINGS', recordings});
+        dispatch({ type: GET_RECORDINGS_FROM_REALM, recordings });
     };
 }
 
@@ -62,7 +69,7 @@ export const uploadSong = (recording, user) => {
                 console.log('oops', err)
                 })
                 ifstream.onEnd(() => {  
-                    form.append('file', data)        
+                    form.append('file', data)
                     fetch('http://beta.noteable.me/post-blob', {
                         method : 'POST',
                         headers: {
@@ -80,17 +87,28 @@ export const uploadSong = (recording, user) => {
                             recording.id = song.id;
                         });
                         const recordings = getRecordingsFromRealm(realm);
-                        dispatch({ type: 'RECORDING_SYNCED', recordings });
+                        dispatch({ type: RECORDING_SYNCED, recordings });
                     });
                 })
             })
     }
 } 
 
-export const initializePlayer = (currentRecording, audio) => {
-    return {type: 'INITIALIZE_PLAYER', currentRecording, audio };
-}
+const fetchRecordingsFromApi = (user) => (
+  (dispatch) => {
+    fetchUtil.get({ url: 'http://beta.noteable.me/recordings/', auth: user.jwt })
+    .then(response => response.json())
+    .then((recordings) => {
+      dispatch({ type: RECORDINGS_FETCHED, recordings });
+    })
+    .catch(error => logErrorToCrashlytics(error));
+  }
+);
 
-export const togglePlayFlag = () => {
-    return {type: 'TOGGLE_PLAY_FLAG' };
-}
+export const initializePlayer = (currentRecording, audio) => (
+    { type: INITIALIZE_PLAYER, currentRecording, audio }
+);
+
+export const togglePlayFlag = () => (
+    { type: TOGGLE_PLAY_FLAG }
+);

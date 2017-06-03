@@ -1,24 +1,23 @@
-export const getEvents = () => {
-    return (dispatch) => {
-        fetchEvents((events) => {
-            dispatch({ type: 'GET_EVENTS', events });
-        });
-    }
-}
+import { fetchUtil, logErrorToCrashlytics } from '../util';
+
+export const getEvents = () => (
+  (dispatch) => {
+    fetchEvents((events) => {
+      dispatch({ type: 'GET_EVENTS', events });
+    });
+  }
+);
 
 const fetchEvents = (next) => {
-    fetch(`http://beta.noteable.me/api/events`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then((events) => {
-        next(events);
-    });
-}
+  fetchUtil.get({
+    url: 'http://beta.noteable.me/api/events',
+  })
+  .then(response => response.json())
+  .then((events) => {
+    next(events);
+  })
+  .catch(error => logErrorToCrashlytics(error));
+};
 
 /*const events = [
     {
