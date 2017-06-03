@@ -1,20 +1,18 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
 import {
-  Button,
   Text,
   View,
   TouchableHighlight,
-  Image,
   TextInput,
   Animated,
   Dimensions,
+  Modal,
   Easing,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import moment from 'moment';
 
+import { Actions } from 'react-native-router-flux';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -22,7 +20,7 @@ import Realm from 'realm';
 
 import Schemas from '../../realmSchemas';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Modal, RecentRecordings } from '../../components/Shared';
+import { Recordings } from '../../components/Shared';
 import { DisplayTime, MapRecordingFromDB } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 
@@ -35,8 +33,7 @@ const realm = new Realm(Schemas.RecordingSchema);
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
 const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
-let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1;
-console.log([...untitled].filter(x => x.name.split(' ').length === 2));
+let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1 || 1;
 
 export default class Audio extends Component {
   state = {
@@ -52,6 +49,7 @@ export default class Audio extends Component {
     didSave: false,
     stopTiming: true,
     displayTime: DisplayTime(0),
+    modal: false,
   };
 
   componentDidMount() {
@@ -84,7 +82,7 @@ export default class Audio extends Component {
     }
 
     this.setState({
-      start: new Date(),
+      start: new Date() - 20,
       isTiming: true,
     });
 
@@ -227,7 +225,7 @@ export default class Audio extends Component {
           currentTime: 0,
           reviewMode: false,
           displayTime: DisplayTime(0),
-          detailsModal: false,
+          modal: false,
         });
       });
     });
@@ -254,19 +252,6 @@ export default class Audio extends Component {
       </TouchableHighlight>
     );
   }
-
-  renderRecordingButton = () => (
-    <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
-      <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
-        { this.state.recording ?
-          <View style={styles.stopButton} /> :
-          <View style={styles.recordButton}>
-            <Icon name="mic" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'white'} />
-          </View>
-        }
-      </TouchableHighlight>
-    </View>
-  );
 
   renderPlayButton = () => (
     <View style={styles.buttonContainer}>
@@ -300,43 +285,12 @@ export default class Audio extends Component {
     </View>
     );
 
-  renderModal = (acceptText, cancelText, onAccept, onCancel, title, children) => {
-    this.setState({
-      modal: (
-        <Modal
-          acceptText={acceptText}
-          cancelText={cancelText}
-          onAccept={onAccept}
-          onCancel={() => { this.setState({ modal: null }); onCancel(); }}
-          title={title}
-        >
-          {children}
-        </Modal>
-      ),
-    });
-  }
-
-  showModal = () => {
-    this.renderModal(
-      'Save',
-      'Cancel',
-      this.saveAudio,
-      () => {},
-      'Details',
-      [
-        <Text style={styles.inputLabel} key="name">Name</Text>,
-        <TextInput style={styles.inputField} key="name-input" onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />,
-        <Text style={styles.inputLabel} key="tags">Tags</Text>,
-        <TextInput style={styles.inputField} key="tags-input" onChangeText={tags => this.setState({ tags })} value={this.state.tags} />,
-      ],
-    );
-  }
-
   render() {
     return (
       <View style={styles.container}>
         {this.state.timingBarWidth ? <Animated.View style={[{ width: this.state.timingBarWidth }, styles.timingBar]} /> : null}
         <View style={styles.timingBarShadow} />
+        {/* Details */}
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
           { this.state.reviewMode ? this.renderDeleteButton() : null}
@@ -345,14 +299,63 @@ export default class Audio extends Component {
           </View>
           { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null}
         </View>
-        { this.renderRecordingButton() }
-        {this.state.reviewMode ? this.renderSaveButton() : null }
-        <RecentRecordings
-          sampleRate={SAMPLE_RATE}
-          recentRecordings={this.state.recentRecordings}
-          renderModal={this.renderModal}
-        />
-        {this.state.modal}
+        {/* Recording button */}
+        <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
+          <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
+            { this.state.recording ?
+              <View style={styles.stopButton} /> :
+              <View style={styles.recordButton}>
+                <Icon name="mic" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'white'} />
+              </View>
+            }
+          </TouchableHighlight>
+        </View>
+        {/* Save button */}
+        {!this.state.reviewMode ? null :
+        <View style={[styles.buttonContainer, styles.saveContainer]}>
+          <TouchableHighlight style={styles.saveButton} onPress={() => this.setState({ modal: true })}>
+            <Text style={styles.saveText}>Save</Text>
+          </TouchableHighlight>
+        </View>
+        }
+        {/* Recent Recordings */}
+
+        <View style={styles.recordingsContainer}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Recent</Text>
+            <TouchableHighlight onPress={() => Actions.music()}>
+              <Text style={styles.navigateRecordings}>{'Recordings >'}</Text>
+            </TouchableHighlight>
+          </View>
+          <Recordings
+            recordings={this.state.recentRecordings}
+          />
+        </View>
+        {/* Modal */}
+
+        <Modal
+          animationType={'none'}
+          transparent
+          visible={this.state.modal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modal}>
+              <Text style={styles.modalTitle}>Title</Text>
+              <Text style={styles.inputLabel}>Name</Text>
+              <TextInput style={styles.inputField} onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />
+              <Text style={styles.inputLabel}>Tags</Text>
+              <TextInput style={styles.inputField} onChangeText={tags => this.setState({ tags })} value={this.state.tags} />
+              <View style={styles.buttonRow}>
+                <TouchableHighlight style={styles.buttonOption} onPress={() => this.setState({ modal: false })}>
+                  <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Cancel</Text>
+                </TouchableHighlight>
+                <TouchableHighlight style={styles.buttonOption} onPress={() => this.saveAudio()}>
+                  <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Save</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
