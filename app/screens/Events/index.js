@@ -9,11 +9,12 @@ import EventMap from '../../components/Events/EventMap';
 import { getEvents } from '../../actions/eventActions';
 
 const mapDispatchToProps = dispatch => ({
-  getEvents: () => dispatch(getEvents()),
+  getEventsAction: () => dispatch(getEvents()),
 });
 
 const mapStateToProps = state => ({
   events: state.eventsReducer.events,
+  location: state.eventsReducer.location,
 });
 
 class Events extends Component {
@@ -22,8 +23,8 @@ class Events extends Component {
   }
 
   componentDidMount() {
-    const { getEvents } = this.props;
-    getEvents();
+    const { getEventsAction } = this.props;
+    getEventsAction();
   }
 
   showList = () => {
@@ -35,11 +36,11 @@ class Events extends Component {
   }
 
   render() {
-    const { events } = this.props;
+    const { events, location } = this.props;
     return (
       <View style={styles.container}>
         <EventsHeader showList={this.showList} showMap={this.showMap} />
-        {this.state.mapView ? <EventMap events={events} /> : <EventList events={events} />}
+        {this.state.mapView ? <EventMap events={events} location={location} /> : <EventList events={events} location={location} />}
       </View>
     );
   }

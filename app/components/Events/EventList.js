@@ -1,20 +1,11 @@
 import React, { Component } from 'react';
 import { ScrollView, View } from 'react-native';
-import { connect } from 'react-redux';
 
 import Event from './Event';
 
-const mapStateToProps = state => ({
-  location: state.eventsReducer.location,
-});
-
-const mapDispatchToProps = dispatch => ({
-  changeLocation: () => {console.warn('changeLocation');},
-});
-
-class EventList extends Component {
+export default class EventList extends Component {
   render() {
-    const { location, changeLocation, events } = this.props;
+    const { location, events } = this.props;
     return (
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -28,8 +19,6 @@ class EventList extends Component {
     );
   }
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(EventList);
 
 const styles = {
   container: {

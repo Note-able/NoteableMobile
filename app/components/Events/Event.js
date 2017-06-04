@@ -6,7 +6,7 @@ const Event = ({ event, containerStyles, closeEvent }) => (
     { closeEvent ?
       (<TouchableHighlight style={styles.closeButton} onPress={closeEvent}>
         <Image source={require('../../img/close.png')} />
-      </TouchableHighlight>) : null 
+      </TouchableHighlight>) : null
     }
     <Image source={{ uri: event.imageUrl }} style={styles.eventImage} />
     <View style={styles.eventInfoContainer}>

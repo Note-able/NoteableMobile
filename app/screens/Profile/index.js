@@ -1,53 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
-import {
-    StyleSheet,
-    Text,
-    View,
-    Image,
-    TouchableHighlight,
-    ScrollView,
-} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
 
 import ProfileInfo from '../../components/ProfileInfo/index.js';
 import Interests from '../../components/Interests/index.js';
 import PublicSongList from '../../components/Music/PublicSongList.js';
 import Player from '../../components/Music/Player';
 import { getUser } from '../../actions/accountActions';
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    flex: 1,
-  },
-  navBar: {
-    top: 0,
-    right: 0,
-    left: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#D93A64',
-    height: 45,
-  },
-  navTitle: {
-    padding: 10,
-    color: 'white',
-    fontSize: 20,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  navBackArrow: {
-    height: 30,
-    width: 30,
-    marginLeft: 16,
-  },
-  green: {
-    backgroundColor: '#31CB94',
-  },
-});
-
 
 const ProfileNavBar = ({ scrollTo, navigate }) => (
   <View style={styles.navBar}>
@@ -139,6 +99,38 @@ class Profile extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
+  navBar: {
+    top: 0,
+    right: 0,
+    left: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#D93A64',
+    height: 45,
+  },
+  navTitle: {
+    padding: 10,
+    color: 'white',
+    fontSize: 20,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  navBackArrow: {
+    height: 30,
+    width: 30,
+    marginLeft: 16,
+  },
+  green: {
+    backgroundColor: '#31CB94',
+  },
+});
 
 /*
 profile = {

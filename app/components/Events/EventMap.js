@@ -1,21 +1,14 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { View, StyleSheet } from 'react-native';
-import { connect } from 'react-redux';
 
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import Event from './Event';
 
-const mapStateToProps = state => ({
-  location: state.eventsReducer.location,
-});
-
-const mapDispatchToProps = dispatch => ({
-  changeLocation: () => { console.warn('changeLocation'); },
-});
-
-class EventMap extends Component {
+export default class EventMap extends Component {
   static propTypes = {
+    location: PropTypes.object.isRequired,
     events: PropTypes.arrayOf(PropTypes.object),
   }
 
@@ -33,21 +26,21 @@ class EventMap extends Component {
   }
 
   render() {
-    const { location, changeLocation, events } = this.props;
+    const { location, events } = this.props;
     const { selectedEvent, showEvent } = this.state;
     return (
       <View style={styles.container}>
         <MapView initialRegion={location} style={styles.map} provider={PROVIDER_GOOGLE}>
           { !events ? null : events.map((event) => {
             const { latitude, longitude } = event.location;
-            const location = {
+            const coordinate = {
               latitude: parseFloat(latitude),
               longitude: parseFloat(longitude),
             };
 
             return (<MapView.Marker
               key={event.id}
-              coordinate={location}
+              coordinate={coordinate}
               title={event.title}
               onPress={() => { this.handleMarkerPress(event); }}
             />);
@@ -58,8 +51,6 @@ class EventMap extends Component {
     );
   }
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(EventMap);
 
 const styles = {
   container: {
