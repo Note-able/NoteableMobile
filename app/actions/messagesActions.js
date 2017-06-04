@@ -12,14 +12,14 @@ export const searchNav = () => ({ type: 'HEADER_SEARCH' });
 
 export const listNav = () => ({ type: 'HEADER_LIST' });
 
-export const getConversations = (currentUser) => (
+export const getConversations = currentUser => (
   (dispatch) => {
-    fetchConversations(currentUser, (conversations) => {
-      conversations = conversations.reduce((map, c) => { 
-        const users = [ ...c.users ].reduce((users, user) => { users[user.id] = user; return users; }, {});
-        c.users = users;
-        map[c.id] = c;
-        return map; 
+    fetchConversations(currentUser, (data) => {
+      const conversations = data.reduce((map, c) => {
+        const conversation = { ...c };
+        conversation.users = [...c.users].reduce((users, user) => { users[user.id] = user; return users; }, {});
+        map[conversation.id] = conversation;
+        return map;
       }, {});
       dispatch({ type: 'MESSAGES/GET_CONVERSATIONS', conversations });
     });
@@ -29,7 +29,7 @@ export const getConversations = (currentUser) => (
 export const openConversation = (currentUser, userId, conversationId) => (
   (dispatch) => {
     fetchConversation(currentUser, conversationId, (conversation) => {
-      const users = conversation.users.reduce((map, user) => {map[user.id] = user; return map;}, {});
+      const users = conversation.users.reduce((map, user) => { map[user.id] = user; return map; }, {});
       conversation.users = users;
       const userName = `${users[userId].firstName} ${users[userId].lastName}`;
       dispatch({ type: 'MESSAGES/OPEN_CONVERSATION', conversation, userName });
@@ -42,7 +42,7 @@ const fetchConversation = (user, id, next) => (
     url: `http://beta.noteable.me/conversation/${id}`,
     auth: user.jwt,
   })
-  .then((response) => { return response.json(); })
+  .then(response => response.json())
   .then((conversation) => {
     next(conversation);
   })

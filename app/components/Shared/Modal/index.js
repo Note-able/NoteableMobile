@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import {
-  TextInput,
-  Text,
-  TouchableHighlight,
-  View,
-} from 'react-native';
+import { Text, TouchableHighlight, View } from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './styles.js';
 

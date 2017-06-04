@@ -17,9 +17,9 @@ import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Realm from 'realm';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Schemas from '../../realmSchemas';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Recordings } from '../../components/Shared';
 import { DisplayTime, MapRecordingFromDB } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
@@ -293,11 +293,11 @@ export default class Audio extends Component {
         {/* Details */}
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
-          { this.state.reviewMode ? this.renderDeleteButton() : null}
+          { this.state.reviewMode ? this.renderDeleteButton() : null }
           <View style={styles.progressTextContainer}>
             <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 125 } : null]}>{this.state.displayTime}</Text>
           </View>
-          { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null}
+          { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null }
         </View>
         {/* Recording button */}
         <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>

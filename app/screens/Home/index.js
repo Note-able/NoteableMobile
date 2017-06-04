@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight, Text } from 'react-native';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
 
 import AudioRecorder from '../AudioRecorder';

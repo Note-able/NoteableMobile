@@ -4,7 +4,7 @@ import { fetchUtil, logErrorToCrashlytics } from '../util';
 
 const USER = '@ACCOUNTS:CURRENT_USER';
 
-export const getUser = (user) => (
+export const getUser = user => (
   (dispatch) => {
     fetchCurrentProfile(user, (profile) => {
       dispatch({ type: 'USER/CURRENT_PROFILE', profile });
@@ -12,7 +12,7 @@ export const getUser = (user) => (
   }
 );
 
-export const onSignIn = (token) => (
+export const onSignIn = token => (
   async function (dispatch) {
     const currentUser = await AsyncStorage.getItem(USER);
     if (!currentUser) {
