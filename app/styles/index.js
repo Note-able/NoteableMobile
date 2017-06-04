@@ -1,16 +1,22 @@
 export const colors = {
+  shade0: '#1B1F20', // primary background
+  shade20: '#2D2E2E',
+  shade90: '#95989A',
+  shade140: '#DDDDDA',
+  shadow: '#0E1010',
   green: '#31CB94',
+  recordingRed: '#E8163E',
+  white: '#FFFFFF',
+  /** haven't used below yet */
   blue: '#1875DC',
   purple: '#8A32D9',
   red: '#D93A64',
-  recordingRed: '#E8163E',
   orange: '#F0A63E',
   yellow: '#EACF3F',
   light: '#D0D1D5',
   medium: '#7A7B86',
   mediumDark: '#32302F',
   dark: '#1f1b20',
-  white: '#FFF',
 };
 
 const colorRGBA = {

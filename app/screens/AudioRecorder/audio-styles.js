@@ -1,10 +1,13 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import {
+  colors,
+} from '../../styles';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: '#1B1F20',
+    backgroundColor: colors.shade0,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -12,24 +15,24 @@ export default StyleSheet.create({
   },
   timingBar: {
     alignSelf: 'flex-end',
-    backgroundColor: '#31CB94',
+    backgroundColor: colors.green,
     height: 3,
   },
   recordingBar: {
     alignSelf: 'flex-start',
-    backgroundColor: '#31CB94',
+    backgroundColor: colors.green,
     height: 3,
     width: 1,
   },
   timingBarShadow: {
     alignSelf: 'flex-end',
-    borderBottomColor: '#31CB94',
+    borderBottomColor: colors.green,
     width: WINDOW_WIDTH,
     borderBottomWidth: 1,
     height: 0,
   },
   fileName: {
-    borderColor: 'white',
+    borderColor: colors.white,
     borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -41,7 +44,7 @@ export default StyleSheet.create({
     height: 28,
   },
   fileNameInput: {
-    color: 'white',
+    color: colors.white,
     flex: 1,
     fontSize: 18,
     textAlign: 'center',
@@ -49,11 +52,11 @@ export default StyleSheet.create({
   },
   progressText: {
     fontSize: 24,
-    color: 'white',
+    color: colors.white,
     width: 87,
   },
   recordButton: {
-    backgroundColor: '#E8163E',
+    backgroundColor: colors.recordingRed,
     borderRadius: 30,
     height: 60,
     width: 60,
@@ -66,12 +69,12 @@ export default StyleSheet.create({
     alignSelf: 'center',
   },
   stopButton: {
-    backgroundColor: '#E8163E',
+    backgroundColor: colors.recordingRed,
     height: 60,
     width: 60,
   },
   saveButton: {
-    backgroundColor: '#31CB94',
+    backgroundColor: colors.green,
     borderRadius: 4,
     flex: 1,
     height: 50,
@@ -82,12 +85,12 @@ export default StyleSheet.create({
     justifyContent: 'center',
   },
   saveText: {
-    color: 'white',
+    color: colors.white,
     textAlign: 'center',
     fontSize: 18,
   },
   cancelButton: {
-    borderColor: '#E8163E',
+    borderColor: colors.recordingRed,
     borderWidth: 1,
     borderRadius: 4,
     flex: 1,
@@ -98,7 +101,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
   },
   cancelText: {
-    color: '#E8163E',
+    color: colors.recordingRed,
     textAlign: 'center',
     fontSize: 18,
   },
@@ -109,12 +112,12 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E8163E',
+    backgroundColor: colors.recordingRed,
     height: 50,
   },
   navTitle: {
     padding: 10,
-    color: 'white',
+    color: colors.white,
     fontSize: 20,
     marginLeft: 10,
     marginRight: 10,
@@ -152,9 +155,9 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   modal: {
-    backgroundColor: '#1B1F20',
+    backgroundColor: colors.shade0,
     borderRadius: 2,
-    shadowColor: '#0E1010',
+    shadowColor: colors.shadow,
     shadowOffset: { height: 5, width: 5 },
     shadowOpacity: 0.8,
     shadowRadius: 15,
@@ -164,22 +167,22 @@ export default StyleSheet.create({
     width: '100%',
   },
   modalTitle: {
-    color: '#95989A',
+    color: colors.shade90,
     fontSize: 20,
     marginBottom: 12,
     textAlign: 'center',
     width: '100%',
   },
   inputField: {
-    backgroundColor: '#2D2E2E',
-    color: '#DDDDDA',
+    backgroundColor: colors.shade20,
+    color: colors.shade140,
     height: 32,
     marginVertical: 4,
     paddingHorizontal: 4,
     width: '100%',
   },
   inputLabel: {
-    color: '#95989A',
+    color: colors.shade90,
     fontSize: 14,
     marginTop: 2,
   },
@@ -198,25 +201,25 @@ export default StyleSheet.create({
     width: '100%',
   },
   header: {
-    backgroundColor: '#1B1F20',
+    backgroundColor: colors.shade0,
     flexDirection: 'row',
     height: 40,
     justifyContent: 'space-between',
     padding: 11,
     paddingLeft: 20,
     paddingRight: 20,
-    shadowColor: '#111111',
+    shadowColor: colors.shadow,
     shadowOpacity: 0.6,
     shadowRadius: 5,
     shadowOffset: { height: 0 },
     zIndex: 4,
   },
   headerText: {
-    color: 'white',
+    color: colors.white,
     fontSize: 18,
   },
   navigateRecordings: {
-    color: 'white',
+    color: colors.white,
     fontSize: 14,
     paddingBottom: 2,
     paddingTop: 2,

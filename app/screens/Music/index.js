@@ -8,7 +8,7 @@ import { Recordings } from '../../components/Shared';
 import Schemas from '../../realmSchemas';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import { MapRecordingFromDB } from '../../mappers/recordingMapper';
-// import styles from './styles.js';
+import styles from './styles.js';
 
 const realm = new Realm(Schemas.RecordingSchema);
 
@@ -28,7 +28,7 @@ export default class Music extends Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.recordingsContainer}>
         <Recordings recordings={this.state.recordings} />
       </View>
     );
