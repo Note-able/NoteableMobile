@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import AudioRecorder from '../AudioRecorder';
 import { Navigation } from '../../components/Shared';
 import styles from './main-styles';
+import { onSignIn } from '../../actions/accountActions';
 
 const mapStateToProps = state => state;
 
@@ -14,6 +15,7 @@ const mapDispatchToProps = dispatch => ({
     scene();
     dispatch({ type: 'changeScene' });
   },
+  onSignIn: (result) => { dispatch(onSignIn(result)); },
 });
 // navigateScene(views[view].scene);
 
@@ -36,7 +38,7 @@ class Home extends Component {
       <View style={styles.container}>
         <AudioRecorder openNav={() => this.setState({ navOpen: true })} />
         {!this.state.navOpen ? null : (
-          <Navigation />
+          <Navigation onSignIn={this.props.onSignIn} />
         )}
       </View>
     );

@@ -2,8 +2,13 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   navButton: {
-    position: 'absolute',
-    left: 10,
-    top: 10,
+    alignSelf: 'flex-end',
+  },
+  navBar: {
+    flexDirection: 'row',
+    height: 20,
+  },
+  navTitle: {
+    flex: 1,
   },
 });
