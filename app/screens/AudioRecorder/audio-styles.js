@@ -180,6 +180,7 @@ export default StyleSheet.create({
     marginVertical: 4,
     paddingHorizontal: 4,
     width: '100%',
+    paddingTop: 0,
   },
   inputLabel: {
     color: colors.shade90,

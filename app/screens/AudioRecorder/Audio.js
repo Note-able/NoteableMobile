@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import moment from 'moment';
 
-import { Actions } from 'react-native-router-flux';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -323,8 +322,11 @@ export default class Audio extends Component {
         <View style={styles.recordingsContainer}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Recent</Text>
-            <TouchableHighlight onPress={() => Actions.music()}>
+            <TouchableHighlight onPress={() => { this.props.goToRecordings(); }}>
               <Text style={styles.navigateRecordings}>{'Recordings >'}</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => { this.props.goToProfile(); }}>
+              <Text style={styles.navigateRecordings}>{'Profile'}</Text>
             </TouchableHighlight>
           </View>
           <Recordings
