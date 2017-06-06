@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
 
@@ -38,9 +37,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  navigateback: () => {
-    Actions.pop();
-  },
   getCurrentUser: (user) => { dispatch(getUser(user)); },
 });
 
@@ -75,7 +71,7 @@ class Profile extends Component {
     const name = `${firstName} ${lastName}`;
     return (
       <View style={styles.container}>
-        { ProfileNavBar({ scrollTo: this.scrollToView, navigate: this.props.navigateback }) }
+        { ProfileNavBar({ scrollTo: this.scrollToView, navigate: this.props.history.goBack }) }
         <ScrollView ref={(ref) => { this._scrollView = ref; }}>
           <ProfileInfo
             coverImage={coverImage || 'default'}

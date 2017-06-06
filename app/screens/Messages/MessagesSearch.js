@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { Actions } from 'react-native-router-flux';
 
 import { openConversation } from '../../actions/messagesActions';
 import UserSearch from '../../components/UserSearch';
@@ -20,7 +19,6 @@ class MessagesSearch extends Component {
   onSelectUser = (id) => {
     const { openConversation } = this.props;
     openConversation(this.state.userId, id);
-    Actions.messages_conversation();
   }
 
   render() {

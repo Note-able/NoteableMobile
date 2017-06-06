@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Actions, Router, Scene } from 'react-native-router-flux';
-import { Provider, connect } from 'react-redux';
+import { View } from 'react-native';
+import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { Answers } from 'react-native-fabric';
+import { NativeRouter, Route } from 'react-router-native';
+import createMemoryHistory from 'history/createMemoryHistory';
 
 
 import { appReducer } from './app/reducers';
@@ -23,27 +25,8 @@ import MessagesSearch from './app/screens/Messages/MessagesSearch';
 import MessagesCreate from './app/screens/Messages/MessagesCreate';
 import MessagesConversation from './app/screens/Messages/MessagesConversation';
 
-const ConnectedRouter = connect()(Router);
 const store = createStore(appReducer, applyMiddleware(thunk));
-
-/* eslint-disable */
-const Scenes = Actions.create(
-  <Scene key="root">
-    <Scene key="home" component={Home} hideNavBar />
-    <Scene key="nearby" component={Nearby} />
-    <Scene key="profile" component={Profile} />
-    <Scene key="messages" navBar={MessagesNavBar}>
-      <Scene key="messages_list" component={Messages} />
-      <Scene key="messages_create" component={MessagesCreate} />
-      <Scene key="messages_conversation" component={MessagesConversation} />
-      <Scene key="messages_search" component={MessagesSearch} />
-    </Scene>
-    <Scene key="events" component={Events} />
-    <Scene key="music"component={Music} />
-    <Scene key="recorder"component={AudioRecorder} />
-  </Scene>,
-);
-/* eslint-enable */
+const history = createMemoryHistory();
 
 export default class NoteableMobile extends Component {
   componentDidMount() {
@@ -54,7 +37,13 @@ export default class NoteableMobile extends Component {
   render() {
     return (
       <Provider store={store}>
-        <ConnectedRouter scenes={Scenes} />
+        <NativeRouter history={history}>
+          <View style={{ flex: 1, marginTop: 20 }}>
+            <Route exact path="/" component={Home} />
+            <Route path="/recordings" component={Music} />
+            <Route path="/profile" component={Profile} />
+          </View>
+        </NativeRouter>
       </Provider>
     );
   }
