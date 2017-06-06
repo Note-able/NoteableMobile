@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, ScrollView, Text, Image, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
-import { Actions } from 'react-native-router-flux';
 
 import EventCard from '../../components/Nearby/EventCard';
 import JamCard from '../../components/Nearby/JamCard';
@@ -60,7 +59,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Nearby);
 
 const NearbyHeader = () => (
   <View style={styles.navBar}>
-    <TouchableHighlight onPress={() => { Actions.pop(); }}>
+    <TouchableHighlight onPress={() => { console.log('go back'); }}>
       <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow} />
     </TouchableHighlight>
     <TextInput style={styles.navInput} />
