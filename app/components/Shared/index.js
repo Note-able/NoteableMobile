@@ -1,13 +1,13 @@
-import Navigation from './Navigation';
+import Footer from './Footer';
 import Header from './Header';
+import Navigation from './Navigation';
 import Recordings from './Recordings';
-import Modal from './Modal';
 import Recording from './Recording';
 
 export {
-  Navigation,
+  Footer,
   Header,
-  Recordings,
+  Navigation,
   Recording,
-  Modal,
+  Recordings,
 };

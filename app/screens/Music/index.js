@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View,
+  ScrollView,
 } from 'react-native';
 import Realm from 'realm';
 
@@ -14,7 +14,7 @@ const realm = new Realm(Schemas.RecordingSchema);
 
 export default class Music extends Component {
   state = {
-    recordings: realm.objects('Recording').sorted('id', true),
+    recordings: [...realm.objects('Recording').sorted('id', true)],
   };
 
   componentDidMount() {
@@ -28,9 +28,9 @@ export default class Music extends Component {
 
   render() {
     return (
-      <View style={styles.recordingsContainer}>
+      <ScrollView contentContainerStyle={styles.recordingsContainer} bounces={false}>
         <Recordings recordings={this.state.recordings} />
-      </View>
+      </ScrollView>
     );
   }
 }

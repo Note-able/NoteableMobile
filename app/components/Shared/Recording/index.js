@@ -24,7 +24,7 @@ Recording.propTypes = {
   name: PropTypes.string.isRequired,
   openMoreMenu: PropTypes.func.isRequired,
   primaryAction: PropTypes.func.isRequired,
-  primaryDetails: PropTypes.string.isRequired,
+  primaryDetails: PropTypes.string,
 };
 
 export default Recording;
