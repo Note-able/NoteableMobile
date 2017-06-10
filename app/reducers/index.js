@@ -1,19 +1,4 @@
-import { ActionConst } from 'react-native-router-flux';
 import { combineReducers } from 'redux';
-
-const DEFAULT_STATE = { scene: {} };
-const sceneReducer = (state = DEFAULT_STATE, { type, scene }) => {
-  switch (type) {
-    // focus action is dispatched when a new screen comes into focus
-    case ActionConst.FOCUS:
-      return {
-        ...state,
-        scene,
-      };
-    default:
-      return state;
-  }
-};
 
 const recordingsReducer = (state = { recordings: [], shouldPlay: false }, { type, recordings, audio, currentRecording }) => {
   switch (type) {
@@ -93,13 +78,13 @@ const eventsReducer = (state = { location: defaultRegion, events: [] }, { type, 
       return { ...state, events };
     default:
       return state;
-}
+  }
 };
 
 const userReducer = (state = {}, { type, user, profile }) => {
   switch (type) {
     case 'USER/SIGNIN':
-      return {...state, user };
+      return { ...state, user };
     case 'USER/SIGNOUT':
       return { ...state, user: null };
     case 'USER/CURRENT_PROFILE':
@@ -110,7 +95,6 @@ const userReducer = (state = {}, { type, user, profile }) => {
 };
 
 export const appReducer = combineReducers({
-  sceneReducer,
   recordingsReducer,
   profileReducer,
   messagesReducer,

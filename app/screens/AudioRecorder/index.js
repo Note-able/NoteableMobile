@@ -14,7 +14,7 @@ const mapDispatchToProps = dispatch => ({
 const AudioRecorder = props => (
   <View style={{ flex: 1 }}>
     <Header openNav={props.openNav} title="Record" />
-    <Audio addRecording={props.addRecording} />
+    <Audio addRecording={props.addRecording} goToRecordings={props.goToRecordings} />
   </View>
 );
 

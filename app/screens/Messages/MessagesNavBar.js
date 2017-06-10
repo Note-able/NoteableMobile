@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
-import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { searchNav, listNav } from '../../actions/messagesActions';
@@ -28,7 +27,7 @@ class MessagesNavBar extends Component {
     const { search, searchNav } = this.props;
     if (!search) {
       searchNav();
-      Actions.messages_search();
+      // Actions.messages_search();
     }
   }
 
@@ -43,20 +42,20 @@ class MessagesNavBar extends Component {
   closeSearch = () => {
     const { search, listNav } = this.props;
     if (search) {
-      Actions.pop();
+      // Actions.pop();
       listNav();
     }
   }
 
   newMessage = () => {
-    Actions.messages_create();
+    // Actions.messages_create();
   }
 
   closeConversation = () => {
     const { conversation, listNav } = this.props;
     if (conversation) {
       listNav();
-      Actions.pop();
+      // Actions.pop();
     }
   }
 
@@ -66,7 +65,7 @@ class MessagesNavBar extends Component {
     return (
       <View style={styles.navBar}>
         { search ? null :
-        (<TouchableHighlight onPress={() => { Actions.pop(); }}>
+        (<TouchableHighlight /*onPress={() => { Actions.pop(); }}*/>
           <Icon name="keyboard-arrow-left" style={styles.navBackArrow} color="#FFF" />
         </TouchableHighlight>)
         }

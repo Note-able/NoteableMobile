@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableHighlight, Image } from 'react-native';
 import { connect } from 'react-redux';
-import { Actions } from 'react-native-router-flux';
 
 import EventList from '../../components/Events/EventList';
 import EventMap from '../../components/Events/EventMap';
@@ -50,7 +49,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Events);
 
 const EventsHeader = ({ showList, showMap }) => (
   <View style={styles.navBar}>
-    <TouchableHighlight onPress={() => { Actions.pop(); }}>
+    <TouchableHighlight /*onPress={() => { Actions.pop(); }}*/>
       <Image source={require('../../img/back_arrow.png')} style={styles.navBackArrow} />
     </TouchableHighlight>
     <TouchableHighlight style={styles.navTitleHighlight} onPress={() => { showMap(); }}>
@@ -59,7 +58,7 @@ const EventsHeader = ({ showList, showMap }) => (
     <TouchableHighlight style={styles.navTitleHighlight} onPress={() => { showList(); }}>
       <Text style={styles.navTitle}>List</Text>
     </TouchableHighlight>
-    <TouchableHighlight onPress={() => { Actions.pop(); }}>
+    <TouchableHighlight /*onPress={() => { Actions.pop(); }}*/>
       <Image source={require('../../img/plus.png')} style={styles.navClose} />
     </TouchableHighlight>
   </View>);

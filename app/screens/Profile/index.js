@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
 
@@ -39,7 +38,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   navigateback: () => {
-    Actions.pop();
+    // Actions.pop();
   },
   getCurrentUser: (user) => { dispatch(getUser(user)); },
 });

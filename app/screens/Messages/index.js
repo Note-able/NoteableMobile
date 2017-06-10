@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { Actions } from 'react-native-router-flux';
 
 import { getConversations as fetchConversations, openConversation } from '../../actions/messagesActions';
 import MessageList from '../../components/MessageList';
@@ -24,7 +23,7 @@ class Messages extends Component {
   selectConversation = (conversationId, userId) => {
     const { openConversation, user } = this.props;
     openConversation(user, userId, conversationId);
-    Actions.messages_conversation();
+    // Actions.messages_conversation();
   }
 
   render() {
