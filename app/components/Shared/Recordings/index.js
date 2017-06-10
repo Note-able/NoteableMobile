@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
+  ActivityIndicator,
   Animated,
   Easing,
   ScrollView,
@@ -21,6 +22,7 @@ const OPTIONS_WIDTH = 175;
 
 export default class Recordings extends Component {
   static propTypes = {
+    loadingRecordings: PropTypes.bool,
     recordings: PropTypes.arrayOf(PropTypes.shape({
       name: PropTypes.string.isRequired,
       duration: PropTypes.number.isRequired,
@@ -97,6 +99,7 @@ export default class Recordings extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.recordings} bounces={false}>
+        {this.props.loadingRecordings ? <ActivityIndicator animating={this.props.loadingRecordings} size="large" style={{ marginTop: 20 }} /> : null }
         {this.props.recordings.map(recording => (
           <Animated.View
             style={[

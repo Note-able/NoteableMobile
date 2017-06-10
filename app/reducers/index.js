@@ -1,16 +1,26 @@
 import { combineReducers } from 'redux';
+import { MapRecordingFromDB } from '../mappers/recordingMapper';
+import { RecordingActionTypes } from '../actions/ActionTypes';
 
-const recordingsReducer = (state = { recordings: [], shouldPlay: false }, { type, recordings, audio, currentRecording }) => {
+const {
+  fetchRecordingsType,
+} = RecordingActionTypes;
+
+const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
+  const { type, recordings, audio, currentRecording, error } = action;
+  const { shouldPlay } = state;
   switch (type) {
-    case 'GET_RECORDINGS':
+    case fetchRecordingsType.success:
     case 'RECORDING_SYNCED':
-      return { ...state, recordings };
+      return { ...state, recordings: recordings.map(x => MapRecordingFromDB(x)), processing: false };
+    case fetchRecordingsType.error:
+      return { ...state, recordingsError: error, processing: false };
+    case fetchRecordingsType.processing:
+      return { ...state, processing: true };
     case 'INITIALIZE_PLAYER':
       return { ...state, audio, currentRecording, shouldPlay: true };
-    case 'TOGGLE_PLAY_FLAG': {
-      const { shouldPlay } = state;
+    case 'TOGGLE_PLAY_FLAG':
       return { ...state, shouldPlay: !shouldPlay };
-    }
     default:
       return state;
   }
@@ -95,7 +105,7 @@ const userReducer = (state = {}, { type, user, profile }) => {
 };
 
 export const appReducer = combineReducers({
-  recordingsReducer,
+  Recordings,
   profileReducer,
   messagesReducer,
   newsFeedReducer,

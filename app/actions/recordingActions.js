@@ -1,40 +1,45 @@
 import Realm from 'realm';
 import RNFetchBlob from 'react-native-fetch-blob';
 
-import { RecordingSchema } from '../realmSchemas';
+import Schemas from '../realmSchemas';
 import { recordingLocation } from '../constants';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
+import { RecordingActionTypes } from './ActionTypes';
+
+const {
+  fetchRecordingsType,
+} = RecordingActionTypes;
+
 
 const RECORDINGS_FETCHED = 'RECORDINGS_FETCHED';
-const GET_RECORDINGS_FROM_REALM = 'GET_RECORDINGS_FROM_REALM';
+const GET_RECORDINGS_FROM_REALM = 'GET_RECORDINGS';
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
-const getRecordingsFromRealm = realm => realm.objects('Recording');
-
+const getRecordingsFromRealm = realm => realm.objects('Recording').sorted('id', true);
 export const fetchRecordings = () => (
   (dispatch) => {
-    const realm = new Realm({ schema: [RecordingSchema] });
-    const recordings = getRecordingsFromRealm(realm);
-    return dispatch({ type: GET_RECORDINGS_FROM_REALM, recordings });
+    dispatch({ type: fetchRecordingsType.processing });
+
+    new Promise((resolve, reject) => {
+      try {
+        const realm = new Realm(Schemas.RecordingSchema);
+        return resolve([...getRecordingsFromRealm(realm)]);
+      } catch (e) {
+        return reject(e);
+      }
+    }).then(recordings => dispatch({ type: fetchRecordingsType.success, recordings }))
+    .catch(e => dispatch({ type: fetchRecordingsType.error, error: e }));
   }
 );
 
-export const addRecording = (name, date, duration) => (
+export const addRecording = recording => (
   (dispatch) => {
-    const realm = new Realm({ schema: [RecordingSchema] });
+    const realm = new Realm(Schemas.RecordingSchema);
     // Create Realm objects and write to local storage
     realm.write(() => {
-      realm.create('Recording', {
-        name,
-        date,
-        duration,
-        path: `${name}.aac`,
-        description: 'some description',
-        isSynced: false,
-        id: '',
-      });
+      realm.create('Recording', recording);
     });
 
     const recordings = getRecordingsFromRealm(realm);
@@ -84,7 +89,7 @@ export const uploadSong = (recording, user) => (
         })
         .then(res => res.json())
         .then((song) => {
-          const realm = new Realm({ schema: [RecordingSchema] });
+          const realm = new Realm(Schemas.RecordingSchema);
           realm.write(() => {
             recording.isSynced = true;
             recording.id = song.id;

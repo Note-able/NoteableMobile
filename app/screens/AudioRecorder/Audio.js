@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Text,
@@ -34,7 +35,21 @@ const SAMPLE_RATE = 22050;
 const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
 let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1 || 1;
 
-export default class Audio extends Component {
+export default class Audio extends PureComponent {
+  static propTypes = {
+    fetchRecordings: PropTypes.func.isRequired,
+    loadingRecordings: PropTypes.bool,
+    recordings: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      path: PropTypes.string.isRequired,
+      duration: PropTypes.number,
+      description: PropTypes.string,
+      isSynced: PropTypes.bool.isRequired,
+      id: PropTypes.number.isRequired,
+    })),
+    saveRecording: PropTypes.func.isRequired,
+  };
+
   state = {
     currentTime: 0.0,
     recording: false,
@@ -44,7 +59,7 @@ export default class Audio extends Component {
     finished: false,
     fileName: `Untitled ${untitledTitle}`,
     recordingLeft: 0,
-    recentRecordings: [...(realm.objects('Recording').sorted('id', true)).map(x => MapRecordingFromDB(x))],
+    recordings: this.props.recordings || [],
     didSave: false,
     stopTiming: true,
     displayTime: DisplayTime(0),
@@ -53,8 +68,7 @@ export default class Audio extends Component {
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
-    this._recentRecordings = realm.objects('Recording').sorted('id', true);
-    realm.addListener('change', this.recordingsChange);
+    this.props.fetchRecordings();
 
     AudioRecorder.onProgress = () => {};
     AudioRecorder.onFinished = () => this.toggleTiming();
@@ -66,9 +80,11 @@ export default class Audio extends Component {
     }
   }
 
-  recordingsChange = () => this.setState({
-    recentRecordings: [...this._recentRecordings.map(x => MapRecordingFromDB(x))],
-  });
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      recordings: nextProps.recordings || [],
+    });
+  }
 
   toggleTiming = () => {
     if (this.state.isTiming) {
@@ -201,31 +217,29 @@ export default class Audio extends Component {
         return;
       }
 
-      realm.write(() => {
-        realm.create(Schemas.RecordingSchema.schema[0].name, {
-          name: this.state.fileName,
-          path: this.state.audioPath,
-          date: moment.utc().format(),
-          duration: audio.getDuration(),
-          description: '',
-          isSynced: false,
-          id: Schemas.GetId(realm.objects('Recording')) + 1,
-        });
+      this.props.saveRecording({
+        name: this.state.fileName,
+        path: this.state.audioPath,
+        date: moment.utc().format(),
+        duration: audio.getDuration(),
+        description: '',
+        isSynced: false,
+        id: Schemas.GetId(realm.objects('Recording')) + 1,
+      });
 
-        if (this.state.fileName === `Untitled ${untitledTitle}`) {
-          untitledTitle += 1;
-          this.setState({
-            fileName: `Untitled ${untitledTitle}`,
-          });
-        }
-
+      if (this.state.fileName === `Untitled ${untitledTitle}`) {
+        untitledTitle += 1;
         this.setState({
-          audioPath: '',
-          currentTime: 0,
-          reviewMode: false,
-          displayTime: DisplayTime(0),
-          modal: false,
+          fileName: `Untitled ${untitledTitle}`,
         });
+      }
+
+      this.setState({
+        audioPath: '',
+        currentTime: 0,
+        reviewMode: false,
+        displayTime: DisplayTime(0),
+        modal: false,
       });
     });
   }
@@ -240,50 +254,6 @@ export default class Audio extends Component {
     });
   }
 
-  renderButton = (title, onPress, active) => {
-    const style = (active) ? styles.activeButtonText : styles.buttonText;
-
-    return (
-      <TouchableHighlight style={styles.button} onPress={onPress}>
-        <Text style={style}>
-          {title}
-        </Text>
-      </TouchableHighlight>
-    );
-  }
-
-  renderPlayButton = () => (
-    <View style={styles.buttonContainer}>
-      <TouchableHighlight onPress={this.startPlay}>
-        <Icon name="play-arrow" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
-      </TouchableHighlight>
-    </View>
-  );
-
-  renderPauseButton = () => (
-    <View style={styles.buttonContainer}>
-      <TouchableHighlight onPress={this.pausePlay}>
-        <Icon name="pause" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
-      </TouchableHighlight>
-    </View>
-  );
-
-  renderDeleteButton = () => (
-    <View style={styles.buttonContainer}>
-      <TouchableHighlight onPress={this.deleteRecording}>
-        <Icon name="delete" size={40} style={{ width: 40, height: 40, margin: 15 }} color={'#31CB94'} />
-      </TouchableHighlight>
-    </View>
-  )
-
-  renderSaveButton = () => (
-    <View style={[styles.buttonContainer, styles.saveContainer]}>
-      <TouchableHighlight style={styles.saveButton} onPress={() => this.showModal()}>
-        <Text style={styles.saveText}>Save</Text>
-      </TouchableHighlight>
-    </View>
-    );
-
   render() {
     return (
       <View style={styles.container}>
@@ -292,11 +262,26 @@ export default class Audio extends Component {
         {/* Details */}
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
-          { this.state.reviewMode ? this.renderDeleteButton() : null }
+          { this.state.reviewMode ?
+            <View style={styles.buttonContainer}>
+              <TouchableHighlight onPress={this.deleteRecording}>
+                <Icon name="delete" size={40} style={{ width: 40, height: 40, margin: 15 }} color={'#31CB94'} />
+              </TouchableHighlight>
+            </View> : null }
           <View style={styles.progressTextContainer}>
             <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 125 } : null]}>{this.state.displayTime}</Text>
           </View>
-          { this.state.reviewMode ? (this.state.isPlaying ? this.renderPauseButton() : this.renderPlayButton()) : null }
+          { !this.state.reviewMode ? null : (this.state.isPlaying ?
+            <View style={styles.buttonContainer}>
+              <TouchableHighlight onPress={this.pausePlay}>
+                <Icon name="pause" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
+              </TouchableHighlight>
+            </View> :
+            <View style={styles.buttonContainer}>
+              <TouchableHighlight onPress={this.startPlay}>
+                <Icon name="play-arrow" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
+              </TouchableHighlight>
+            </View>)}
         </View>
         {/* Recording button */}
         <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
@@ -327,7 +312,8 @@ export default class Audio extends Component {
             </TouchableHighlight>
           </View>
           <Recordings
-            recordings={this.state.recentRecordings}
+            recordings={this.state.recordings}
+            loadingRecordings={this.props.loadingRecordings}
           />
         </View>
         {/* Modal */}
