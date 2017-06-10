@@ -57,10 +57,6 @@ const signIn = (token, next) => {
 };
 
 const fetchCurrentProfile = (user, next) => {
-  if (!user) {
-    return;
-  }
-
   fetchUtil.get({
     url: 'http://beta.noteable.me/user/me',
     auth: user.jwt,

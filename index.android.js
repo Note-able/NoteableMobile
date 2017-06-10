@@ -1,3 +1,5 @@
+import React from 'react';
+import { AppRegistry } from 'react-native';
 import NoteableMobile from './index.js';
 
-new NoteableMobile().startApp();
+AppRegistry.registerComponent('noteableMobile', () => NoteableMobile);

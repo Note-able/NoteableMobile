@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
-import { Provider } from 'react-redux';
+import { Actions, Router, Scene } from 'react-native-router-flux';
+import { Provider, connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { Answers } from 'react-native-fabric';
-import { Navigation } from 'react-native-navigation';
+
 
 import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
@@ -23,31 +23,39 @@ import MessagesSearch from './app/screens/Messages/MessagesSearch';
 import MessagesCreate from './app/screens/Messages/MessagesCreate';
 import MessagesConversation from './app/screens/Messages/MessagesConversation';
 
+const ConnectedRouter = connect()(Router);
 const store = createStore(appReducer, applyMiddleware(thunk));
 
-const registerScreens = (store, Provider) => {
-  Navigation.registerComponent('Home', () => Home, store, Provider);
-  Navigation.registerComponent('Recordings', () => Music, store, Provider);
-  Navigation.registerComponent('Profile', () => Profile, store, Provider);
-};
-
-registerScreens(store, Provider);
+/* eslint-disable */
+const Scenes = Actions.create(
+  <Scene key="root">
+    <Scene key="home" component={Home} hideNavBar />
+    <Scene key="nearby" component={Nearby} />
+    <Scene key="profile" component={Profile} />
+    <Scene key="messages" navBar={MessagesNavBar}>
+      <Scene key="messages_list" component={Messages} />
+      <Scene key="messages_create" component={MessagesCreate} />
+      <Scene key="messages_conversation" component={MessagesConversation} />
+      <Scene key="messages_search" component={MessagesSearch} />
+    </Scene>
+    <Scene key="events" component={Events} />
+    <Scene key="music"component={Music} />
+    <Scene key="recorder"component={AudioRecorder} />
+  </Scene>,
+);
+/* eslint-enable */
 
 export default class NoteableMobile extends Component {
-  constructor(props) {
-    super(props);
-
+  componentDidMount() {
     store.dispatch(getAlreadySignedInUser());
     Answers.logCustom('Opened App');
   }
 
-  startApp() {
-    Navigation.startSingleScreenApp({
-      screen: {
-        screen: 'Home', // unique ID registered with Navigation.registerScreen
-        title: 'Noteable', // title of the screen as appears in the nav bar (optional)
-        navigatorStyle: { navBarHidden: true },
-      },
-    });
+  render() {
+    return (
+      <Provider store={store}>
+        <ConnectedRouter scenes={Scenes} />
+      </Provider>
+    );
   }
 }

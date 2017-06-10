@@ -2,7 +2,6 @@ package com.noteablemobile;
 
 import android.app.Application;
 
-import com.reactnativenavigation.NavigationApplication;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
 import com.smixx.fabric.FabricPackage;
@@ -27,26 +26,34 @@ import com.facebook.appevents.AppEventsLogger;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends NavigationApplication {
+public class MainApplication extends Application implements ReactApplication {
+
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    @Override
+    public boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+          new MainReactPackage(),
+            new FabricPackage(),
+            new FBSDKPackage(mCallbackManager),
+            new RealmReactPackage(),
+            new VectorIconsPackage(),
+            new RNSoundPackage(),
+            new MapsPackage(),
+            new LinearGradientPackage(),
+            new RNFetchBlobPackage(),
+            new ReactNativeAudioPackage()
+      );
+    }
+  };
 
   @Override
-  public boolean isDebug() {
-    // Make sure you are using BuildConfig from your own application
-    return BuildConfig.DEBUG;
-  }
-
-  protected List<ReactPackage> getPackages() {
-    return Arrays.<ReactPackage>asList(
-          new FabricPackage(),
-          new FBSDKPackage(mCallbackManager),
-          new RealmReactPackage(),
-          new VectorIconsPackage(),
-          new RNSoundPackage(),
-          new MapsPackage(),
-          new LinearGradientPackage(),
-          new RNFetchBlobPackage(),
-          new ReactNativeAudioPackage()
-    );
+  public ReactNativeHost getReactNativeHost() {
+    return mReactNativeHost;
   }
 
   @Override
@@ -55,11 +62,6 @@ public class MainApplication extends NavigationApplication {
     Fabric.with(this, new Crashlytics());
     SoLoader.init(this, /* native exopackage */ false);
     FacebookSdk.sdkInitialize(getApplicationContext());
-  }
-
-  @Override
-  public List<ReactPackage> createAdditionalReactPackages() {
-    return getPackages();
   }
 
   private static CallbackManager mCallbackManager = CallbackManager.Factory.create();

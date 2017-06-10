@@ -36,7 +36,7 @@ class Home extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <AudioRecorder openNav={() => this.setState({ navOpen: true })} navigator={this.props.navigator} />
+        <AudioRecorder openNav={() => this.setState({ navOpen: true })} />
         {!this.state.navOpen ? null : (
           <Navigation onSignIn={this.props.onSignIn} />
         )}
