@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { Answers } from 'react-native-fabric';
 import { StackNavigator } from 'react-navigation';
-
-
 import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
 import { appScreens } from './screens';
@@ -26,7 +24,6 @@ export default class NoteableMobile extends Component {
       <Provider store={store}>
         <View style={{ flex: 1 }}>
           <AppNavigator />
-          <Text style={{ height: 50, width: 100 }}>Some stuff</Text>
         </View>
       </Provider>
     );

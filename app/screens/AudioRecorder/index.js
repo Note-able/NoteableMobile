@@ -8,11 +8,17 @@ import {
   addRecording,
   fetchRecordings,
 } from '../../actions/recordingActions';
+
+import {
+  startPlayer,
+} from '../../actions/playerActions';
+
 import { Header } from '../../components/Shared';
 
 const mapDispatchToProps = dispatch => ({
   saveRecording: (name, date, duration) => dispatch(addRecording(name, date, duration)),
   fetchRecordings: () => dispatch(fetchRecordings()),
+  startPlayer: recording => dispatch(startPlayer(recording)),
 });
 
 const mapStateToProps = state => ({
@@ -28,8 +34,13 @@ const AudioRecorder = props => (
       saveRecording={props.saveRecording}
       recordings={props.recordings.recordings}
       goToRecordings={props.goToRecordings}
+      startPlayer={props.startPlayer}
     />
   </View>
   );
+
+AudioRecorder.navigationOptions = {
+  tabBarLabel: 'Setup',
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioRecorder);

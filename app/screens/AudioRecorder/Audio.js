@@ -48,6 +48,7 @@ export default class Audio extends PureComponent {
       id: PropTypes.number.isRequired,
     })),
     saveRecording: PropTypes.func.isRequired,
+    startPlayer: PropTypes.func.isRequired,
   };
 
   state = {
@@ -307,12 +308,13 @@ export default class Audio extends PureComponent {
         <View style={styles.recordingsContainer}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Recent</Text>
-            <TouchableHighlight onPress={() => {this.props.goToRecordings(); }}>
+            <TouchableHighlight onPress={() => { this.props.goToRecordings(); }}>
               <Text style={styles.navigateRecordings}>{'Recordings >'}</Text>
             </TouchableHighlight>
           </View>
           <Recordings
             recordings={this.state.recordings}
+            startPlayer={this.props.startPlayer}
             loadingRecordings={this.props.loadingRecordings}
           />
         </View>

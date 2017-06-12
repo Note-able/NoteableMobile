@@ -9,7 +9,6 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Realm from 'realm';
@@ -29,20 +28,11 @@ export default class Recordings extends Component {
       description: PropTypes.string,
       path: PropTypes.string.isRequired,
     })),
+    startPlayer: PropTypes.func.isRequired,
   };
 
   state = {
     showOptions: null,
-  }
-
-  playSong = (recordingId) => {
-    const audio = new Sound(this.props.recordings.filter(x => x.id === recordingId)[0], '', (err) => {
-      if (err != null) {
-        console.warn(err);
-      }
-
-      console.log(audio);
-    });
   }
 
   createAnimations = (recordingId) => {
@@ -113,7 +103,7 @@ export default class Recordings extends Component {
             ]}
             key={recording.id}
           >
-            <Recording primaryAction={() => {}} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
+            <Recording primaryAction={() => this.props.startPlayer(recording)} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
             <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
               <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.deleteRecording(recording)}>
                 <Icon name="delete" size={25} color={'#95989A'} />

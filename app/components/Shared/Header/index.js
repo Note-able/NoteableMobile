@@ -11,7 +11,7 @@ import styles from './styles.js';
 
 export default class Header extends Component {
   static propTypes = {
-    openNav: PropTypes.func.isRequired,
+    openNav: PropTypes.func,
     title: PropTypes.string.isRequired,
   }
 

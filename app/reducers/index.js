@@ -1,10 +1,19 @@
 import { combineReducers } from 'redux';
 import { MapRecordingFromDB } from '../mappers/recordingMapper';
-import { RecordingActionTypes } from '../actions/ActionTypes';
+import {
+  PlayerActionTypes,
+  RecordingActionTypes,
+} from '../actions/ActionTypes';
+import { logErrorToCrashlytics } from '../util.js';
 
 const {
   fetchRecordingsType,
 } = RecordingActionTypes;
+
+const {
+  startPlayerTypes,
+  togglePlayerTypes,
+} = PlayerActionTypes;
 
 const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
   const { type, recordings, audio, currentRecording, error } = action;
@@ -44,7 +53,7 @@ const DEFAULT_MESSAGES_STATE = {
 const messagesReducer = (state = DEFAULT_MESSAGES_STATE, { type, conversation, userName, conversations, message }) => {
   switch (type) {
     case 'HEADER_SEARCH':
-      return { ...state, nav: { search: true} };
+      return { ...state, nav: { search: true } };
     case 'HEADER_LIST':
       return { ...state, nav: { list: true } };
     case 'MESSAGES/OPEN_CONVERSATION':
@@ -104,8 +113,26 @@ const userReducer = (state = {}, { type, user, profile }) => {
   }
 };
 
+const Player = (state = { isPlaying: false, sound: null, recording: null }, action) => {
+  const { type, error } = action;
+  switch (type) {
+    case startPlayerTypes.success:
+      return {
+        ...state,
+        sound: action.sound,
+        recording: action.recording,
+      };
+    case startPlayerTypes.error:
+      logErrorToCrashlytics({ customMessage: 'starting player error: ', error });
+      return state;
+    default:
+      return state;
+  }
+};
+
 export const appReducer = combineReducers({
   Recordings,
+  Player,
   profileReducer,
   messagesReducer,
   newsFeedReducer,

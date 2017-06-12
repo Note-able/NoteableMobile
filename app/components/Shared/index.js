@@ -1,11 +1,11 @@
-// import Footer from './Footer';
+import Footer from './Footer';
 import Header from './Header';
 import Navigation from './Navigation';
 import Recordings from './Recordings';
 import Recording from './Recording';
 
 export {
-//  Footer,
+  Footer,
   Header,
   Navigation,
   Recording,

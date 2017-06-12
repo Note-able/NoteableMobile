@@ -1,36 +1,40 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   ScrollView,
 } from 'react-native';
-import Realm from 'realm';
-
+import { connect } from 'react-redux';
 import { Recordings } from '../../components/Shared';
-import Schemas from '../../realmSchemas';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
-import { MapRecordingFromDB } from '../../mappers/recordingMapper';
 import styles from './styles.js';
 
-const realm = new Realm(Schemas.RecordingSchema);
+import {
+  startPlayer,
+} from '../../actions/playerActions';
 
-export default class Music extends Component {
-  state = {
-    recordings: [...realm.objects('Recording').sorted('id', true)],
+const mapDispatchToProps = dispatch => ({
+  startPlayer: recording => dispatch(startPlayer(recording)),
+});
+
+const mapStateToProps = state => ({
+  recordings: state.Recordings,
+  player: state.Player,
+});
+
+class Music extends Component {
+  static propTypes = {
+    startPlayer: PropTypes.func.isRequired,
   };
-
-  componentDidMount() {
-    this._recordings = realm.objects('Recording').sorted('id', true);
-    realm.addListener('change', this.recordingsChange);
-  }
-
-  recordingsChange = () => this.setState({
-    recordings: [...this._recordings.map(x => MapRecordingFromDB(x))],
-  });
 
   render() {
     return (
       <ScrollView contentContainerStyle={styles.recordingsContainer} bounces={false}>
-        <Recordings recordings={this.state.recordings} />
+        <Recordings
+          recordings={this.props.recordings.recordings}
+          startPlayer={this.props.startPlayer}
+        />
       </ScrollView>
     );
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Music);

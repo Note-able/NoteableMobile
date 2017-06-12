@@ -4,6 +4,7 @@ export const colors = {
   shade90: '#95989A',
   shade140: '#DDDDDA',
   shadow: '#0E1010',
+  black: '#000000',
   green: '#31CB94',
   recordingRed: '#E8163E',
   white: '#FFFFFF',

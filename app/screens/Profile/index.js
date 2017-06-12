@@ -48,7 +48,7 @@ class Profile extends Component {
     getCurrentUser: PropTypes.func.isRequired,
     navigateback: PropTypes.func.isRequired,
     profile: PropTypes.shape({}),
-    showPlayer: PropTypes.func.isRequired,
+    showPlayer: PropTypes.bool.isRequired,
     user: PropTypes.shape({}),
   }
 
