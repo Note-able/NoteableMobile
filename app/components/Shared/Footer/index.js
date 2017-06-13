@@ -37,10 +37,7 @@ class Footer extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if ((this.state.player.sound == null && nextProps.player.sound != null) ||
-      (this.state.player.recording == null && nextProps.player.recording != null) ||
-      (nextProps.player.recording != null && this.state.player.recording.path !== nextProps.player.recording.path)
-    ) {
+    if ((this.state.player.sound == null && nextProps.player.sound != null) || nextProps.player.recording != null) {
       this.setState({
         player: nextProps.player,
         isPlaying: true,
@@ -51,7 +48,8 @@ class Footer extends Component {
 
   resetPlayer = () => {
     this.setState({
-      timingBarWidth: 0,
+      timingBarWidth: new Animated.Value(0),
+      playerHeight: new Animated.Value(0),
       isPlaying: false,
     });
 
@@ -66,10 +64,19 @@ class Footer extends Component {
           toValue: 0,
           duration: 50,
         }).start();
-    }, 5000);
+    }, 30000);
   }
 
   animatePlayer = (height) => {
+    if (this.hideTimeout == null) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+
+    this.setState({
+      showPlayer: true,
+    });
+
     Animated.timing(
       this.state.playerHeight, {
         easing: Easing.linear,
@@ -91,6 +98,7 @@ class Footer extends Component {
   render() {
     return (
       <View style={styles.footerContainer}>
+
         {
           /**
            * Player Component
@@ -106,7 +114,7 @@ class Footer extends Component {
                 <TouchableHighlight >
                   <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> :
-                <TouchableHighlight >
+                <TouchableHighlight onPress={() => this.animatePlayer(40)}>
                   <Icon name="play-arrow" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> }
             </View>
