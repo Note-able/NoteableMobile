@@ -9,6 +9,7 @@ import { appReducer } from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
 import { appScreens } from './screens';
 
+console.disableYellowBox = true;
 const store = createStore(appReducer, applyMiddleware(thunk));
 
 const AppNavigator = StackNavigator(appScreens, { navigationOptions: { header: null } });

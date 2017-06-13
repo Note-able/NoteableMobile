@@ -69,6 +69,7 @@ export default class Audio extends PureComponent {
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
+    console.log('fetching recordings');
     this.props.fetchRecordings();
 
     AudioRecorder.onProgress = () => {};
@@ -88,6 +89,7 @@ export default class Audio extends PureComponent {
   }
 
   toggleTiming = () => {
+    console.log(this.state);
     if (this.state.isTiming) {
       clearInterval(this.interval);
       this.setState({

@@ -13,7 +13,7 @@ import { colors } from '../../styles';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
-  initialRouteName: 'Record',
+  initialRouteName: 'Recordings',
   tabBarOptions: {
     activeTintColor: 'blue',
     labelStyle: {
@@ -51,13 +51,34 @@ class Home extends Component {
 
   state = {
     navOpen: false,
+    screen: '',
   };
 
+  getCurrentRouteName = (navigationState) => {
+    if (!navigationState) {
+      return null;
+    }
+    const route = navigationState.routes[navigationState.index];
+  // dive into nested navigators
+    if (route.routes) {
+      return this.getCurrentRouteName(route);
+    }
+    return route.routeName;
+  }
+
+  navigationStateChange = (prevState, currentState) => {
+    this.setState({
+      screen: this.getCurrentRouteName(currentState),
+    });
+  }
+
   render() {
-    const { navigate } = this.props.navigation;
     return (
       <View style={{ flex: 1 }}>
-        <App />
+        <App
+          onNavigationStateChange={this.navigationStateChange}
+          screenProps={{ screen: this.state.screen }}
+        />
         {!this.state.navOpen ? null : (
           <Navigation onSignIn={this.props.onSignIn} />
         )}

@@ -197,7 +197,7 @@ export default StyleSheet.create({
     flex: 1,
   },
   recordingsContainer: {
-    height: 200,
+    height: 250,
     width: '100%',
   },
   header: {

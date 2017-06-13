@@ -7,7 +7,7 @@ import { fetchUtil, logErrorToCrashlytics } from '../util';
 import { RecordingActionTypes } from './ActionTypes';
 
 const {
-  fetchRecordingsType,
+  fetchRecordingsTypes,
 } = RecordingActionTypes;
 
 
@@ -20,17 +20,34 @@ const RECORDING_SYNCED = 'RECORDING_SYNCED';
 const getRecordingsFromRealm = realm => realm.objects('Recording').sorted('id', true);
 export const fetchRecordings = () => (
   (dispatch) => {
-    dispatch({ type: fetchRecordingsType.processing });
+    dispatch({ type: fetchRecordingsTypes.processing });
 
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
+        console.log([...getRecordingsFromRealm(realm)]);
         return resolve([...getRecordingsFromRealm(realm)]);
       } catch (e) {
         return reject(e);
       }
-    }).then(recordings => dispatch({ type: fetchRecordingsType.success, recordings }))
-    .catch(e => dispatch({ type: fetchRecordingsType.error, error: e }));
+    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings }))
+    .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
+  }
+);
+
+export const searchRecordings = search => (
+  (dispatch) => {
+    dispatch({ type: fetchRecordingsTypes.processing });
+
+    new Promise((resolve, reject) => {
+      try {
+        const realm = new Realm(Schemas.RecordingSchema);
+        return resolve([...getRecordingsFromRealm(realm).filtered(`name CONTAINS "${search}"`)]);
+      } catch (e) {
+        return reject(e);
+      }
+    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings, search }))
+    .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
   }
 );
 

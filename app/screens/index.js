@@ -6,7 +6,7 @@ import Events from './Events';
 import Music from './Music/index.js';
 
 export const appScreens = {
-  Settings: { screen: AudioRecorder },
+  Settings: { screen: Nearby },
   Recordings: { screen: Music },
   Record: { screen: AudioRecorder },
   // Profile: { screen: Profile },

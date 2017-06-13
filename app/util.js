@@ -29,3 +29,17 @@ export const logErrorToCrashlytics = (error) => {
     Crashlytics.logException(error);
   }
 };
+
+export const debounceFunc = (name, func, delay) => {
+  const timeoutFunc = () => {
+    func();
+    clearTimeout(this[name]);
+  };
+
+  if (this[name] != null) {
+    clearTimeout(this[name]);
+    setTimeout(timeoutFunc, delay);
+  } else {
+    this[name] = setTimeout(timeoutFunc, delay);
+  }
+};

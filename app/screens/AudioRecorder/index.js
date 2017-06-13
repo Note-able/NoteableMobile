@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import { View } from 'react-native';
 import { connect } from 'react-redux';
@@ -25,20 +25,37 @@ const mapStateToProps = state => ({
   recordings: state.Recordings,
 });
 
-const AudioRecorder = props => (
-  <View style={{ flex: 1 }}>
-    <Header openNav={props.openNav} title="Record" />
-    <Audio
-      fetchRecordings={props.fetchRecordings}
-      loadingRecordings={props.recordings.processing}
-      saveRecording={props.saveRecording}
-      recordings={props.recordings.recordings}
-      goToRecordings={props.goToRecordings}
-      startPlayer={props.startPlayer}
-      navigation={props.navigation}
-    />
-  </View>
-  );
+class AudioRecorder extends Component {
+  state = {
+    screen: '',
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.screenProps.screen === 'Record' && this.state.screen === '') {
+      this.props.fetchRecordings();
+      this.setState({
+        screen: 'Record',
+      });
+    }
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <Header openNav={this.props.openNav} title="Record" />
+        <Audio
+          fetchRecordings={this.props.fetchRecordings}
+          loadingRecordings={this.props.recordings.processing}
+          saveRecording={this.props.saveRecording}
+          recordings={this.props.recordings.recordings}
+          goToRecordings={this.props.goToRecordings}
+          startPlayer={this.props.startPlayer}
+          navigation={this.props.navigation}
+        />
+      </View>
+    );
+  }
+}
 
 AudioRecorder.navigationOptions = {
   tabBarLabel: 'Setup',

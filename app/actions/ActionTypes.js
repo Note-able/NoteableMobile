@@ -1,7 +1,7 @@
 import { createAsyncActionTypes } from './util.js';
 
 export const RecordingActionTypes = {
-  fetchRecordingsType: createAsyncActionTypes('FETCH_RECORDINGS'),
+  fetchRecordingsTypes: createAsyncActionTypes('FETCH_RECORDINGS'),
 };
 
 export const PlayerActionTypes = {

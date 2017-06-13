@@ -88,7 +88,7 @@ export default class Recordings extends Component {
 
   render() {
     return (
-      <ScrollView contentContainerStyle={styles.recordings} bounces={false}>
+      <ScrollView contentContainerStyle={styles.recordings} bounces>
         {this.props.loadingRecordings ? <ActivityIndicator animating={this.props.loadingRecordings} size="large" style={{ marginTop: 20 }} /> : null }
         {this.props.recordings.map(recording => (
           <Animated.View

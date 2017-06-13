@@ -5,16 +5,17 @@ import {
 } from '../../../styles';
 
 export default StyleSheet.create({
-  recentRecordings: {
+  recordings: {
     backgroundColor: 'transparent',
-    maxHeight: 250,
+    maxHeight: 350,
+    minHeight: 275,
     justifyContent: 'flex-start',
     overflow: 'scroll',
     width: '100%',
   },
   row: {
-    backgroundColor: '#252626',
-    borderBottomColor: '#1B1F20',
+    backgroundColor: colors.shade10,
+    borderBottomColor: colors.shade0,
     borderBottomWidth: 2,
     height: 48,
     flexDirection: 'row',
@@ -31,14 +32,14 @@ export default StyleSheet.create({
     width: '100%',
   },
   rowTitle: {
-    color: '#95989A',
+    color: colors.shade90,
     width: 100,
   },
   name: {
     width: 150,
   },
   icon: {
-    color: '#95989A',
+    color: colors.shade90,
   },
   rowOptions: {
     flexDirection: 'row',
@@ -63,7 +64,7 @@ export default StyleSheet.create({
   },
   modal: {
     ...shadowProps,
-    backgroundColor: '#1B1F20',
+    backgroundColor: colors.shade0,
     borderRadius: 2,
     marginBottom: 130,
     paddingHorizontal: 12,
@@ -72,22 +73,22 @@ export default StyleSheet.create({
     width: '90%',
   },
   modalTitle: {
-    color: '#95989A',
+    color: colors.shade90,
     fontSize: 20,
     marginBottom: 12,
     textAlign: 'center',
     width: '100%',
   },
   inputField: {
-    backgroundColor: '#2D2E2E',
-    color: '#DDDDDA',
+    backgroundColor: colors.shade20,
+    color: colors.shade140,
     height: 32,
     marginVertical: 4,
     paddingHorizontal: 4,
     width: '100%',
   },
   inputLabel: {
-    color: '#95989A',
+    color: colors.shade90,
     fontSize: 14,
     marginTop: 2,
   },
