@@ -13,7 +13,7 @@ import { colors } from '../../styles';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
-  initialRouteName: 'AudioRecorder',
+  initialRouteName: 'Record',
   tabBarOptions: {
     activeTintColor: 'blue',
     labelStyle: {

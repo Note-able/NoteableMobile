@@ -36,3 +36,10 @@ export const gradients = {
   orangeToYellow: [colorRGBA.orange, colorRGBA.yellow],
   redToOrange: [colorRGBA.red, colorRGBA.orange],
 };
+
+export const shadowProps = {
+  shadowColor: colors.black,
+  shadowOffset: { height: 5, width: 5 },
+  shadowOpacity: 0.8,
+  shadowRadius: 15,
+};

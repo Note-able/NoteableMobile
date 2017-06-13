@@ -35,6 +35,7 @@ const AudioRecorder = props => (
       recordings={props.recordings.recordings}
       goToRecordings={props.goToRecordings}
       startPlayer={props.startPlayer}
+      navigation={props.navigation}
     />
   </View>
   );

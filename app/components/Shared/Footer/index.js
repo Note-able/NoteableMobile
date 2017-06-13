@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Animated,
+  Dimensions,
   Easing,
   Text,
   TouchableHighlight,
@@ -15,6 +16,8 @@ import {
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
+import { colors } from '../../../styles';
+import { mapIcon } from '../util.js';
 
 const mapDispatchToProps = dispatch => ({
   togglePlayer: play => dispatch(togglePlayer(play)),
@@ -28,16 +31,42 @@ class Footer extends Component {
   state = {
     player: this.props.player,
     playerHeight: new Animated.Value(0),
+    timingBarWidth: new Animated.Value(0),
+    isPlaying: false,
+    showPlayer: false,
   };
 
   componentWillReceiveProps(nextProps) {
-    if ((this.state.player.sound == null && nextProps.player.sound != null) || this.state.player.recording.path !== nextProps.player.recording.path) {
+    if ((this.state.player.sound == null && nextProps.player.sound != null) ||
+      (this.state.player.recording == null && nextProps.player.recording != null) ||
+      (nextProps.player.recording != null && this.state.player.recording.path !== nextProps.player.recording.path)
+    ) {
       this.setState({
         player: nextProps.player,
+        isPlaying: true,
+        showPlayer: true,
+      }, () => this.animatePlayer(40));
+    }
+  }
+
+  resetPlayer = () => {
+    this.setState({
+      timingBarWidth: 0,
+      isPlaying: false,
+    });
+
+    this.hideTimeout = setTimeout(() => {
+      this.setState({
+        showPlayer: false,
       });
 
-      this.animatePlayer(36);
-    }
+      Animated.timing(
+        this.state.playerHeight, {
+          easing: Easing.linear,
+          toValue: 0,
+          duration: 50,
+        }).start();
+    }, 5000);
   }
 
   animatePlayer = (height) => {
@@ -47,6 +76,16 @@ class Footer extends Component {
         toValue: height,
         duration: 50,
       }).start();
+
+    this.state.player.sound.play(this.resetPlayer);
+
+    Animated.timing(
+      this.state.timingBarWidth, {
+        easing: Easing.linear,
+        toValue: Dimensions.get('window').width,
+        duration: this.state.player.recording.duration * 1000,
+      },
+    ).start();
   }
 
   render() {
@@ -57,11 +96,19 @@ class Footer extends Component {
            * Player Component
            */
         }
+        {this.state.showPlayer ? <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} /> : null}
         <Animated.View style={[styles.playerContainer, { height: this.state.playerHeight }]}>
           {this.state.player.sound != null ?
             <View style={styles.player}>
               <Text style={styles.playerText}>{this.state.player.recording.name}</Text>
-              <Text style={styles.playerText}>{this.state.player.recording.name}</Text>
+              <Text style={styles.playerDetails}>{this.state.player.recording.name}</Text>
+              {this.state.isPlaying ?
+                <TouchableHighlight >
+                  <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
+                </TouchableHighlight> :
+                <TouchableHighlight >
+                  <Icon name="play-arrow" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
+                </TouchableHighlight> }
             </View>
             : null}
         </Animated.View>
@@ -72,24 +119,14 @@ class Footer extends Component {
            */
         }
         <View style={styles.tabsContainer}>
-          <TouchableHighlight style={styles.navButton} onPress={this.props.openNav}>
-            <View style={styles.button}>
-              <Icon name="mic" size={24} style={{ width: 24, height: 24 }} color={'white'} />
-              <Text style={styles.buttonText}>Settings</Text>
-            </View>
-          </TouchableHighlight>
-          <TouchableHighlight style={styles.navButton} onPress={this.props.openNav}>
-            <View style={styles.button}>
-              <Icon name="album" size={24} style={{ width: 24, height: 24 }} color={'white'} />
-              <Text style={styles.buttonText}>Recordings</Text>
-            </View>
-          </TouchableHighlight>
-          <TouchableHighlight style={styles.navButton} onPress={this.props.openNav}>
-            <View style={styles.button}>
-              <Icon name="mic" size={24} style={{ width: 24, height: 24 }} color={'white'} />
-              <Text style={styles.buttonText}>Record</Text>
-            </View>
-          </TouchableHighlight>
+          {this.props.navigationState.routes.map((route, index) => (
+            <TouchableHighlight style={styles.navButton} onPress={() => this.props.navigation.navigate(route.key)}>
+              <View style={styles.button} key={route.key}>
+                <Icon name={mapIcon[route.key]} size={24} style={{ width: 24, height: 24 }} color={index === this.props.navigationState.index ? colors.green : 'white'} />
+                <Text style={styles.buttonText}>{route.key}</Text>
+              </View>
+            </TouchableHighlight>
+          ))}
         </View>
       </View>
     );

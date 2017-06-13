@@ -1,4 +1,8 @@
 import { StyleSheet } from 'react-native';
+import {
+  colors,
+  shadowProps,
+} from '../../../styles';
 
 export default StyleSheet.create({
   recentRecordings: {
@@ -58,12 +62,9 @@ export default StyleSheet.create({
     bottom: 0,
   },
   modal: {
+    ...shadowProps,
     backgroundColor: '#1B1F20',
     borderRadius: 2,
-    shadowColor: '#0E1010',
-    shadowOffset: { height: 5, width: 5 },
-    shadowOpacity: 0.8,
-    shadowRadius: 15,
     marginBottom: 130,
     paddingHorizontal: 12,
     paddingTop: 12,

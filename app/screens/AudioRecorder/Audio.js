@@ -308,7 +308,7 @@ export default class Audio extends PureComponent {
         <View style={styles.recordingsContainer}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Recent</Text>
-            <TouchableHighlight onPress={() => { this.props.goToRecordings(); }}>
+            <TouchableHighlight onPress={() => { this.props.navigation.navigate('Recordings'); }}>
               <Text style={styles.navigateRecordings}>{'Recordings >'}</Text>
             </TouchableHighlight>
           </View>
