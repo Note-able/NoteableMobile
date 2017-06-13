@@ -62,9 +62,9 @@ export default class Audio extends PureComponent {
     recordingLeft: 0,
     recordings: this.props.recordings || [],
     didSave: false,
-    stopTiming: true,
     displayTime: DisplayTime(0),
     modal: false,
+    isTiming: false,
   };
 
   componentDidMount() {
@@ -107,8 +107,9 @@ export default class Audio extends PureComponent {
       this.setState({
         currentTime,
         displayTime: DisplayTime(currentTime),
+        isTiming: true,
       });
-    }, 90);
+    }, 60);
   }
 
   async prepareRecordingPath(audioPath) {
@@ -194,6 +195,7 @@ export default class Audio extends PureComponent {
   }
 
   async toggleRecording(isRecording) {
+    this.toggleTiming();
     if (!isRecording) {
       const datedFilePath = `${moment().format('HHmmss')}`;
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
@@ -201,7 +203,6 @@ export default class Audio extends PureComponent {
       this.setState({ recording: true, stoppedRecording: false, audioPath });
       try {
         await AudioRecorder.startRecording();
-        this.toggleTiming();
       } catch (err) {
         console.warn(err);
       }
