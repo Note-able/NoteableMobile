@@ -51,6 +51,7 @@ export default StyleSheet.create({
     marginHorizontal: 40,
   },
   progressText: {
+    backgroundColor: 'transparent',
     fontSize: 24,
     color: colors.white,
     width: 87,

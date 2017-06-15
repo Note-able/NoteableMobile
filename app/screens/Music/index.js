@@ -7,8 +7,9 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
 
-import { colors } from '../../styles';
+import { colors, colorRGBA } from '../../styles';
 import { Recordings } from '../../components/Shared';
 import { debounceFunc } from '../../util.js';
 import styles from './styles.js';
@@ -56,9 +57,16 @@ class Music extends Component {
             <Icon name="check-box-outline-blank" size={28} style={{ width: 28, height: 28 }} color={colors.shade90} />
           </View>
           <View style={styles.searchInput}>
-            <TextInput style={styles.input} value={this.props.recordings.search} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} />
+            <TextInput style={styles.input} value={this.state.search} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} />
           </View>
         </View>
+        <LinearGradient
+          start={{ x: 0.0, y: 0.0 }}
+          end={{ x: 0.9, y: 0.9 }}
+          locations={[0.1, 0.3, 0.8]}
+          colors={[colorRGBA.green, colorRGBA.lightGreen, colors.shade0]}
+          style={{ position: 'absolute', width: 800, height: 800, top: -400, left: -400, borderRadius: 400 }}
+        />
         <Recordings
           recordings={this.props.recordings.recordings}
           startPlayer={this.props.startPlayer}

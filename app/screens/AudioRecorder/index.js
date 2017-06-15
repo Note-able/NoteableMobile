@@ -13,8 +13,6 @@ import {
   startPlayer,
 } from '../../actions/playerActions';
 
-import { Header } from '../../components/Shared';
-
 const mapDispatchToProps = dispatch => ({
   saveRecording: (name, date, duration) => dispatch(addRecording(name, date, duration)),
   fetchRecordings: () => dispatch(fetchRecordings()),
@@ -42,7 +40,6 @@ class AudioRecorder extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <Header openNav={this.props.openNav} title="Record" />
         <Audio
           fetchRecordings={this.props.fetchRecordings}
           loadingRecordings={this.props.recordings.processing}

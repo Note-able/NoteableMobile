@@ -14,9 +14,9 @@ export default StyleSheet.create({
     width: '100%',
   },
   row: {
-    backgroundColor: colors.shade10,
-    borderBottomColor: colors.shade0,
-    borderBottomWidth: 2,
+    backgroundColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderBottomWidth: 1,
     height: 48,
     flexDirection: 'row',
     width: '100%',

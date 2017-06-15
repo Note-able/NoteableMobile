@@ -12,6 +12,7 @@ import {
   Easing,
 } from 'react-native';
 import moment from 'moment';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
@@ -23,6 +24,7 @@ import Schemas from '../../realmSchemas';
 import { Recordings } from '../../components/Shared';
 import { DisplayTime, MapRecordingFromDB } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
+import { colors, colorRGBA } from '../../styles';
 
 // RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath}`).then((result) => {
 //   console.log(result.filename);
@@ -89,7 +91,7 @@ export default class Audio extends PureComponent {
   }
 
   toggleTiming = () => {
-    console.log(this.state);
+    console.log(this.state.isTiming);
     if (this.state.isTiming) {
       clearInterval(this.interval);
       this.setState({
@@ -182,28 +184,23 @@ export default class Audio extends PureComponent {
   }
 
   playSound = (audio) => {
-    audio.play((success) => {
-      console.log('Finished playing: ', success);
-      if (!success) {
-        console.warn('FAILED');
-      } else {
-        this.setState({
-          isPaused: false,
-          isPlaying: false,
-          timingBarWidth: null,
-        });
-      }
+    audio.play(() => {
+      this.setState({
+        isPaused: false,
+        isPlaying: false,
+        timingBarWidth: null,
+      });
     });
   }
 
   async toggleRecording(isRecording) {
-    this.toggleTiming();
     if (!isRecording) {
       const datedFilePath = `${moment().format('HHmmss')}`;
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
       await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
       try {
+        this.toggleTiming();
         await AudioRecorder.startRecording();
       } catch (err) {
         console.warn(err);
@@ -261,10 +258,15 @@ export default class Audio extends PureComponent {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.timingBarWidth ? <Animated.View style={[{ width: this.state.timingBarWidth }, styles.timingBar]} /> : null}
-        <View style={styles.timingBarShadow} />
+        <LinearGradient
+          start={{ x: 1.0, y: 0.0 }}
+          end={{ x: 0.1, y: 0.9 }}
+          locations={[0.1, 0.3, 0.8]}
+          colors={[colorRGBA.red, colorRGBA.lightRed, colors.shade0]}
+          style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
+        />
         {/* Details */}
-        <Text style={{ fontSize: 20, color: 'white', paddingTop: 28 }}>Recording Time</Text>
+        <Text style={{ fontSize: 20, color: 'white', paddingTop: 28, backgroundColor: 'transparent' }}>Recording Time</Text>
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
           { this.state.reviewMode ?
             <View style={styles.buttonContainer}>

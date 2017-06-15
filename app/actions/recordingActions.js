@@ -25,7 +25,6 @@ export const fetchRecordings = () => (
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
-        console.log([...getRecordingsFromRealm(realm)]);
         return resolve([...getRecordingsFromRealm(realm)]);
       } catch (e) {
         return reject(e);

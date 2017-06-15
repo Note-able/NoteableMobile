@@ -1,15 +1,9 @@
 import { StyleSheet } from 'react-native';
+import { colors } from '../../../styles';
 
 export default StyleSheet.create({
-  row: {
-    backgroundColor: '#252626',
-    borderBottomColor: '#1B1F20',
-    borderBottomWidth: 2,
-    height: 48,
-    flexDirection: 'row',
-    width: '100%',
-  },
   rowContent: {
+    backgroundColor: colors.shade10,
     flexDirection: 'row',
     overflow: 'hidden',
     alignItems: 'center',

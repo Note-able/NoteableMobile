@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -24,6 +24,10 @@ export default class NoteableMobile extends Component {
     return (
       <Provider store={store}>
         <View style={{ flex: 1 }}>
+          <StatusBar
+            backgroundColor="black"
+            barStyle="light-content"
+          />
           <AppNavigator />
         </View>
       </Provider>

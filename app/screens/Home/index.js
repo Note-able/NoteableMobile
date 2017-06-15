@@ -74,7 +74,7 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
         <App
           onNavigationStateChange={this.navigationStateChange}
           screenProps={{ screen: this.state.screen }}

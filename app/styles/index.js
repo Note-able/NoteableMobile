@@ -21,11 +21,14 @@ export const colors = {
   dark: '#1f1b20',
 };
 
-const colorRGBA = {
-  green: 'rgba(49,203,148, 1)',
+export const colorRGBA = {
+  green: 'rgba(49, 203, 148, 0.4)',
+  lightGreen: 'rgba(49, 203, 148, 0.2)',
   blue: 'rgba(24,117,220, 1)',
   purple: 'rgba(138,50,217, 1)',
-  red: 'rgba(217,58,100, 1)',
+  red: 'rgba(217, 58, 100, 0.4)',
+  lightRed: 'rgba(217, 58, 100, 0.2)',
+  veryLightRed: 'rgba(217, 58, 100, 0.05)',
   orange: 'rgba(240,166,62, 1)',
   yellow: 'rgba(234,207,63, 1)',
 };

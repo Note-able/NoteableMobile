@@ -15,11 +15,14 @@ export default StyleSheet.create({
   headerBar: {
     backgroundColor: colors.shade0,
     flexDirection: 'row',
-    height: 48,
+    height: 68,
     justifyContent: 'space-between',
     padding: 11,
+    paddingTop: 30,
     paddingHorizontal: 20,
     ...shadowProps,
+    top: -20,
+    marginBottom: -20,
     zIndex: 4,
   },
   sortOptions: {

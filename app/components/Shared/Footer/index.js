@@ -37,7 +37,7 @@ class Footer extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if ((this.state.player.sound == null && nextProps.player.sound != null) || nextProps.player.recording != null) {
+    if (this.props.navigationState.index === nextProps.navigationState.index && ((this.state.player.sound == null && nextProps.player.sound != null) || nextProps.player.recording != null)) {
       this.setState({
         player: nextProps.player,
         isPlaying: true,
