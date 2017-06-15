@@ -5,7 +5,6 @@ import {
   Animated,
   Easing,
   ScrollView,
-  Text,
   TouchableHighlight,
   View,
 } from 'react-native';
@@ -33,6 +32,18 @@ export default class Recordings extends Component {
 
   state = {
     showOptions: null,
+    recordingsOpacity: new Animated.Value(0),
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.recordings.length === 0 && nextProps.recordings.length !== 0) {
+      Animated.timing(
+        this.state.recordingsOpacity, {
+          easing: Easing.cubic,
+          toValue: 1,
+          duration: 200,
+        }).start();
+    }
   }
 
   createAnimations = (recordingId) => {
@@ -90,30 +101,34 @@ export default class Recordings extends Component {
     return (
       <ScrollView contentContainerStyle={styles.recordings} bounces>
         {this.props.loadingRecordings ? <ActivityIndicator animating={this.props.loadingRecordings} size="large" style={{ marginTop: 20 }} /> : null }
-        {this.props.recordings.map(recording => (
-          <Animated.View
-            style={[
-              styles.row,
-              this.state[recording.id] == null ? null : {
-                transform: [{ translateX: this.state[recording.id].interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, -1 * OPTIONS_WIDTH],
-                }) }],
-              },
-            ]}
-            key={recording.id}
-          >
-            <Recording primaryAction={() => this.props.startPlayer(recording)} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
-            <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
-              <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.deleteRecording(recording)}>
-                <Icon name="delete" size={25} color={'#95989A'} />
-              </TouchableHighlight>
-              <Icon name="delete" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
-              <Icon name="send" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
-            </View>
-          </Animated.View>
-            ),
-          )}
+        <Animated.View
+          style={{ opacity: this.state.recordingsOpacity }}
+        >
+          {this.props.recordings.map(recording => (
+            <Animated.View
+              style={[
+                styles.row,
+                this.state[recording.id] == null ? null : {
+                  transform: [{ translateX: this.state[recording.id].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -1 * OPTIONS_WIDTH],
+                  }) }],
+                },
+              ]}
+              key={recording.id}
+            >
+              <Recording primaryAction={() => this.props.startPlayer(recording)} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
+              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.deleteRecording(recording)}>
+                  <Icon name="delete" size={25} color={'#95989A'} />
+                </TouchableHighlight>
+                <Icon name="delete" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
+                <Icon name="send" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
+              </View>
+            </Animated.View>
+              ),
+            )}
+        </Animated.View>
       </ScrollView>
     );
   }

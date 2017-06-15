@@ -71,7 +71,6 @@ export default class Audio extends PureComponent {
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
-    console.log('fetching recordings');
     this.props.fetchRecordings();
 
     AudioRecorder.onProgress = () => {};
