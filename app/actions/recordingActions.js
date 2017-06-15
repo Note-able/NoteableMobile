@@ -8,11 +8,11 @@ import { RecordingActionTypes } from './ActionTypes';
 
 const {
   fetchRecordingsTypes,
+  saveRecordingsTypes,
 } = RecordingActionTypes;
 
 
 const RECORDINGS_FETCHED = 'RECORDINGS_FETCHED';
-const GET_RECORDINGS_FROM_REALM = 'GET_RECORDINGS';
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
@@ -46,20 +46,26 @@ export const searchRecordings = search => (
         return reject(e);
       }
     }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings, search }))
-    .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
+    .catch(error => dispatch({ type: fetchRecordingsTypes.error, error }));
   }
 );
 
 export const addRecording = recording => (
   (dispatch) => {
-    const realm = new Realm(Schemas.RecordingSchema);
-    // Create Realm objects and write to local storage
-    realm.write(() => {
-      realm.create('Recording', recording);
-    });
+    dispatch({ type: saveRecordingsTypes.processing });
 
-    const recordings = getRecordingsFromRealm(realm);
-    dispatch({ type: GET_RECORDINGS_FROM_REALM, recordings });
+    new Promise((resolve, reject) => {
+      try {
+        const realm = new Realm(Schemas.RecordingSchema);
+        realm.write(() => {
+          realm.create('Recording', recording);
+        });
+        return resolve([...getRecordingsFromRealm(realm)]);
+      } catch (e) {
+        return reject(e);
+      }
+    }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings }))
+    .catch(error => dispatch({ type: saveRecordingsTypes.error, error }));
   }
 );
 

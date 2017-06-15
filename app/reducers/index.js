@@ -8,6 +8,7 @@ import { logErrorToCrashlytics } from '../util.js';
 
 const {
   fetchRecordingsTypes,
+  saveRecordingsTypes,
 } = RecordingActionTypes;
 
 const {
@@ -18,11 +19,14 @@ const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
   const { type, recordings, audio, currentRecording, error } = action;
   const { shouldPlay } = state;
   switch (type) {
+    case saveRecordingsTypes.success:
     case fetchRecordingsTypes.success:
     case 'RECORDING_SYNCED':
       return { ...state, recordings: recordings.map(x => MapRecordingFromDB(x)), processing: false, search: action.search };
+    case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
       return { ...state, recordingsError: error, processing: false };
+    case saveRecordingsTypes.processing:
     case fetchRecordingsTypes.processing:
       return { ...state, processing: true };
     case 'INITIALIZE_PLAYER':

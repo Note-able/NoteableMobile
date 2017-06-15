@@ -14,7 +14,7 @@ import {
 } from '../../actions/playerActions';
 
 const mapDispatchToProps = dispatch => ({
-  saveRecording: (name, date, duration) => dispatch(addRecording(name, date, duration)),
+  saveRecording: recording => dispatch(addRecording(recording)),
   fetchRecordings: () => dispatch(fetchRecordings()),
   startPlayer: recording => dispatch(startPlayer(recording)),
 });

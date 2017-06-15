@@ -96,6 +96,7 @@ class Footer extends Component {
   }
 
   render() {
+    console.log(this.props.player);
     return (
       <View style={styles.footerContainer}>
 
