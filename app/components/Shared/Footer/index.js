@@ -131,8 +131,7 @@ class Footer extends Component {
           {this.props.navigationState.routes.map((route, index) => (
             <TouchableHighlight style={styles.navButton} onPress={() => this.props.navigation.navigate(route.key)}>
               <View style={styles.button} key={route.key}>
-                <Icon name={mapIcon[route.key]} size={24} style={{ width: 24, height: 24 }} color={index === this.props.navigationState.index ? colors.green : 'white'} />
-                <Text style={styles.buttonText}>{route.key}</Text>
+                <Icon name={mapIcon[route.key]} size={32} style={{ width: 32, height: 32 }} color={index === this.props.navigationState.index ? colors.green : 'white'} />
               </View>
             </TouchableHighlight>
           ))}

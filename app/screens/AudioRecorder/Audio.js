@@ -22,9 +22,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Schemas from '../../realmSchemas';
 import { Recordings } from '../../components/Shared';
-import { DisplayTime, MapRecordingFromDB } from '../../mappers/recordingMapper';
+import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
+import { logErrorToCrashlytics } from '../../util';
 
 // RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath}`).then((result) => {
 //   console.log(result.filename);
@@ -90,7 +91,6 @@ export default class Audio extends PureComponent {
   }
 
   toggleTiming = () => {
-    console.log(this.state.isTiming);
     if (this.state.isTiming) {
       clearInterval(this.interval);
       this.setState({
@@ -112,7 +112,7 @@ export default class Audio extends PureComponent {
         displayTime: DisplayTime(currentTime),
         isTiming: true,
       });
-    }, 60);
+    }, 50);
   }
 
   async prepareRecordingPath(audioPath) {
@@ -141,7 +141,7 @@ export default class Audio extends PureComponent {
   getAudio = () => new Promise((resolve) => {
     const audio = new Sound(this.state.audioPath, '', (error) => {
       if (error) {
-        console.warn(`${error.message}`);
+        logErrorToCrashlytics(`${error.message}`);
       }
       resolve(audio);
     });
@@ -202,7 +202,7 @@ export default class Audio extends PureComponent {
         this.toggleTiming();
         await AudioRecorder.startRecording();
       } catch (err) {
-        console.warn(err);
+        logErrorToCrashlytics(err);
       }
     } else {
       await AudioRecorder.stopRecording();
@@ -213,7 +213,7 @@ export default class Audio extends PureComponent {
   saveAudio = () => {
     const audio = new Sound(this.state.audioPath, '', (error) => {
       if (error || audio.getDuration === -1) {
-        console.warn(`${error.message}`);
+        logErrorToCrashlytics(`${error.message}`);
         return;
       }
 
@@ -274,7 +274,7 @@ export default class Audio extends PureComponent {
               </TouchableHighlight>
             </View> : null }
           <View style={styles.progressTextContainer}>
-            <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 125 } : null]}>{this.state.displayTime}</Text>
+            <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 110 } : null]}>{this.state.displayTime}</Text>
           </View>
           { !this.state.reviewMode ? null : (this.state.isPlaying ?
             <View style={styles.buttonContainer}>
@@ -317,6 +317,7 @@ export default class Audio extends PureComponent {
             </TouchableHighlight>
           </View>
           <Recordings
+            deleteRecording={this.props.deleteRecording}
             recordings={this.state.recordings}
             startPlayer={this.props.startPlayer}
             loadingRecordings={this.props.loadingRecordings}

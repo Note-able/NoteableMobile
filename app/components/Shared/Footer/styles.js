@@ -13,12 +13,11 @@ export default StyleSheet.create({
     ...shadowProps,
   },
   tabsContainer: {
+    alignItems: 'center',
     backgroundColor: colors.shade0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 50,
-    paddingVertical: 2,
-    paddingTop: 4,
     width: '100%',
   },
   navButton: {
@@ -33,13 +32,14 @@ export default StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    height: 40,
+    height: 44,
+    justifyContent: 'center',
   },
   player: {
     alignItems: 'center',
     backgroundColor: colors.shade0,
     flexDirection: 'row',
-    height: 40,
+    height: 44,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },

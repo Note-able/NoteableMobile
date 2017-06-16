@@ -54,6 +54,7 @@ export default StyleSheet.create({
     backgroundColor: 'transparent',
     fontSize: 24,
     color: colors.white,
+    textAlign: 'center',
     width: 87,
   },
   recordButton: {

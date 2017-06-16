@@ -41,4 +41,20 @@ export default StyleSheet.create({
     paddingHorizontal: 6,
     width: '100%',
   },
+  filterContainer: {
+    ...shadowProps,
+    backgroundColor: colors.shade0,
+    top: 68,
+    left: 20,
+    position: 'absolute',
+    width: 125,
+    zIndex: 10,
+  },
+  filterOption: {
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: colors.shade10,
+    justifyContent: 'center',
+    height: 36,
+  },
 });

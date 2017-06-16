@@ -20,6 +20,7 @@ const OPTIONS_WIDTH = 175;
 
 export default class Recordings extends Component {
   static propTypes = {
+    deleteRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
     recordings: PropTypes.arrayOf(PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -89,14 +90,6 @@ export default class Recordings extends Component {
     }
   }
 
-  deleteRecording = (recording) => {
-    RNFetchBlob.fs.unlink(recording.path);
-    realm.write(() => {
-      const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
-      realm.delete(recordings);
-    });
-  }
-
   render() {
     return (
       <ScrollView contentContainerStyle={styles.recordings} bounces>
@@ -119,10 +112,10 @@ export default class Recordings extends Component {
             >
               <Recording primaryAction={() => this.props.startPlayer(recording)} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
               <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
-                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.deleteRecording(recording)}>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
                   <Icon name="delete" size={25} color={'#95989A'} />
                 </TouchableHighlight>
-                <Icon name="delete" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
+                <Icon name="create" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
                 <Icon name="send" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
               </View>
             </Animated.View>

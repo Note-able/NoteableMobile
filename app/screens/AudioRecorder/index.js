@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import Audio from './Audio.js';
 import {
   addRecording,
+  deleteRecording,
   fetchRecordings,
 } from '../../actions/recordingActions';
 
@@ -14,6 +15,7 @@ import {
 } from '../../actions/playerActions';
 
 const mapDispatchToProps = dispatch => ({
+  deleteRecording: recording => dispatch(deleteRecording(recording)),
   saveRecording: recording => dispatch(addRecording(recording)),
   fetchRecordings: () => dispatch(fetchRecordings()),
   startPlayer: recording => dispatch(startPlayer(recording)),
@@ -41,6 +43,7 @@ class AudioRecorder extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Audio
+          deleteRecording={this.props.deleteRecording}
           fetchRecordings={this.props.fetchRecordings}
           loadingRecordings={this.props.recordings.processing}
           saveRecording={this.props.saveRecording}

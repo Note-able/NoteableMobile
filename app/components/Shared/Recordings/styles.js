@@ -14,6 +14,10 @@ export default StyleSheet.create({
     width: '100%',
   },
   row: {
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.4,
+    shadowRadius: 1,
     backgroundColor: 'transparent',
     borderBottomColor: 'transparent',
     borderBottomWidth: 1,
@@ -42,6 +46,7 @@ export default StyleSheet.create({
     color: colors.shade90,
   },
   rowOptions: {
+    backgroundColor: colors.shade0,
     flexDirection: 'row',
     overflow: 'hidden',
     alignItems: 'center',

@@ -7,6 +7,7 @@ import {
 import { logErrorToCrashlytics } from '../util.js';
 
 const {
+  deleteRecordingTypes,
   fetchRecordingsTypes,
   saveRecordingsTypes,
 } = RecordingActionTypes;
@@ -19,10 +20,16 @@ const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
   const { type, recordings, audio, currentRecording, error } = action;
   const { shouldPlay } = state;
   switch (type) {
+    case deleteRecordingTypes.success:
+      return {
+        ...state,
+        recordings: state.recordings.filter(recording => recording.id !== action.id),
+      };
     case saveRecordingsTypes.success:
     case fetchRecordingsTypes.success:
     case 'RECORDING_SYNCED':
       return { ...state, recordings: recordings.map(x => MapRecordingFromDB(x)), processing: false, search: action.search };
+    case deleteRecordingTypes.error:
     case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
       return { ...state, recordingsError: error, processing: false };

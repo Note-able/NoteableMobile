@@ -45,5 +45,5 @@ export const shadowProps = {
   shadowColor: colors.black,
   shadowOffset: { height: 5, width: 5 },
   shadowOpacity: 0.8,
-  shadowRadius: 15,
+  shadowRadius: 10,
 };

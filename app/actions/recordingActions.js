@@ -7,6 +7,7 @@ import { fetchUtil, logErrorToCrashlytics } from '../util';
 import { RecordingActionTypes } from './ActionTypes';
 
 const {
+  deleteRecordingTypes,
   fetchRecordingsTypes,
   saveRecordingsTypes,
 } = RecordingActionTypes;
@@ -67,6 +68,24 @@ export const addRecording = recording => (
     }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings }))
     .catch(error => dispatch({ type: saveRecordingsTypes.error, error }));
   }
+);
+
+export const deleteRecording = recording => (
+  dispatch => new Promise((resolve) => {
+    if (!recording.isSynced) {
+      RNFetchBlob.fs.unlink(recording.path);
+      const realm = new Realm(Schemas.RecordingSchema);
+      realm.write(() => {
+        const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
+        realm.delete(recordings);
+        resolve(recording.id);
+      });
+    }
+  }).then(id => dispatch({ type: deleteRecordingTypes.success, id }))
+    .catch((error) => {
+      logErrorToCrashlytics(error);
+      dispatch({ type: deleteRecordingTypes.error, error });
+    })
 );
 
 export const uploadSong = (recording, user) => (
