@@ -129,8 +129,8 @@ class Footer extends Component {
         }
         <View style={styles.tabsContainer}>
           {this.props.navigationState.routes.map((route, index) => (
-            <TouchableHighlight style={styles.navButton} onPress={() => this.props.navigation.navigate(route.key)}>
-              <View style={styles.button} key={route.key}>
+            <TouchableHighlight style={styles.navButton} onPress={() => this.props.navigation.navigate(route.key)} key={route.key}>
+              <View style={styles.button}>
                 <Icon name={mapIcon[route.key]} size={32} style={{ width: 32, height: 32 }} color={index === this.props.navigationState.index ? colors.green : 'white'} />
               </View>
             </TouchableHighlight>

@@ -4,22 +4,6 @@ import { View } from 'react-native';
 import { connect } from 'react-redux';
 
 import Audio from './Audio.js';
-import {
-  addRecording,
-  deleteRecording,
-  fetchRecordings,
-} from '../../actions/recordingActions';
-
-import {
-  startPlayer,
-} from '../../actions/playerActions';
-
-const mapDispatchToProps = dispatch => ({
-  deleteRecording: recording => dispatch(deleteRecording(recording)),
-  saveRecording: recording => dispatch(addRecording(recording)),
-  fetchRecordings: () => dispatch(fetchRecordings()),
-  startPlayer: recording => dispatch(startPlayer(recording)),
-});
 
 const mapStateToProps = state => ({
   recordings: state.Recordings,
@@ -28,6 +12,8 @@ const mapStateToProps = state => ({
 class AudioRecorder extends Component {
   state = {
     screen: '',
+    recordingActions: this.props.screenProps.recordingActions,
+    playerActions: this.props.screenProps.playerActions,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -43,13 +29,13 @@ class AudioRecorder extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Audio
-          deleteRecording={this.props.deleteRecording}
-          fetchRecordings={this.props.fetchRecordings}
+          deleteRecording={this.state.recordingActions.deleteRecording}
+          fetchRecordings={this.state.recordingActions.fetchRecordings}
           loadingRecordings={this.props.recordings.processing}
-          saveRecording={this.props.saveRecording}
+          saveRecording={this.state.recordingActions.saveRecording}
           recordings={this.props.recordings.recordings}
           goToRecordings={this.props.goToRecordings}
-          startPlayer={this.props.startPlayer}
+          startPlayer={this.state.playerActions.startPlayer}
           navigation={this.props.navigation}
         />
       </View>
@@ -61,4 +47,4 @@ AudioRecorder.navigationOptions = {
   tabBarLabel: 'Setup',
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AudioRecorder);
+export default connect(mapStateToProps)(AudioRecorder);

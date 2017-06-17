@@ -18,7 +18,7 @@ const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
-const getRecordingsFromRealm = realm => realm.objects('Recording').sorted('id', true);
+const getRecordingsFromRealm = realm => realm.objects('Recording');
 export const fetchRecordings = () => (
   (dispatch) => {
     dispatch({ type: fetchRecordingsTypes.processing });
@@ -26,12 +26,28 @@ export const fetchRecordings = () => (
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
-        return resolve([...getRecordingsFromRealm(realm)]);
+        return resolve([...getRecordingsFromRealm(realm).sorted('id', true)]);
       } catch (e) {
         return reject(e);
       }
     }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings }))
     .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
+  }
+);
+
+export const filterRecordings = filter => (
+  (dispatch) => {
+    dispatch({ type: fetchRecordingsTypes.processing });
+
+    new Promise((resolve, reject) => {
+      try {
+        const realm = new Realm(Schemas.RecordingSchema);
+        return resolve([...getRecordingsFromRealm(realm).sorted(filter)]);
+      } catch (e) {
+        return reject(e);
+      }
+    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings, filter }))
+    .catch(error => dispatch({ type: fetchRecordingsTypes.error, error }));
   }
 );
 
@@ -42,7 +58,7 @@ export const searchRecordings = search => (
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
-        return resolve([...getRecordingsFromRealm(realm).filtered(`name CONTAINS "${search}"`)]);
+        return resolve([...getRecordingsFromRealm(realm).sorted('id', true).sorted('id', true).filtered(`name CONTAINS "${search}"`)]);
       } catch (e) {
         return reject(e);
       }

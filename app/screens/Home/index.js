@@ -2,14 +2,23 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-
-import AudioRecorder from '../AudioRecorder';
-import { Footer, Navigation } from '../../components/Shared';
-import styles from './main-styles';
-import { onSignIn } from '../../actions/accountActions';
 import { TabNavigator } from 'react-navigation';
+
+import { Footer, Navigation } from '../../components/Shared';
 import { appScreens } from '../../screens';
 import { colors } from '../../styles';
+
+import {
+  addRecording,
+  deleteRecording,
+  fetchRecordings,
+  filterRecordings,
+  searchRecordings,
+} from '../../actions/recordingActions';
+
+import {
+  startPlayer,
+} from '../../actions/playerActions';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
@@ -29,24 +38,22 @@ const App = TabNavigator(appScreens, {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = dispatch => ({
-  navigateScene: (scene) => {
-    scene();
-    dispatch({ type: 'changeScene' });
+  recordingActions: {
+    deleteRecording: recording => dispatch(deleteRecording(recording)),
+    saveRecording: recording => dispatch(addRecording(recording)),
+    searchRecordings: search => dispatch(searchRecordings(search)),
+    fetchRecordings: () => dispatch(fetchRecordings()),
+    filterRecordings: filter => dispatch(filterRecordings(filter)),
   },
-  onSignIn: (result) => { dispatch(onSignIn(result)); },
+  playerActions: {
+    startPlayer: recording => dispatch(startPlayer(recording)),
+  },
 });
-// navigateScene(views[view].scene);
 
-/*
-  propTypes = {
-    navigateScene: typeof function
-  }
-        <AudioRecorder openNav={() => this.setState({ navOpen: true })} goToRecordings={() => { navigate('Music'); }} />
-        <Footer />
- */
 class Home extends Component {
   static propTypes = {
-    navigateScene: PropTypes.func.isRequired,
+    recordingActions: PropTypes.shape({}),
+    playerActions: PropTypes.shape({}),
   }
 
   state = {
@@ -59,7 +66,6 @@ class Home extends Component {
       return null;
     }
     const route = navigationState.routes[navigationState.index];
-  // dive into nested navigators
     if (route.routes) {
       return this.getCurrentRouteName(route);
     }
@@ -77,7 +83,11 @@ class Home extends Component {
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
         <App
           onNavigationStateChange={this.navigationStateChange}
-          screenProps={{ screen: this.state.screen }}
+          screenProps={{
+            screen: this.state.screen,
+            recordingActions: this.props.recordingActions,
+            playerActions: this.props.playerActions,
+          }}
         />
         {!this.state.navOpen ? null : (
           <Navigation onSignIn={this.props.onSignIn} />
