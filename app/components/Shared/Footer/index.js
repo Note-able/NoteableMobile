@@ -33,11 +33,16 @@ class Footer extends Component {
     playerHeight: new Animated.Value(0),
     timingBarWidth: new Animated.Value(0),
     isPlaying: false,
+    isPaused: 0,
     showPlayer: false,
   };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.navigationState.index === nextProps.navigationState.index && ((this.state.player.sound == null && nextProps.player.sound != null) || nextProps.player.recording != null)) {
+      if (this.state.player != null && this.state.isPlaying) {
+        this.resetPlayer();
+      }
+
       this.setState({
         player: nextProps.player,
         isPlaying: true,
@@ -51,6 +56,7 @@ class Footer extends Component {
       timingBarWidth: new Animated.Value(0),
       playerHeight: new Animated.Value(0),
       isPlaying: false,
+      isPaused: 0,
     });
 
     this.hideTimeout = setTimeout(() => {
@@ -84,35 +90,51 @@ class Footer extends Component {
         duration: 50,
       }).start();
 
-    this.state.player.sound.play(this.resetPlayer);
+    if (this.state.isPaused === 0) {
+      this.state.player.sound.play(this.resetPlayer);
+      this.timingAnimation = Animated.timing(
+        this.state.timingBarWidth, {
+          easing: Easing.linear,
+          toValue: Dimensions.get('window').width,
+          duration: this.state.player.recording.duration * 1000,
+        },
+      );
+      this.timingAnimation.start();
+    } else {
+      this.timingAnimation = Animated.timing(
+        this.state.timingBarWidth, {
+          easing: Easing.linear,
+          toValue: Dimensions.get('window').width,
+          duration: (this.state.player.recording.duration * 1000) - (this.state.isPaused * 1000),
+        },
+      );
+      this.timingAnimation.start();
+    }
+  }
 
-    Animated.timing(
-      this.state.timingBarWidth, {
-        easing: Easing.linear,
-        toValue: Dimensions.get('window').width,
-        duration: this.state.player.recording.duration * 1000,
-      },
-    ).start();
+  pause = () => {
+    this.state.player.sound.pause();
+    this.timingAnimation.stop();
+    this.state.player.sound.getCurrentTime((seconds) => {
+      this.setState({
+        isPlaying: false,
+        isPaused: seconds,
+      });
+    });
   }
 
   render() {
-    console.log(this.props.player);
     return (
       <View style={styles.footerContainer}>
-
-        {
-          /**
-           * Player Component
-           */
-        }
+        {/* Player Component */}
         {this.state.showPlayer ? <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} /> : null}
         <Animated.View style={[styles.playerContainer, { height: this.state.playerHeight }]}>
           {this.state.player.sound != null ?
             <View style={styles.player}>
-              <Text style={styles.playerText}>{this.state.player.recording.name}</Text>
-              <Text style={styles.playerDetails}>{this.state.player.recording.name}</Text>
+              <Text numberOfLines={1} style={styles.playerText}>{this.state.player.recording.name}</Text>
+              <Text numberOfLines={1} style={styles.playerDetails}>{this.state.player.recording.name}</Text>
               {this.state.isPlaying ?
-                <TouchableHighlight >
+                <TouchableHighlight onPress={this.pause}>
                   <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> :
                 <TouchableHighlight onPress={() => this.animatePlayer(40)}>
@@ -121,12 +143,7 @@ class Footer extends Component {
             </View>
             : null}
         </Animated.View>
-
-        {
-          /**
-           * Tabs Component
-           */
-        }
+        {/* Tabs Component */}
         <View style={styles.tabsContainer}>
           {this.props.navigationState.routes.map((route, index) => (
             <TouchableHighlight style={styles.navButton} onPress={() => this.props.navigation.navigate(route.key)} key={route.key}>
