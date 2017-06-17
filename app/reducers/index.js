@@ -10,6 +10,7 @@ const {
   deleteRecordingTypes,
   fetchRecordingsTypes,
   saveRecordingsTypes,
+  updateRecordingTypes,
 } = RecordingActionTypes;
 
 const {
@@ -24,6 +25,16 @@ const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
       return {
         ...state,
         recordings: state.recordings.filter(recording => recording.id !== action.id),
+      };
+    case updateRecordingTypes.success:
+      return {
+        ...state,
+        recordings: state.recordings.map((recording) => {
+          if (recording.id === action.record.id) {
+            return MapRecordingFromDB(action.record);
+          }
+          return recording;
+        }),
       };
     case saveRecordingsTypes.success:
     case fetchRecordingsTypes.success:

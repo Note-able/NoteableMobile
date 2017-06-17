@@ -18,7 +18,7 @@ class AudioRecorder extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.screenProps.screen === 'Record' && this.state.screen === '') {
-      this.props.fetchRecordings();
+      this.state.recordingActions.fetchRecordings();
       this.setState({
         screen: 'Record',
       });

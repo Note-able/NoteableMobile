@@ -12,8 +12,7 @@ import {
   addRecording,
   deleteRecording,
   fetchRecordings,
-  filterRecordings,
-  searchRecordings,
+  updateRecording,
 } from '../../actions/recordingActions';
 
 import {
@@ -40,10 +39,11 @@ const mapStateToProps = state => state;
 const mapDispatchToProps = dispatch => ({
   recordingActions: {
     deleteRecording: recording => dispatch(deleteRecording(recording)),
-    saveRecording: recording => dispatch(addRecording(recording)),
-    searchRecordings: search => dispatch(searchRecordings(search)),
     fetchRecordings: () => dispatch(fetchRecordings()),
-    filterRecordings: filter => dispatch(filterRecordings(filter)),
+    filterRecordings: filter => dispatch(fetchRecordings(filter)),
+    updateRecording: recording => dispatch(updateRecording(recording)),
+    saveRecording: recording => dispatch(addRecording(recording)),
+    searchRecordings: search => dispatch(fetchRecordings(null, search)),
   },
   playerActions: {
     startPlayer: recording => dispatch(startPlayer(recording)),

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Animated,
   Easing,
+  Modal,
   ScrollView,
   Text,
   TextInput,
@@ -14,7 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { colors, colorRGBA } from '../../styles';
-import { Recordings } from '../../components/Shared';
+import { Recordings, CustomModal } from '../../components/Shared';
 import { debounceFunc } from '../../util.js';
 import styles from './styles.js';
 
@@ -67,6 +68,31 @@ class Music extends Component {
     });
   }
 
+  editRecording = (recording) => {
+    this.setState({
+      modal: {
+        id: recording.id,
+        name: recording.name,
+      },
+      fileName: recording.name,
+      recording,
+    });
+  }
+
+  updateRecording = (recordingInfo) => {
+    this.state.recordingActions.updateRecording({
+      ...this.state.recording,
+      name: recordingInfo.fileName,
+      tags: recordingInfo.tags,
+    });
+
+    this.setState({
+      recording: null,
+      modal: null,
+      fileName: '',
+    });
+  }
+
   render() {
     const check = <Icon name="check" size={18} style={{ width: 18, height: 18, marginRight: 4 }} color={colors.green} />;
     return (
@@ -110,7 +136,20 @@ class Music extends Component {
           deleteRecording={this.state.recordingActions.deleteRecording}
           recordings={this.props.recordings.recordings}
           startPlayer={this.state.playerActions.startPlayer}
+          editRecording={this.editRecording}
         />
+        {/* Modal */}
+        <Modal
+          animationType={'none'}
+          transparent
+          visible={this.state.modal != null}
+        >
+          <CustomModal
+            initialValue={this.state.fileName}
+            cancel={() => this.setState({ modal: null })}
+            save={recordingInfo => this.updateRecording(recordingInfo)}
+          />
+        </Modal>
       </ScrollView>
     );
   }

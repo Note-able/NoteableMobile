@@ -21,6 +21,7 @@ const OPTIONS_WIDTH = 175;
 export default class Recordings extends Component {
   static propTypes = {
     deleteRecording: PropTypes.func.isRequired,
+    editRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
     recordings: PropTypes.arrayOf(PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -115,8 +116,12 @@ export default class Recordings extends Component {
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
                   <Icon name="delete" size={25} color={'#95989A'} />
                 </TouchableHighlight>
-                <Icon name="create" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
-                <Icon name="send" size={25} style={{ width: 25, height: 25, margin: 10 }} color={'#95989A'} />
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
+                  <Icon name="create" size={25} color={'#95989A'} />
+                </TouchableHighlight>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => {}}>
+                  <Icon name="send" size={25} color={'#95989A'} />
+                </TouchableHighlight>
               </View>
             </Animated.View>
               ),

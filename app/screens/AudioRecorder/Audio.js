@@ -21,7 +21,7 @@ import Realm from 'realm';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Schemas from '../../realmSchemas';
-import { Recordings } from '../../components/Shared';
+import { CustomModal, Recordings } from '../../components/Shared';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
@@ -210,7 +210,7 @@ export default class Audio extends PureComponent {
     }
   }
 
-  saveAudio = () => {
+  saveAudio = (recording) => {
     const audio = new Sound(this.state.audioPath, '', (error) => {
       if (error || audio.getDuration === -1) {
         logErrorToCrashlytics(`${error.message}`);
@@ -218,7 +218,7 @@ export default class Audio extends PureComponent {
       }
 
       this.props.saveRecording({
-        name: this.state.fileName,
+        name: recording.fileName,
         path: this.state.audioPath,
         date: moment.utc().format(),
         duration: audio.getDuration(),
@@ -227,7 +227,7 @@ export default class Audio extends PureComponent {
         id: Schemas.GetId(realm.objects('Recording')) + 1,
       });
 
-      if (this.state.fileName === `Untitled ${untitledTitle}`) {
+      if (recording.fileName === `Untitled ${untitledTitle}`) {
         untitledTitle += 1;
         this.setState({
           fileName: `Untitled ${untitledTitle}`,
@@ -324,29 +324,16 @@ export default class Audio extends PureComponent {
           />
         </View>
         {/* Modal */}
-
         <Modal
           animationType={'none'}
           transparent
           visible={this.state.modal}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modal}>
-              <Text style={styles.modalTitle}>Title</Text>
-              <Text style={styles.inputLabel}>Name</Text>
-              <TextInput style={styles.inputField} onChangeText={name => this.setState({ fileName: name })} value={this.state.fileName} />
-              <Text style={styles.inputLabel}>Tags</Text>
-              <TextInput style={styles.inputField} onChangeText={tags => this.setState({ tags })} value={this.state.tags} />
-              <View style={styles.buttonRow}>
-                <TouchableHighlight style={styles.buttonOption} onPress={() => this.setState({ modal: false })}>
-                  <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Cancel</Text>
-                </TouchableHighlight>
-                <TouchableHighlight style={styles.buttonOption} onPress={() => this.saveAudio()}>
-                  <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Save</Text>
-                </TouchableHighlight>
-              </View>
-            </View>
-          </View>
+          <CustomModal
+            initialValue={this.state.fileName}
+            cancel={() => this.setState({ modal: false })}
+            save={recordingInfo => this.saveAudio(recordingInfo)}
+          />
         </Modal>
       </View>
     );

@@ -9,6 +9,7 @@ import { RecordingActionTypes } from './ActionTypes';
 const {
   deleteRecordingTypes,
   fetchRecordingsTypes,
+  updateRecordingTypes,
   saveRecordingsTypes,
 } = RecordingActionTypes;
 
@@ -19,51 +20,24 @@ const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
 const getRecordingsFromRealm = realm => realm.objects('Recording');
-export const fetchRecordings = () => (
+export const fetchRecordings = (filter, search) => (
   (dispatch) => {
     dispatch({ type: fetchRecordingsTypes.processing });
 
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
+        if (filter != null) {
+          return resolve([...getRecordingsFromRealm(realm).sorted(filter)]);
+        } else if (search != null) {
+          return resolve([...getRecordingsFromRealm(realm).sorted('id', true).filtered(`name CONTAINS "${search}"`)]);
+        }
         return resolve([...getRecordingsFromRealm(realm).sorted('id', true)]);
       } catch (e) {
         return reject(e);
       }
     }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings }))
     .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
-  }
-);
-
-export const filterRecordings = filter => (
-  (dispatch) => {
-    dispatch({ type: fetchRecordingsTypes.processing });
-
-    new Promise((resolve, reject) => {
-      try {
-        const realm = new Realm(Schemas.RecordingSchema);
-        return resolve([...getRecordingsFromRealm(realm).sorted(filter)]);
-      } catch (e) {
-        return reject(e);
-      }
-    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings, filter }))
-    .catch(error => dispatch({ type: fetchRecordingsTypes.error, error }));
-  }
-);
-
-export const searchRecordings = search => (
-  (dispatch) => {
-    dispatch({ type: fetchRecordingsTypes.processing });
-
-    new Promise((resolve, reject) => {
-      try {
-        const realm = new Realm(Schemas.RecordingSchema);
-        return resolve([...getRecordingsFromRealm(realm).sorted('id', true).sorted('id', true).filtered(`name CONTAINS "${search}"`)]);
-      } catch (e) {
-        return reject(e);
-      }
-    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings, search }))
-    .catch(error => dispatch({ type: fetchRecordingsTypes.error, error }));
   }
 );
 
@@ -77,7 +51,7 @@ export const addRecording = recording => (
         realm.write(() => {
           realm.create('Recording', recording);
         });
-        return resolve([...getRecordingsFromRealm(realm)]);
+        return resolve([...getRecordingsFromRealm(realm).sorted('id', true)]);
       } catch (e) {
         return reject(e);
       }
@@ -102,6 +76,26 @@ export const deleteRecording = recording => (
       logErrorToCrashlytics(error);
       dispatch({ type: deleteRecordingTypes.error, error });
     })
+);
+
+export const updateRecording = recording => (
+  (dispatch) => {
+    dispatch({ type: updateRecordingTypes.processing });
+    new Promise((resolve, reject) => {
+      try {
+        let record;
+        const realm = new Realm(Schemas.RecordingSchema);
+        realm.write(() => {
+          record = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
+          record.name = recording.name;
+        });
+        return resolve({ ...record });
+      } catch (e) {
+        return reject(e);
+      }
+    }).then(record => dispatch({ type: updateRecordingTypes.success, record }))
+    .catch(error => dispatch({ type: updateRecordingTypes.error, error }));
+  }
 );
 
 export const uploadSong = (recording, user) => (
