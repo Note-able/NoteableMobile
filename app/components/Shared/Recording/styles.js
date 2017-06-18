@@ -15,7 +15,13 @@ export default StyleSheet.create({
   },
   rowTitle: {
     color: '#95989A',
-    width: 100,
+    width: 85,
+  },
+  rowDetails: {
+    color: '#95989A',
+    fontSize: 12,
+    marginLeft: 8,
+    width: 85,
   },
   name: {
     width: 150,

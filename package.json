@@ -7,7 +7,7 @@
     "deploy-crashlytics": "cd android && ./gradlew assembleRelease crashlyticsUploadDistributionRelease"
   },
   "dependencies": {
-    "moment": "^2.15.2",
+    "moment": "^2.18.1",
     "prop-types": "^15.5.8",
     "react": "16.0.0-alpha.6",
     "react-addons-pure-render-mixin": "^15.5.2",

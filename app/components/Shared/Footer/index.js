@@ -81,6 +81,7 @@ class Footer extends Component {
 
     this.setState({
       showPlayer: true,
+      isPlaying: true,
     });
 
     Animated.timing(
@@ -90,16 +91,20 @@ class Footer extends Component {
         duration: 50,
       }).start();
 
-    if (this.state.isPaused === 0 && newSong) {
-      this.state.player.sound.play(this.resetPlayer);
-      this.timingAnimation = Animated.timing(
-        this.state.timingBarWidth, {
-          easing: Easing.linear,
-          toValue: Dimensions.get('window').width,
-          duration: this.state.player.recording.duration * 1000,
-        },
-      );
-      this.timingAnimation.start();
+    if (this.state.isPaused === 0 || newSong) {
+      this.setState({
+        timingBarWidth: new Animated.Value(0),
+      }, () => {
+        this.state.player.sound.play(this.resetPlayer);
+        this.timingAnimation = Animated.timing(
+          this.state.timingBarWidth, {
+            easing: Easing.linear,
+            toValue: Dimensions.get('window').width,
+            duration: this.state.player.recording.duration * 1000,
+          },
+        );
+        this.timingAnimation.start();
+      });
     } else {
       this.state.player.sound.play(this.resetPlayer);
       this.timingAnimation = Animated.timing(

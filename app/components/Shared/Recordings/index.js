@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFetchBlob from 'react-native-fetch-blob';
+import moment from 'moment';
 import Realm from 'realm';
 import styles from './styles.js';
 import Schemas from '../../../realmSchemas';
@@ -70,6 +71,12 @@ export default class Recordings extends Component {
     }
 
     if (oldOptions != null) {
+      if (oldOptions.id === recordingId) {
+        this.setState({
+          showOptions: null,
+        });
+      }
+
       animations.push(Animated.spring(
         this.state[oldOptions.id], {
           easing: Easing.linear,
@@ -89,6 +96,13 @@ export default class Recordings extends Component {
     } else {
       this.createAnimations(recordingId);
     }
+  }
+
+  startPlayer = (recording) => {
+    this.props.startPlayer(recording);
+    this.setState({
+      activeRecording: recording.id,
+    });
   }
 
   render() {
@@ -111,7 +125,15 @@ export default class Recordings extends Component {
               ]}
               key={recording.id}
             >
-              <Recording primaryAction={() => this.props.startPlayer(recording)} name={recording.name} openMoreMenu={() => this.showOptions(recording.id)} primaryDetails={recording.durationDisplay} />
+              <Recording
+                primaryAction={() => this.startPlayer(recording)}
+                name={recording.name}
+                isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
+                isPlaying={this.state.activeRecording === recording.id}
+                openMoreMenu={() => this.showOptions(recording.id)}
+                secondaryDetails={recording.durationDisplay}
+                primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
+              />
               <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
                   <Icon name="delete" size={25} color={'#95989A'} />
