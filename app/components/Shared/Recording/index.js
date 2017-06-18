@@ -10,10 +10,12 @@ import styles from './styles.js';
 
 const Recording = props => (
   <View style={styles.rowContent}>
-    <TouchableHighlight onPress={props.primaryAction}>
-      <Text style={[styles.rowTitle, styles.name]} numberOfLines={1}>{props.name}</Text>
+    <TouchableHighlight onPress={props.primaryAction} underlayColor="transparent">
+      <View style={{ height: '100%', alignItems: 'center', flexDirection: 'row' }}>
+        <Text style={[styles.rowTitle, styles.name]} numberOfLines={1}>{props.name}</Text>
+        <Text style={styles.rowTitle} numberOfLines={1}>{props.primaryDetails}</Text>
+      </View>
     </TouchableHighlight>
-    <Text style={styles.rowTitle}>{props.primaryDetails}</Text>
     <TouchableHighlight onPress={props.openMoreMenu}>
       <Icon name="more-horiz" size={32} style={{ width: 32, height: 32, margin: 10 }} color={'#95989A'} />
     </TouchableHighlight>

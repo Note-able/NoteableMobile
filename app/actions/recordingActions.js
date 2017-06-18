@@ -101,8 +101,19 @@ export const updateRecording = recording => (
         let record;
         const realm = new Realm(Schemas.RecordingSchema);
         realm.write(() => {
+          const rec = realm.objects('Recording');
+          let index = 0;
           record = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
-          record.name = recording.name;
+
+          while (rec.filtered(`name = "${recording.name}${index === 0 ? '' : ` (${index})`}"`).length !== 0) {
+            index += 1;
+          }
+
+          if (index !== 0) {
+            record.name = `${recording.name} (${index})`;
+          } else {
+            record.name = recording.name;
+          }
         });
         return resolve({ ...record });
       } catch (e) {

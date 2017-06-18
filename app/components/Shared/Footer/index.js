@@ -47,7 +47,7 @@ class Footer extends Component {
         player: nextProps.player,
         isPlaying: true,
         showPlayer: true,
-      }, () => this.animatePlayer(40));
+      }, () => this.animatePlayer(40, true));
     }
   }
 
@@ -73,7 +73,7 @@ class Footer extends Component {
     }, 30000);
   }
 
-  animatePlayer = (height) => {
+  animatePlayer = (height, newSong) => {
     if (this.hideTimeout == null) {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
@@ -90,7 +90,7 @@ class Footer extends Component {
         duration: 50,
       }).start();
 
-    if (this.state.isPaused === 0) {
+    if (this.state.isPaused === 0 && newSong) {
       this.state.player.sound.play(this.resetPlayer);
       this.timingAnimation = Animated.timing(
         this.state.timingBarWidth, {
@@ -101,7 +101,7 @@ class Footer extends Component {
       );
       this.timingAnimation.start();
     } else {
-      this.state.player.sound.resume();
+      this.state.player.sound.play(this.resetPlayer);
       this.timingAnimation = Animated.timing(
         this.state.timingBarWidth, {
           easing: Easing.linear,
