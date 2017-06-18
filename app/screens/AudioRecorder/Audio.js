@@ -206,7 +206,7 @@ export default class Audio extends PureComponent {
       }
     } else {
       await AudioRecorder.stopRecording();
-      this.setState({ stoppedRecording: true, recording: false, reviewMode: true });
+      this.setState({ stoppedRecording: true, recording: false, reviewMode: true, modal: true });
     }
   }
 
@@ -264,31 +264,12 @@ export default class Audio extends PureComponent {
           colors={[colorRGBA.red, colorRGBA.lightRed, colors.shade0]}
           style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
         />
-        {/* Details */}
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28, backgroundColor: 'transparent' }}>Recording Time</Text>
         <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
-          { this.state.reviewMode ?
-            <View style={styles.buttonContainer}>
-              <TouchableHighlight onPress={this.deleteRecording}>
-                <Icon name="delete" size={40} style={{ width: 40, height: 40, margin: 15 }} color={'#31CB94'} />
-              </TouchableHighlight>
-            </View> : null }
           <View style={styles.progressTextContainer}>
             <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 110 } : null]}>{this.state.displayTime}</Text>
           </View>
-          { !this.state.reviewMode ? null : (this.state.isPlaying ?
-            <View style={styles.buttonContainer}>
-              <TouchableHighlight onPress={this.pausePlay}>
-                <Icon name="pause" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
-              </TouchableHighlight>
-            </View> :
-            <View style={styles.buttonContainer}>
-              <TouchableHighlight onPress={this.startPlay}>
-                <Icon name="play-arrow" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'#31CB94'} />
-              </TouchableHighlight>
-            </View>)}
         </View>
-        {/* Recording button */}
         <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
           <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
             { this.state.recording ?
@@ -299,16 +280,6 @@ export default class Audio extends PureComponent {
             }
           </TouchableHighlight>
         </View>
-        {/* Save button */}
-        {!this.state.reviewMode ? null :
-        <View style={[styles.buttonContainer, styles.saveContainer]}>
-          <TouchableHighlight style={styles.saveButton} onPress={() => this.setState({ modal: true })}>
-            <Text style={styles.saveText}>Save</Text>
-          </TouchableHighlight>
-        </View>
-        }
-        {/* Recent Recordings */}
-
         <View style={styles.recordingsContainer}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Recent</Text>
@@ -323,7 +294,6 @@ export default class Audio extends PureComponent {
             loadingRecordings={this.props.loadingRecordings}
           />
         </View>
-        {/* Modal */}
         <Modal
           animationType={'none'}
           transparent
@@ -331,7 +301,10 @@ export default class Audio extends PureComponent {
         >
           <CustomModal
             initialValue={this.state.fileName}
-            cancel={() => this.setState({ modal: false })}
+            cancel={() => {
+              this.setState({ modal: false });
+              this.deleteRecording();
+            }}
             save={recordingInfo => this.saveAudio(recordingInfo)}
           />
         </Modal>

@@ -101,6 +101,7 @@ class Footer extends Component {
       );
       this.timingAnimation.start();
     } else {
+      this.state.player.sound.resume();
       this.timingAnimation = Animated.timing(
         this.state.timingBarWidth, {
           easing: Easing.linear,

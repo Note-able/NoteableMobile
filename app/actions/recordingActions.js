@@ -1,5 +1,6 @@
 import Realm from 'realm';
 import RNFetchBlob from 'react-native-fetch-blob';
+import { AudioUtils } from 'react-native-audio';
 
 import Schemas from '../realmSchemas';
 import { recordingLocation } from '../constants';
@@ -19,7 +20,16 @@ const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
-const getRecordingsFromRealm = realm => realm.objects('Recording');
+const validate = (recordings) => {
+  const directory = AudioUtils.DocumentDirectoryPath;
+  return recordings.map((record) => {
+    if (record.isSynced || record.path.indexOf(directory) !== -1) {
+      return record;
+    }
+    return null;
+  });
+};
+
 export const fetchRecordings = (filter, search) => (
   (dispatch) => {
     dispatch({ type: fetchRecordingsTypes.processing });
@@ -28,11 +38,11 @@ export const fetchRecordings = (filter, search) => (
       try {
         const realm = new Realm(Schemas.RecordingSchema);
         if (filter != null) {
-          return resolve([...getRecordingsFromRealm(realm).sorted(filter)]);
+          return resolve([...validate(realm.objects('Recording').sorted(filter))]);
         } else if (search != null) {
-          return resolve([...getRecordingsFromRealm(realm).sorted('id', true).filtered(`name CONTAINS "${search}"`)]);
+          return resolve([...validate(realm.objects('Recording').sorted('id', true).filtered(`name CONTAINS "${search}"`))]);
         }
-        return resolve([...getRecordingsFromRealm(realm).sorted('id', true)]);
+        return resolve([...validate(realm.objects('Recording').sorted('id', true))]);
       } catch (e) {
         return reject(e);
       }
@@ -44,14 +54,19 @@ export const fetchRecordings = (filter, search) => (
 export const addRecording = recording => (
   (dispatch) => {
     dispatch({ type: saveRecordingsTypes.processing });
-
     new Promise((resolve, reject) => {
       try {
         const realm = new Realm(Schemas.RecordingSchema);
         realm.write(() => {
-          realm.create('Recording', recording);
+          const record = realm.objects('Recording').filtered(`name = "${recording.name}"`);
+
+          if (record.length !== 0) {
+            realm.create('Recording', { ...recording, name: `${recording.name} (1)` });
+          } else {
+            realm.create('Recording', recording);
+          }
         });
-        return resolve([...getRecordingsFromRealm(realm).sorted('id', true)]);
+        return resolve([...realm.objects('Recording').sorted('id', true)]);
       } catch (e) {
         return reject(e);
       }
@@ -145,7 +160,7 @@ export const uploadSong = (recording, user) => (
             recording.isSynced = true;
             recording.id = song.id;
           });
-          const recordings = getRecordingsFromRealm(realm);
+          const recordings = realm.objects('Recording');
           dispatch({ type: RECORDING_SYNCED, recordings });
         });
       });
