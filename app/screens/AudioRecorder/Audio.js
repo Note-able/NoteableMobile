@@ -5,7 +5,6 @@ import {
   Text,
   View,
   TouchableHighlight,
-  TextInput,
   Animated,
   Dimensions,
   Modal,
@@ -32,7 +31,7 @@ import { logErrorToCrashlytics } from '../../util';
 //   result.forEach(r => RNFetchBlob.fs.unlink(r.path));
 // });
 
-const realm = new Realm(Schemas.RecordingSchema);
+const realm = Schemas.RecordingSchema;
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
 const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');

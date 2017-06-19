@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import Recording from './Recording.js';
 import { fetchRecordings, initializePlayer } from '../../actions/recordingActions';
-import RecordingSchema from '../../realmSchemas';
+import Schemas from '../../realmSchemas';
 
 const mapStateToProps = state => ({
   recordings: mapRealmResults(state.recordingsReducer.recordings),
@@ -32,7 +32,7 @@ class PublicSongList extends Component {
   }
 
   toggleSync = (name, date) => {
-    const realm = new Realm(RecordingSchema);
+    const realm = Schemas.RecordingSchema;
     const recordings = realm.objects('Recording');
     const recording = recordings.filtered(`name = "${name}" AND date = "${date}" `)[0];
     realm.write(() => {
@@ -84,7 +84,7 @@ class PublicSongList extends Component {
   }
 }
 
-const mapRealmResults = (results) => results.reduce((map, file) => {
+const mapRealmResults = results => results.reduce((map, file) => {
   map[file.name] = file;
   return map;
 }, {});

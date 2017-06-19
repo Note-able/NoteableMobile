@@ -16,7 +16,7 @@ import styles from './styles.js';
 import Schemas from '../../../realmSchemas';
 import { Recording } from '../';
 
-const realm = new Realm(Schemas.RecordingSchema);
+const realm = Schemas.RecordingSchema;
 const OPTIONS_WIDTH = 175;
 
 export default class Recordings extends Component {

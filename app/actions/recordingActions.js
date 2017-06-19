@@ -14,7 +14,7 @@ const {
   saveRecordingsTypes,
 } = RecordingActionTypes;
 
-
+const realm = Schemas.RecordingSchema;
 const RECORDINGS_FETCHED = 'RECORDINGS_FETCHED';
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
@@ -36,7 +36,6 @@ export const fetchRecordings = (filter, search) => (
 
     new Promise((resolve, reject) => {
       try {
-        const realm = new Realm(Schemas.RecordingSchema);
         if (filter != null) {
           return resolve([...validate(realm.objects('Recording').sorted(filter))]);
         } else if (search != null) {
@@ -56,7 +55,6 @@ export const addRecording = recording => (
     dispatch({ type: saveRecordingsTypes.processing });
     new Promise((resolve, reject) => {
       try {
-        const realm = new Realm(Schemas.RecordingSchema);
         realm.write(() => {
           const record = realm.objects('Recording').filtered(`name = "${recording.name}"`);
 
@@ -79,7 +77,6 @@ export const deleteRecording = recording => (
   dispatch => new Promise((resolve) => {
     if (!recording.isSynced) {
       RNFetchBlob.fs.unlink(recording.path);
-      const realm = new Realm(Schemas.RecordingSchema);
       realm.write(() => {
         const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
         realm.delete(recordings);
@@ -99,7 +96,6 @@ export const updateRecording = recording => (
     new Promise((resolve, reject) => {
       try {
         let record;
-        const realm = new Realm(Schemas.RecordingSchema);
         realm.write(() => {
           const rec = realm.objects('Recording');
           let index = 0;
@@ -166,7 +162,6 @@ export const uploadSong = (recording, user) => (
         })
         .then(res => res.json())
         .then((song) => {
-          const realm = new Realm(Schemas.RecordingSchema);
           realm.write(() => {
             recording.isSynced = true;
             recording.id = song.id;

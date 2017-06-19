@@ -1,20 +1,65 @@
 // import Realm from 'realm';
 
 // Define your models and their properties
+// the first schema to update to is the current schema version
+// since the first schema in our array is at
+// open the Realm with the latest schema
+import Realm from 'realm';
+import moment from 'moment';
 
-const RecordingSchema = {
-  name: 'Recording',
-  primaryKey: 'id',
-  properties: {
-    name: 'string',
-    path: 'string',
-    date: 'string',
-    duration: 'double',
-    description: 'string',
-    isSynced: 'bool',
-    id: 'int',
-  },
+const recordingsMigration1 = (oldRealm, newRealm) => {
+  if (oldRealm.schemaVersion < 1) {
+    const oldObjects = oldRealm.objects('Recording');
+    const newObjects = newRealm.objects('Recording');
+
+    // loop through all objects and set the name property in the new schema
+    for (let i = 0; i < oldObjects.length; i += 1) {
+      newObjects[i].date = moment(oldObjects[i].date).toDate();
+    }
+  }
 };
+
+const RecordingSchemas = [
+  {
+    schemaVersion: 0,
+    schema: [{
+      name: 'Recording',
+      primaryKey: 'id',
+      properties: {
+        name: 'string',
+        path: 'string',
+        date: 'string',
+        duration: 'double',
+        description: 'string',
+        isSynced: 'bool',
+        id: 'int',
+      },
+    }],
+  },
+  {
+    schemaVersion: 1,
+    schema: [{
+      name: 'Recording',
+      primaryKey: 'id',
+      properties: {
+        name: 'string',
+        path: 'string',
+        date: 'date',
+        duration: 'double',
+        description: 'string',
+        isSynced: 'bool',
+        id: 'int',
+      },
+    }],
+    migration: recordingsMigration1,
+  },
+];
+
+let nextSchemaIndex = Realm.schemaVersion(Realm.defaultPath);
+while (nextSchemaIndex < RecordingSchemas.length) {
+  const migratedRealm = new Realm(RecordingSchemas[nextSchemaIndex++]);
+  migratedRealm.close();
+}
 
 const GetId = (realm) => {
   const result = realm.sorted('id', true);
@@ -26,8 +71,6 @@ const GetId = (realm) => {
 };
 
 export default {
-  RecordingSchema: {
-    schema: [RecordingSchema],
-  },
+  RecordingSchema: new Realm([RecordingSchemas[RecordingSchemas.length - 1]]),
   GetId,
 };
