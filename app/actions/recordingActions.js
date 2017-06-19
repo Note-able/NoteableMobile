@@ -1,4 +1,3 @@
-import Realm from 'realm';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { AudioUtils } from 'react-native-audio';
 

@@ -37,6 +37,7 @@ class AudioRecorder extends Component {
           goToRecordings={this.props.goToRecordings}
           startPlayer={this.state.playerActions.startPlayer}
           navigation={this.props.navigation}
+          updateRecording={this.state.recordingActions.updateRecording}
         />
       </View>
     );

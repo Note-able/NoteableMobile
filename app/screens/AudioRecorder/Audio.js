@@ -51,6 +51,7 @@ export default class Audio extends PureComponent {
     })),
     saveRecording: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
+    updateRecording: PropTypes.func.isRequired,
   };
 
   state = {
@@ -219,7 +220,7 @@ export default class Audio extends PureComponent {
       this.props.saveRecording({
         name: recording.fileName,
         path: this.state.audioPath,
-        date: moment.utc().format(),
+        date: moment.utc().toDate(),
         duration: audio.getDuration(),
         description: '',
         isSynced: false,
@@ -250,6 +251,31 @@ export default class Audio extends PureComponent {
       currentTime: 0,
       reviewMode: false,
       displayTime: DisplayTime(0),
+    });
+  }
+
+  editRecording = (recording) => {
+    this.setState({
+      modal: {
+        id: recording.id,
+        name: recording.name,
+      },
+      fileName: recording.name,
+      recording,
+    });
+  }
+
+  updateRecording = (recordingInfo) => {
+    this.props.updateRecording({
+      ...this.state.recording,
+      name: recordingInfo.fileName,
+      tags: recordingInfo.tags,
+    });
+
+    this.setState({
+      recording: null,
+      modal: null,
+      fileName: '',
     });
   }
 
@@ -291,6 +317,7 @@ export default class Audio extends PureComponent {
             recordings={this.state.recordings}
             startPlayer={this.props.startPlayer}
             loadingRecordings={this.props.loadingRecordings}
+            editRecording={this.editRecording}
           />
         </View>
         <Modal
@@ -304,7 +331,7 @@ export default class Audio extends PureComponent {
               this.setState({ modal: false });
               this.deleteRecording();
             }}
-            save={recordingInfo => this.saveAudio(recordingInfo)}
+            save={recordingInfo => (this.state.modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
           />
         </Modal>
       </View>
