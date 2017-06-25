@@ -8,8 +8,12 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 
 import { colors, colorRGBA } from '../../styles';
-import { getUser } from '../../actions/accountActions';
 import { Login, Register } from '../../components/Authentication';
+import {
+  getUser,
+  signInLocal,
+  registerUser,
+} from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
   users: state.users,
@@ -17,6 +21,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getCurrentUser: (user) => { dispatch(getUser(user)); },
+  signInLocal: (email, password) => { dispatch(signInLocal(email, password)); },
+  registerUser: (request) => { dispatch(registerUser(request)); },
 });
 
 class Authentication extends Component {
@@ -27,6 +33,12 @@ class Authentication extends Component {
 
   state = {
     screen: 'Login',
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.registration != null) {
+      this.props.signInLocal(nextProps.registration.email, nextProps.registration.password);
+    }
   }
 
   render() {
@@ -41,8 +53,8 @@ class Authentication extends Component {
         />
         <Text style={{ color: colors.shade90, fontSize: 20 }}>{this.state.screen}</Text>
         {this.state.screen === 'Register' ?
-          <Register /> :
-          <Login submitLogin={() => {}} switchToRegister={() => this.setState({ screen: 'Register' })} />
+          <Register submitRegister={this.props.registerUser} switchToLogin={() => this.setState({ screen: 'Login' })} /> :
+          <Login submitLogin={this.props.signInLocal} switchToRegister={() => this.setState({ screen: 'Register' })} />
         }
       </View>
     );

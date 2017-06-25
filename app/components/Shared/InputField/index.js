@@ -60,6 +60,7 @@ export default class InputField extends Component {
           ]}
         >{this.props.name}</Animated.Text>
         <TextInput
+          autoCapitalize="none"
           ref={(ref) => { this._input = ref; }}
           onFocus={() => this.focus(1)}
           onBlur={this.onBlur}

@@ -51,7 +51,6 @@ export default class Login extends Component {
             value: this.state.password,
           }}
         />
-
         <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
           <TouchableOpacity onPress={this.props.switchToRegister}>
             <Text style={{ color: colors.blue, paddingTop: 8 }}>Create a free account</Text>

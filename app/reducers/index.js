@@ -20,6 +20,7 @@ const {
 
 const {
   getCurrentUserTypes,
+  registerUserTypes,
 } = AccountActionTypes;
 
 const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
@@ -135,6 +136,14 @@ const Users = (state = {}, action) => {
       return { ...state, currentUser: action.currentUser, isProcessing: false };
     case getCurrentUserTypes.error:
       return { ...state, isProcessing: false, error };
+    case registerUserTypes.processing:
+      return { ...state, isProcessing: true };
+    case registerUserTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        registration: action.registration,
+      };
     case 'USER/SIGNIN':
       return { ...state, user };
     case 'USER/SIGNOUT':

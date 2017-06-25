@@ -1,19 +1,73 @@
 import { AsyncStorage } from 'react-native';
-
 import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
+
+const {
+  getCurrentUserTypes,
+  fetchSignInTypes,
+  registerUserTypes,
+} = AccountActionTypes;
 
 const USER = '@ACCOUNTS:CURRENT_USER';
 
 export const getCurrentUser = () => (
   async (dispatch) => {
-    dispatch({ type: AccountActionTypes.getCurrentUserTypes.processing });
+    dispatch({ type: getCurrentUserTypes.processing });
     try {
       const currentUser = await AsyncStorage.getItem(USER);
-      dispatch({ type: AccountActionTypes.getCurrentUserTypes.success, currentUser });
+      dispatch({ type: getCurrentUserTypes.success, currentUser });
     } catch (error) {
-      dispatch({ type: AccountActionTypes.getCurrentUserTypes.error, error });
+      dispatch({ type: getCurrentUserTypes.error, error });
     }
+  }
+);
+
+export const registerUser = registration => (
+  (dispatch) => {
+    const { firstName, lastName, email, password } = registration;
+    dispatch({ type: registerUserTypes.processing });
+
+    fetch('http://beta.noteable.me/api/v1/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        password,
+      }),
+    }).then((response) => {
+      if (response.status !== 200) {
+        throw new Error(`Failed to register user: ${response.statusText}`);
+      }
+
+      return response.json();
+    }, error => dispatch({ type: registerUserTypes.error, error }))
+    .then((result) => {
+      dispatch({ type: registerUserTypes.success, registration, result });
+    });
+  }
+);
+
+export const signInLocal = (email, password) => (
+  (dispatch) => {
+    dispatch({ type: fetchSignInTypes.processing });
+
+    fetch('http://beta.noteable.me/auth/local/jwt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: email, password }),
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
 );
 
