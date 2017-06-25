@@ -2,6 +2,7 @@ export const colors = {
   shade0: '#1B1F20', // primary background
   shade10: '#252626',
   shade20: '#2D2E2E',
+  shade40: '#666666',
   shade90: '#95989A',
   shade140: '#DDDDDA',
   shadow: '#0E1010',

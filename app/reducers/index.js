@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { MapRecordingFromDB } from '../mappers/recordingMapper';
 import {
+  AccountActionTypes,
   PlayerActionTypes,
   RecordingActionTypes,
 } from '../actions/ActionTypes';
@@ -16,6 +17,10 @@ const {
 const {
   startPlayerTypes,
 } = PlayerActionTypes;
+
+const {
+  getCurrentUserTypes,
+} = AccountActionTypes;
 
 const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
   const { type, recordings, audio, currentRecording, error } = action;
@@ -121,8 +126,15 @@ const eventsReducer = (state = { location: defaultRegion, events: [] }, { type, 
   }
 };
 
-const userReducer = (state = {}, { type, user, profile }) => {
+const Users = (state = {}, action) => {
+  const { type, error, user, profile } = action;
   switch (type) {
+    case getCurrentUserTypes.processing:
+      return { ...state, isProcessing: true };
+    case getCurrentUserTypes.success:
+      return { ...state, currentUser: action.currentUser, isProcessing: false };
+    case getCurrentUserTypes.error:
+      return { ...state, isProcessing: false, error };
     case 'USER/SIGNIN':
       return { ...state, user };
     case 'USER/SIGNOUT':
@@ -163,5 +175,5 @@ export const appReducer = combineReducers({
   messagesReducer,
   newsFeedReducer,
   eventsReducer,
-  userReducer,
+  Users,
 });

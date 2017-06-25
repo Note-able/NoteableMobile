@@ -25,7 +25,7 @@ const validate = (recordings) => {
     if (record.isSynced || record.path.indexOf(directory) !== -1) {
       return record;
     }
-    return null;
+    return record;
   });
 };
 

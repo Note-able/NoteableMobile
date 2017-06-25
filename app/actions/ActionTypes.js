@@ -11,3 +11,7 @@ export const PlayerActionTypes = {
   startPlayerTypes: createAsyncActionTypes('START_PLAYER'),
   togglePlayerType: 'TOGGLE_PLAYER',
 };
+
+export const AccountActionTypes = {
+  getCurrentUserTypes: createAsyncActionTypes('GET_CURRENT_USER'),
+};

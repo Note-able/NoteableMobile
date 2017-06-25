@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
+import {
+  ActivityIndicator,
+  Text,
+  View,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { TabNavigator } from 'react-navigation';
 
-import { Footer, Navigation } from '../../components/Shared';
+import {
+  Footer,
+  Navigation,
+} from '../../components/Shared';
 import { appScreens } from '../../screens';
 import { colors } from '../../styles';
 
@@ -18,6 +25,10 @@ import {
 import {
   startPlayer,
 } from '../../actions/playerActions';
+
+import {
+  getCurrentUser,
+} from '../../actions/accountActions';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
@@ -34,7 +45,9 @@ const App = TabNavigator(appScreens, {
   tabBarComponent: Footer,
 });
 
-const mapStateToProps = state => state;
+const mapStateToProps = state => ({
+  users: state.Users,
+});
 
 const mapDispatchToProps = dispatch => ({
   recordingActions: {
@@ -48,18 +61,38 @@ const mapDispatchToProps = dispatch => ({
   playerActions: {
     startPlayer: recording => dispatch(startPlayer(recording)),
   },
+  accountActions: {
+    getCurrentUser: () => dispatch(getCurrentUser()),
+  },
 });
 
 class Home extends Component {
   static propTypes = {
     recordingActions: PropTypes.shape({}),
     playerActions: PropTypes.shape({}),
+    accountActions: PropTypes.shape({}),
   }
 
   state = {
+    users: this.props.users,
     navOpen: false,
     screen: '',
   };
+
+  componentDidMount() {
+    this.props.accountActions.getCurrentUser();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.users.isProcessing && !nextProps.users.isProcessing && nextProps.users.currentUser == null) {
+      this.props.navigation.navigate('Authentication');
+      return;
+    }
+
+    this.setState({
+      users: nextProps.users,
+    });
+  }
 
   getCurrentRouteName = (navigationState) => {
     if (!navigationState) {
@@ -79,6 +112,15 @@ class Home extends Component {
   }
 
   render() {
+    if (this.state.users.currentUser == null && this.state.users.isProcessing) {
+      return (
+        <View style={{ backgroundColor: colors.shade10, height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: colors.shade90, fontSize: 20, marginBottom: 20 }}>Loading</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    }
+
     return (
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
         <App
@@ -98,12 +140,3 @@ class Home extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
-
-/*
-const HomeHeader = () => (
-  <View style={{ backgroundColor: 'black', maxHeight: 45, flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={{ flex: 1, color: 'white' }}>Noteable</Text>
-    <SignIn />
-  </View>
-);
-*/

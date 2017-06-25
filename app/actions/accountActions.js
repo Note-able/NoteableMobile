@@ -1,8 +1,21 @@
 import { AsyncStorage } from 'react-native';
 
+import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 
 const USER = '@ACCOUNTS:CURRENT_USER';
+
+export const getCurrentUser = () => (
+  async (dispatch) => {
+    dispatch({ type: AccountActionTypes.getCurrentUserTypes.processing });
+    try {
+      const currentUser = await AsyncStorage.getItem(USER);
+      dispatch({ type: AccountActionTypes.getCurrentUserTypes.success, currentUser });
+    } catch (error) {
+      dispatch({ type: AccountActionTypes.getCurrentUserTypes.error, error });
+    }
+  }
+);
 
 export const getUser = user => (
   (dispatch) => {
@@ -16,7 +29,7 @@ export const onSignIn = token => (
   async function (dispatch) {
     const currentUser = await AsyncStorage.getItem(USER);
     if (!currentUser) {
-      signIn(token, (user) => { dispatch({ type: 'USER/SIGNIN', user }) });
+      signIn(token, (user) => { dispatch({ type: 'USER/SIGNIN', user }); });
     } else {
       dispatch({ type: 'USER/SIGNIN', user: JSON.parse(currentUser) });
     }
@@ -46,7 +59,7 @@ const signIn = (token, next) => {
       token,
     },
   })
-  .then((response) => { return response.json(); })
+  .then(response => response.json())
   .then((json) => {
     const { token, user } = json;
     user.jwt = token;

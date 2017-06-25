@@ -12,7 +12,10 @@ import { appScreens } from './screens';
 console.disableYellowBox = true;
 const store = createStore(appReducer, applyMiddleware(thunk));
 
-const AppNavigator = StackNavigator(appScreens, { navigationOptions: { header: null } });
+const AppNavigator = StackNavigator(appScreens, {
+  initialRouteName: 'Home',
+  navigationOptions: { header: null },
+});
 
 export default class NoteableMobile extends Component {
   componentDidMount() {
