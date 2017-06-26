@@ -84,7 +84,7 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.users.isProcessing && !nextProps.users.isProcessing && nextProps.users.currentUser == null) {
+    if (this.state.users.isProcessing && !nextProps.users.isProcessing && nextProps.users.user == null) {
       this.props.navigation.navigate('Authentication');
       return;
     }
@@ -112,7 +112,7 @@ class Home extends Component {
   }
 
   render() {
-    if (this.state.users.currentUser == null && this.state.users.isProcessing) {
+    if (this.state.users.user == null && this.state.users.isProcessing) {
       return (
         <View style={{ backgroundColor: colors.shade10, height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: colors.shade90, fontSize: 20, marginBottom: 20 }}>Loading</Text>

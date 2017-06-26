@@ -16,7 +16,7 @@ import {
 } from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
-  users: state.users,
+  users: state.Users,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -28,7 +28,7 @@ const mapDispatchToProps = dispatch => ({
 class Authentication extends Component {
   static propTypes = {
     getCurrentUser: PropTypes.func.isRequired,
-    user: PropTypes.shape({}),
+    users: PropTypes.shape({}),
   }
 
   state = {
@@ -36,8 +36,12 @@ class Authentication extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.registration != null) {
+    if (this.props.users.registration == null && nextProps.users.registration != null) {
       this.props.signInLocal(nextProps.registration.email, nextProps.registration.password);
+    }
+
+    if (this.props.users.user == null && nextProps.users.user != null) {
+      this.props.navigation.navigate('Home');
     }
   }
 

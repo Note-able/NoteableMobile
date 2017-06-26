@@ -9,9 +9,7 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import RNFetchBlob from 'react-native-fetch-blob';
 import moment from 'moment';
-import Realm from 'realm';
 import styles from './styles.js';
 import Schemas from '../../../realmSchemas';
 import { Recording } from '../';

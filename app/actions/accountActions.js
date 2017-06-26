@@ -5,6 +5,7 @@ import { fetchUtil, logErrorToCrashlytics } from '../util';
 const {
   getCurrentUserTypes,
   fetchSignInTypes,
+  logoutTypes,
   registerUserTypes,
 } = AccountActionTypes;
 
@@ -62,12 +63,26 @@ export const signInLocal = (email, password) => (
       },
       body: JSON.stringify({ username: email, password }),
     })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
+    .then(response => response.json())
+    .catch(error => dispatch({ type: fetchSignInTypes.error, error }))
+    .then((result) => {
+      const { token, user } = result;
+      AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+      dispatch({ type: fetchSignInTypes.success, user });
     });
+  }
+);
+
+export const logout = () => (
+  async (dispatch) => {
+    dispatch({ type: logoutTypes.processing });
+
+    try {
+      await AsyncStorage.removeItem(USER);
+      dispatch({ type: logoutTypes.success });
+    } catch (error) {
+      dispatch({ type: logoutTypes.error, error });
+    }
   }
 );
 

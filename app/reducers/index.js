@@ -19,7 +19,9 @@ const {
 } = PlayerActionTypes;
 
 const {
+  fetchSignInTypes,
   getCurrentUserTypes,
+  logoutTypes,
   registerUserTypes,
 } = AccountActionTypes;
 
@@ -130,14 +132,36 @@ const eventsReducer = (state = { location: defaultRegion, events: [] }, { type, 
 const Users = (state = {}, action) => {
   const { type, error, user, profile } = action;
   switch (type) {
+    case fetchSignInTypes.processing:
     case getCurrentUserTypes.processing:
-      return { ...state, isProcessing: true };
-    case getCurrentUserTypes.success:
-      return { ...state, currentUser: action.currentUser, isProcessing: false };
-    case getCurrentUserTypes.error:
-      return { ...state, isProcessing: false, error };
     case registerUserTypes.processing:
+    case logoutTypes.processing:
       return { ...state, isProcessing: true };
+    case logoutTypes.success:
+      return {
+        ...state,
+        user: null,
+        isProcessing: false,
+      };
+    case getCurrentUserTypes.success:
+      return {
+        ...state,
+        user: JSON.parse(action.currentUser),
+        isProcessing: false,
+      };
+    case logoutTypes.error:
+    case getCurrentUserTypes.error:
+      return {
+        ...state,
+        isProcessing: false,
+        error,
+      };
+    case fetchSignInTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        user,
+      };
     case registerUserTypes.success:
       return {
         ...state,

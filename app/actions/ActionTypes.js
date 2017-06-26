@@ -15,5 +15,6 @@ export const PlayerActionTypes = {
 export const AccountActionTypes = {
   getCurrentUserTypes: createAsyncActionTypes('GET_CURRENT_USER'),
   fetchSignInTypes: createAsyncActionTypes('FETCH_SIGNIN'),
+  logoutTypes: createAsyncActionTypes('LOGOUT_USER'),
   registerUserTypes: createAsyncActionTypes('REGISTER_USER'),
 };

@@ -22,6 +22,7 @@ import styles from './styles.js';
 const mapStateToProps = state => ({
   recordings: state.Recordings,
   player: state.Player,
+  users: state.Users,
 });
 
 class Music extends Component {
@@ -37,6 +38,15 @@ class Music extends Component {
     playerActions: this.props.screenProps.playerActions,
     height: new Animated.Value(0),
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.screenProps.screen === 'Recordings' && this.state.screen !== 'Recordings') {
+      this.state.recordingActions.fetchRecordings();
+      this.setState({
+        screen: 'Recordings',
+      });
+    }
+  }
 
   search = (search) => {
     this.setState({ search });
