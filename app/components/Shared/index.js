@@ -5,6 +5,7 @@ import InputField from './InputField';
 import Navigation from './Navigation';
 import Recordings from './Recordings';
 import Recording from './Recording';
+import SystemMessage from './SystemMessage';
 
 export {
   CustomModal,
@@ -14,4 +15,5 @@ export {
   Navigation,
   Recording,
   Recordings,
+  SystemMessage,
 };

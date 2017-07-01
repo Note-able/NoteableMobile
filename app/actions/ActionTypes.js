@@ -4,6 +4,7 @@ export const RecordingActionTypes = {
   deleteRecordingTypes: createAsyncActionTypes('DELETE_RECORDINGS'),
   fetchRecordingsTypes: createAsyncActionTypes('FETCH_RECORDINGS'),
   saveRecordingsTypes: createAsyncActionTypes('SAVE_RECORDINGS'),
+  syncDownRecordingsTypes: createAsyncActionTypes('SYNC_DOWN'),
   updateRecordingTypes: createAsyncActionTypes('UPDATE_RECORDING'),
 };
 
@@ -17,4 +18,8 @@ export const AccountActionTypes = {
   fetchSignInTypes: createAsyncActionTypes('FETCH_SIGNIN'),
   logoutTypes: createAsyncActionTypes('LOGOUT_USER'),
   registerUserTypes: createAsyncActionTypes('REGISTER_USER'),
+};
+
+export const SystemMessageActionTypes = {
+  networkingFailureType: 'NETWORK_FAILURE',
 };

@@ -5,11 +5,15 @@ export const colors = {
   shade40: '#666666',
   shade90: '#95989A',
   shade140: '#DDDDDA',
+  shade200: '#FAFAFA',
+
   shadow: '#0E1010',
   black: '#000000',
   green: '#31CB94',
   recordingRed: '#E8163E',
   white: '#FFFFFF',
+  error: '#FF3B30',
+  success: '#4CD964',
   /** haven't used below yet */
   blue: '#1875DC',
   purple: '#8A32D9',

@@ -1,9 +1,10 @@
 import { combineReducers } from 'redux';
-import { MapRecordingFromDB } from '../mappers/recordingMapper';
+import { MapRecordingFromAPI, MapRecordingFromDB, MergeRecordings } from '../mappers/recordingMapper';
 import {
   AccountActionTypes,
   PlayerActionTypes,
   RecordingActionTypes,
+  SystemMessageActionTypes,
 } from '../actions/ActionTypes';
 import { logErrorToCrashlytics } from '../util.js';
 
@@ -11,6 +12,7 @@ const {
   deleteRecordingTypes,
   fetchRecordingsTypes,
   saveRecordingsTypes,
+  syncDownRecordingsTypes,
   updateRecordingTypes,
 } = RecordingActionTypes;
 
@@ -24,6 +26,10 @@ const {
   logoutTypes,
   registerUserTypes,
 } = AccountActionTypes;
+
+const {
+  networkingFailureType,
+} = SystemMessageActionTypes;
 
 const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
   const { type, recordings, audio, currentRecording, error } = action;
@@ -43,6 +49,12 @@ const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
           }
           return recording;
         }),
+      };
+    case syncDownRecordingsTypes.success:
+      return {
+        ...state,
+        recordings: MergeRecordings(state.recordings, recordings.map(x => MapRecordingFromAPI(x))),
+        processing: false,
       };
     case saveRecordingsTypes.success:
     case fetchRecordingsTypes.success:
@@ -129,7 +141,7 @@ const eventsReducer = (state = { location: defaultRegion, events: [] }, { type, 
   }
 };
 
-const Users = (state = {}, action) => {
+const Users = (state = { user: {} }, action) => {
   const { type, error, user, profile } = action;
   switch (type) {
     case fetchSignInTypes.processing:
@@ -171,7 +183,7 @@ const Users = (state = {}, action) => {
     case 'USER/SIGNIN':
       return { ...state, user };
     case 'USER/SIGNOUT':
-      return { ...state, user: null };
+      return { ...state, user: {} };
     case 'USER/CURRENT_PROFILE':
       return { ...state, profile };
     default:
@@ -201,6 +213,26 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
   }
 };
 
+const SystemMessage = (state = {}, action) => {
+  const { type } = action;
+  switch (type) {
+    case networkingFailureType:
+      return {
+        ...state,
+        message: 'No internet connection',
+        kind: 'error',
+      };
+    case syncDownRecordingsTypes.processing:
+      return {
+        ...state,
+        message: 'Fetching recordings metadata',
+        kind: 'success',
+      };
+    default:
+      return state;
+  }
+};
+
 export const appReducer = combineReducers({
   Recordings,
   Player,
@@ -208,5 +240,6 @@ export const appReducer = combineReducers({
   messagesReducer,
   newsFeedReducer,
   eventsReducer,
+  SystemMessage,
   Users,
 });

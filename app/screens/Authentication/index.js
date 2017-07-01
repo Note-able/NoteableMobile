@@ -40,7 +40,9 @@ class Authentication extends Component {
       this.props.signInLocal(nextProps.registration.email, nextProps.registration.password);
     }
 
-    if (this.props.users.user == null && nextProps.users.user != null) {
+    console.log(this.props.users, nextProps.users);
+
+    if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {
       this.props.navigation.navigate('Home');
     }
   }

@@ -10,6 +10,7 @@ import styles from './styles';
 export default class CustomModal extends Component {
   static props = {
     cancel: PropTypes.func.isRequired,
+    cancelText: PropTypes.string.isRequired,
     initialValue: PropTypes.string,
     save: PropTypes.func.isRequired,
   };
@@ -30,7 +31,7 @@ export default class CustomModal extends Component {
           <TextInput style={styles.inputField} onChangeText={tags => this.setState({ tags })} value={this.state.tags} />
           <View style={styles.buttonRow}>
             <TouchableHighlight style={styles.buttonOption} onPress={this.props.cancel}>
-              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Cancel</Text>
+              <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>{this.props.cancelText}</Text>
             </TouchableHighlight>
             <TouchableHighlight style={styles.buttonOption} onPress={() => this.props.save(this.state)}>
               <Text style={{ textAlign: 'center', color: '#95989A', fontSize: 16 }}>Save</Text>

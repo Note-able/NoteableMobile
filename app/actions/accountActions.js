@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-import { AccountActionTypes } from './ActionTypes.js';
+import { AccountActionTypes, SystemMessageActionTypes } from './ActionTypes.js';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 
 const {

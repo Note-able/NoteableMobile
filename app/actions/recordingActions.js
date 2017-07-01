@@ -11,10 +11,10 @@ const {
   fetchRecordingsTypes,
   updateRecordingTypes,
   saveRecordingsTypes,
+  syncDownRecordingsTypes,
 } = RecordingActionTypes;
 
 const realm = Schemas.RecordingSchema;
-const RECORDINGS_FETCHED = 'RECORDINGS_FETCHED';
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 const RECORDING_SYNCED = 'RECORDING_SYNCED';
@@ -28,6 +28,33 @@ const validate = (recordings) => {
     return record;
   });
 };
+
+const fetchRecordingsFromAPI = (dispatch, recordings, iteration) => fetchUtil.get('http://beta.noteable.me/api/v1/recordings', {
+  method: 'GET',
+}).then(response => response.json(), (error) => { throw error; })
+  // eslint-disable-next-line no-loop-func
+  .then((result) => {
+    iteration += 1;
+    recordings.concat(result);
+
+    if (result.length === 0 && iteration === 10) {
+      return new Promise().resolve(recordings);
+    }
+
+    return fetchRecordingsFromAPI(dispatch, recordings, iteration);
+  }, (error) => { throw error; });
+
+export const syncDownRecordings = () => (
+  (dispatch) => {
+    dispatch({ type: syncDownRecordingsTypes.processing });
+    fetchRecordingsFromAPI(dispatch, [], 0)
+      .then((recordings) => {
+        console.log('Recordings: ', recordings);
+        dispatch({ type: syncDownRecordingsTypes.success, recordings });
+      })
+      .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
+  }
+);
 
 export const fetchRecordings = (filter, search) => (
   (dispatch) => {
@@ -170,17 +197,6 @@ export const uploadSong = (recording, user) => (
         });
       });
     });
-  }
-);
-
-const fetchRecordingsFromApi = user => (
-  (dispatch) => {
-    fetchUtil.get({ url: 'http://beta.noteable.me/recordings/', auth: user.jwt })
-    .then(response => response.json())
-    .then((recordings) => {
-      dispatch({ type: RECORDINGS_FETCHED, recordings });
-    })
-    .catch(error => logErrorToCrashlytics(error));
   }
 );
 

@@ -69,7 +69,7 @@ class Settings extends Component {
   }
 
   login = () => {
-    this.props.navigation.navigate('Authentication');
+    this.props.screenProps.stackNavigation.navigate('Authentication');
   }
 
   render() {
