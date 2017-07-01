@@ -12,11 +12,9 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
-
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
-import Realm from 'realm';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Schemas from '../../realmSchemas';
@@ -75,7 +73,12 @@ export default class Audio extends PureComponent {
     this.props.fetchRecordings();
 
     AudioRecorder.onProgress = () => {};
-    AudioRecorder.onFinished = () => this.toggleTiming();
+    AudioRecorder.onFinished = () => {
+      RNFetchBlob.fs.stat(this.state.audioPath)
+        .then(stats => this.setState({ fileStats: stats }));
+
+      this.toggleTiming();
+    };
   }
 
   componentWillUnmount() {
@@ -220,10 +223,12 @@ export default class Audio extends PureComponent {
       this.props.saveRecording({
         name: recording.fileName,
         path: this.state.audioPath,
-        date: moment.utc().toDate(),
+        dateCreated: moment.utc().toDate(),
+        dateModified: moment.utc().toDate(),
         duration: audio.getDuration(),
         description: '',
         isSynced: false,
+        size: this.state.fileStats.size,
         id: Schemas.GetId(realm.objects('Recording')) + 1,
       });
 
@@ -240,6 +245,7 @@ export default class Audio extends PureComponent {
         reviewMode: false,
         displayTime: DisplayTime(0),
         modal: false,
+        fileStats: null,
       });
     });
   }
@@ -295,7 +301,7 @@ export default class Audio extends PureComponent {
             <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 110 } : null]}>{this.state.displayTime}</Text>
           </View>
         </View>
-        <View style={[styles.buttonContainer, this.state.reviewMode ? { marginBottom: 50 } : { marginBottom: 150 }]}>
+        <View style={[styles.buttonContainer, { marginBottom: 75 }]}>
           <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
             { this.state.recording ?
               <View style={styles.stopButton} /> :
@@ -321,7 +327,7 @@ export default class Audio extends PureComponent {
           />
         </View>
         <Modal
-          animationType={'none'}
+          animationType={'slide'}
           transparent
           visible={this.state.modal}
         >
@@ -331,6 +337,7 @@ export default class Audio extends PureComponent {
               this.setState({ modal: false });
               this.deleteRecording();
             }}
+            cancelText="Delete"
             save={recordingInfo => (this.state.modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
           />
         </Modal>

@@ -5,19 +5,19 @@
 // since the first schema in our array is at
 // open the Realm with the latest schema
 import Realm from 'realm';
-import moment from 'moment';
+// import moment from 'moment';
 
-const recordingsMigration1 = (oldRealm, newRealm) => {
-  if (oldRealm.schemaVersion < 1) {
-    const oldObjects = oldRealm.objects('Recording');
-    const newObjects = newRealm.objects('Recording');
+// const recordingsMigration = (oldRealm, newRealm) => {
+//   if (oldRealm.schemaVersion < 1) {
+//     const oldObjects = oldRealm.objects('Recording');
+//     const newObjects = newRealm.objects('Recording');
 
-    // loop through all objects and set the name property in the new schema
-    for (let i = 0; i < oldObjects.length; i += 1) {
-      newObjects[i].date = moment(oldObjects[i].date).toDate();
-    }
-  }
-};
+//     // loop through all objects and set the name property in the new schema
+//     for (let i = 0; i < oldObjects.length; i += 1) {
+//       newObjects[i].resourceId = 0;
+//     }
+//   }
+// };
 
 const RecordingSchemas = [
   {
@@ -28,35 +28,22 @@ const RecordingSchemas = [
       properties: {
         name: 'string',
         path: 'string',
-        date: 'string',
         duration: 'double',
         description: 'string',
         isSynced: 'bool',
         id: 'int',
+        dateCreated: 'date',
+        dateModified: 'date',
+        resourceId: 'int',
+        size: 'int',
       },
     }],
-  },
-  {
-    schemaVersion: 1,
-    schema: [{
-      name: 'Recording',
-      primaryKey: 'id',
-      properties: {
-        name: 'string',
-        path: 'string',
-        date: 'date',
-        duration: 'double',
-        description: 'string',
-        isSynced: 'bool',
-        id: 'int',
-      },
-    }],
-    migration: recordingsMigration1,
   },
 ];
 
 let nextSchemaIndex = Realm.schemaVersion(Realm.defaultPath);
 while (nextSchemaIndex < RecordingSchemas.length) {
+  /* eslint-disable no-plusplus */
   const migratedRealm = new Realm(RecordingSchemas[nextSchemaIndex++]);
   migratedRealm.close();
 }
