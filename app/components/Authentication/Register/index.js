@@ -6,8 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import FBSDK from 'react-native-fbsdk';
 import { colors } from '../../../styles';
 import { InputField } from '../../Shared';
+import { logErrorToCrashlytics } from '../../../util';
+
+const {
+  AccessToken,
+  LoginManager,
+} = FBSDK;
 
 export default class Register extends Component {
   static propTypes = {
@@ -21,6 +28,20 @@ export default class Register extends Component {
     lastName: '',
     firstName: '',
   };
+
+  facebookLogin = () => {
+    LoginManager.logInWithReadPermissions().then(
+      (result) => {
+        if (!result.isCancelled) {
+          AccessToken.getCurrentAccessToken().then(
+            (data) => {
+              this.props.loginFacebook(data.accessToken.toString());
+            },
+          );
+        }
+      }, logErrorToCrashlytics,
+    );
+  }
 
   render() {
     return (
@@ -91,6 +112,11 @@ export default class Register extends Component {
             </View>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity onPress={this.facebookLogin} style={{ alignItems: 'center' }}>
+          <View style={styles.facebook}>
+            <Text style={{ color: colors.facebook }}>Use Facebook</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -116,5 +142,15 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: 'center',
     width: 75,
+  },
+  facebook: {
+    alignItems: 'center',
+    borderColor: colors.facebook,
+    borderWidth: 1,
+    borderRadius: 4,
+    height: 32,
+    justifyContent: 'center',
+    marginTop: 20,
+    width: 150,
   },
 });

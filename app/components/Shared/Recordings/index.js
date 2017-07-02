@@ -36,6 +36,17 @@ export default class Recordings extends Component {
     recordingsOpacity: new Animated.Value(0),
   }
 
+  componentDidMount() {
+    if (this.props.recordings.length !== 0) {
+      Animated.timing(
+        this.state.recordingsOpacity, {
+          easing: Easing.cubic,
+          toValue: 1,
+          duration: 200,
+        }).start();
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.recordings.length === 0 && nextProps.recordings.length !== 0) {
       Animated.timing(

@@ -14,6 +14,7 @@ export const colors = {
   white: '#FFFFFF',
   error: '#FF3B30',
   success: '#4CD964',
+  facebook: '#4080FF',
   /** haven't used below yet */
   blue: '#1875DC',
   purple: '#8A32D9',

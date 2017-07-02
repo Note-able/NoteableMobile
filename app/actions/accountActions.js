@@ -1,11 +1,12 @@
 import { AsyncStorage } from 'react-native';
-import { AccountActionTypes, SystemMessageActionTypes } from './ActionTypes.js';
+import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 
 const {
   getCurrentUserTypes,
   fetchSignInTypes,
   logoutTypes,
+  loginFacebookTypes,
   registerUserTypes,
 } = AccountActionTypes;
 
@@ -49,6 +50,36 @@ export const registerUser = registration => (
     .then((result) => {
       dispatch({ type: registerUserTypes.success, registration, result });
     });
+  }
+);
+
+export const loginFacebook = authToken => (
+  (dispatch) => {
+    console.log(JSON.stringify({ token: authToken }));
+    if (authToken == null) {
+      dispatch({ type: loginFacebookTypes.error, error: 'Access token missing.' });
+    } else {
+      dispatch({ type: loginFacebookTypes.processing });
+
+      fetch('http://beta.noteable.me/auth/facebook/jwt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: authToken }),
+      })
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .catch(error => dispatch({ type: loginFacebookTypes.error, error }))
+      .then((result) => {
+        console.log(result);
+        const { token, user } = result;
+        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        dispatch({ type: loginFacebookTypes.success, user });
+      });
+    }
   }
 );
 

@@ -50,6 +50,7 @@ const App = TabNavigator(appScreens, {
 const mapStateToProps = state => ({
   users: state.Users,
   systemMessage: state.SystemMessage,
+  recordings: state.Recordings,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -135,8 +136,6 @@ class Home extends Component {
         </View>
       );
     }
-
-    console.log(this.state.isConnected);
 
     return (
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>

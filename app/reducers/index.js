@@ -23,6 +23,7 @@ const {
 const {
   fetchSignInTypes,
   getCurrentUserTypes,
+  loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
 } = AccountActionTypes;
@@ -168,7 +169,9 @@ const Users = (state = { user: {} }, action) => {
         isProcessing: false,
         error,
       };
+    case loginFacebookTypes.success:
     case fetchSignInTypes.success:
+      console.log(state.user, user);
       return {
         ...state,
         isProcessing: false,

@@ -13,12 +13,15 @@
 #import <React/RCTRootView.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
 
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+    didFinishLaunchingWithOptions:launchOptions];
   [Fabric with:@[[Crashlytics class]]];
   NSURL *jsCodeLocation;
 
@@ -37,5 +40,16 @@
   [self.window makeKeyAndVisible];
   return YES;
 }
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url 
+    sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+
+  BOOL handled = [[FBSDKApplicationDelegate sharedInstance] application:application
+    openURL:url
+    sourceApplication:sourceApplication
+    annotation:annotation
+  ];
+  return handled;
+} 
 
 @end

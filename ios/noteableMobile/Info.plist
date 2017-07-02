@@ -103,7 +103,7 @@
 	<key>FacebookAppID</key>
 	<string>1668133090067160</string>
 	<key>FacebookDisplayName</key>
-	<string>{your-app-name}</string>
+	<string>Noteable</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
