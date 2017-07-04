@@ -55,7 +55,6 @@ export const registerUser = registration => (
 
 export const loginFacebook = authToken => (
   (dispatch) => {
-    console.log(JSON.stringify({ token: authToken }));
     if (authToken == null) {
       dispatch({ type: loginFacebookTypes.error, error: 'Access token missing.' });
     } else {
@@ -68,13 +67,9 @@ export const loginFacebook = authToken => (
         },
         body: JSON.stringify({ token: authToken }),
       })
-      .then((response) => {
-        console.log(response);
-        return response.json();
-      })
+      .then(response => response.json())
       .catch(error => dispatch({ type: loginFacebookTypes.error, error }))
       .then((result) => {
-        console.log(result);
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: loginFacebookTypes.success, user });

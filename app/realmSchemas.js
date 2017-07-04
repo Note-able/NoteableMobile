@@ -36,6 +36,7 @@ const RecordingSchemas = [
         dateModified: 'date',
         resourceId: 'int',
         size: 'int',
+        audioUrl: 'string',
       },
     }],
   },

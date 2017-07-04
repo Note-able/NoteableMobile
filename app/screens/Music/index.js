@@ -14,6 +14,17 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
+import {
+  deleteRecording,
+  fetchRecordings,
+  updateRecording,
+  uploadRecording,
+} from '../../actions/recordingActions';
+
+import {
+  startPlayer,
+} from '../../actions/playerActions';
+
 import { colors, colorRGBA } from '../../styles';
 import { Recordings, CustomModal } from '../../components/Shared';
 import { debounceFunc } from '../../util.js';
@@ -25,23 +36,36 @@ const mapStateToProps = state => ({
   users: state.Users,
 });
 
+const mapDispatchToProps = dispatch => ({
+  deleteRecording: recording => dispatch(deleteRecording(recording)),
+  fetchRecordings: () => dispatch(fetchRecordings()),
+  filterRecordings: filter => dispatch(fetchRecordings(filter)),
+  updateRecording: recording => dispatch(updateRecording(recording)),
+  uploadRecording: (recording, user) => dispatch(uploadRecording(recording, user)),
+  searchRecordings: search => dispatch(fetchRecordings(null, search)),
+  startPlayer: recording => dispatch(startPlayer(recording)),
+});
+
 class Music extends Component {
   static propTypes = {
-    recordingActions: PropTypes.shape({}),
-    playerActions: PropTypes.shape({}),
+    deleteRecording: PropTypes.func.isRequired,
+    fetchRecordings: PropTypes.func.isRequired,
+    filterRecordings: PropTypes.func.isRequired,
+    updateRecording: PropTypes.func.isRequired,
+    uploadRecording: PropTypes.func.isRequired,
+    searchRecordings: PropTypes.func.isRequired,
+    startPlayer: PropTypes.func.isRequired,
   };
 
   state = {
     search: this.props.recordings.search || '',
     options: '',
-    recordingActions: this.props.screenProps.recordingActions,
-    playerActions: this.props.screenProps.playerActions,
     height: new Animated.Value(0),
   };
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.screenProps.screen === 'Recordings' && this.state.screen !== 'Recordings') {
-      this.state.recordingActions.fetchRecordings();
+      this.props.fetchRecordings();
       this.setState({
         screen: 'Recordings',
       });
@@ -51,7 +75,7 @@ class Music extends Component {
   search = (search) => {
     this.setState({ search });
     debounceFunc('searchRecordings', () => {
-      this.state.recordingActions.searchRecordings(search);
+      this.props.searchRecordings(search);
     }, 300);
   }
 
@@ -71,7 +95,7 @@ class Music extends Component {
   }
 
   filter = (filter) => {
-    this.state.recordingActions.filterRecordings(filter);
+    this.props.filterRecordings(filter);
     this.setState({
       activeFilter: filter,
       options: '',
@@ -90,7 +114,7 @@ class Music extends Component {
   }
 
   updateRecording = (recordingInfo) => {
-    this.state.recordingActions.updateRecording({
+    this.props.updateRecording({
       ...this.state.recording,
       name: recordingInfo.fileName,
       tags: recordingInfo.tags,
@@ -143,10 +167,12 @@ class Music extends Component {
           style={{ position: 'absolute', width: 800, height: 800, top: -400, left: -400, borderRadius: 400 }}
         />
         <Recordings
-          deleteRecording={this.state.recordingActions.deleteRecording}
+          deleteRecording={this.props.deleteRecording}
           recordings={this.props.recordings.recordings}
-          startPlayer={this.state.playerActions.startPlayer}
+          startPlayer={this.props.startPlayer}
           editRecording={this.editRecording}
+          uploadRecording={this.props.uploadRecording}
+          currentUser={this.props.users.user}
         />
         {/* Modal */}
         <Modal
@@ -165,4 +191,4 @@ class Music extends Component {
   }
 }
 
-export default connect(mapStateToProps)(Music);
+export default connect(mapStateToProps, mapDispatchToProps)(Music);

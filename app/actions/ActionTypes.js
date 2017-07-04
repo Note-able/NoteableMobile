@@ -6,6 +6,7 @@ export const RecordingActionTypes = {
   saveRecordingsTypes: createAsyncActionTypes('SAVE_RECORDINGS'),
   syncDownRecordingsTypes: createAsyncActionTypes('SYNC_DOWN'),
   updateRecordingTypes: createAsyncActionTypes('UPDATE_RECORDING'),
+  uploadRecordingTypes: createAsyncActionTypes('UPLOAD_RECORDING'),
 };
 
 export const PlayerActionTypes = {
