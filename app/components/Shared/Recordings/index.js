@@ -13,6 +13,7 @@ import moment from 'moment';
 import styles from './styles.js';
 import Schemas from '../../../realmSchemas';
 import { Recording } from '../';
+import { colors } from '../../../styles';
 
 const realm = Schemas.RecordingSchema;
 const OPTIONS_WIDTH = 175;
@@ -22,6 +23,7 @@ export default class Recordings extends Component {
     deleteRecording: PropTypes.func.isRequired,
     editRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
+    uploadRecording: PropTypes.func.isRequired,
     recordings: PropTypes.arrayOf(PropTypes.shape({
       name: PropTypes.string.isRequired,
       duration: PropTypes.number.isRequired,
@@ -29,6 +31,7 @@ export default class Recordings extends Component {
       path: PropTypes.string.isRequired,
     })),
     startPlayer: PropTypes.func.isRequired,
+    currentUser: PropTypes.shape({}),
   };
 
   state = {
@@ -145,13 +148,13 @@ export default class Recordings extends Component {
               />
               <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
-                  <Icon name="delete" size={25} color={'#95989A'} />
+                  <Icon name="delete" size={25} color={colors.shade90} />
                 </TouchableHighlight>
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
-                  <Icon name="create" size={25} color={'#95989A'} />
+                  <Icon name="create" size={25} color={colors.shade90} />
                 </TouchableHighlight>
-                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => {}}>
-                  <Icon name="send" size={25} color={'#95989A'} />
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.uploadRecording(recording, this.props.currentUser)}>
+                  <Icon name="cloud-upload" size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced ? colors.green : colors.shade60)} />
                 </TouchableHighlight>
               </View>
             </Animated.View>

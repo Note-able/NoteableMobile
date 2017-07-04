@@ -1,24 +1,61 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 
 import Audio from './Audio.js';
 
+import {
+  addRecording,
+  deleteRecording,
+  fetchRecordings,
+  syncDownRecordings,
+  updateRecording,
+  uploadRecording,
+} from '../../actions/recordingActions';
+
+import {
+  startPlayer,
+} from '../../actions/playerActions';
+
+import {
+  getCurrentUser,
+} from '../../actions/accountActions';
+
 const mapStateToProps = state => ({
   recordings: state.Recordings,
 });
 
+const mapDispatchToProps = dispatch => ({
+  deleteRecording: recording => dispatch(deleteRecording(recording)),
+  fetchRecordings: () => dispatch(fetchRecordings()),
+  filterRecordings: filter => dispatch(fetchRecordings(filter)),
+  updateRecording: recording => dispatch(updateRecording(recording)),
+  saveRecording: recording => dispatch(addRecording(recording)),
+  searchRecordings: search => dispatch(fetchRecordings(null, search)),
+  syncDownRecordings: () => dispatch(syncDownRecordings()),
+  startPlayer: recording => dispatch(startPlayer(recording)),
+  getCurrentUser: () => dispatch(getCurrentUser()),
+  uploadRecording: recording => dispatch(uploadRecording(recording)),
+});
+
 class AudioRecorder extends Component {
+  static propTypes = {
+    deleteRecording: PropTypes.func.isRequired,
+    fetchRecordings: PropTypes.func.isRequired,
+    updateRecording: PropTypes.func.isRequired,
+    saveRecording: PropTypes.func.isRequired,
+    startPlayer: PropTypes.func.isRequired,
+    uploadRecording: PropTypes.func.isRequired,
+  };
+
   state = {
     screen: '',
-    recordingActions: this.props.screenProps.recordingActions,
-    playerActions: this.props.screenProps.playerActions,
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.screenProps.screen === 'Record' && this.state.screen === '') {
-      this.state.recordingActions.fetchRecordings();
+      this.props.fetchRecordings();
       this.setState({
         screen: 'Record',
       });
@@ -29,15 +66,16 @@ class AudioRecorder extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Audio
-          deleteRecording={this.state.recordingActions.deleteRecording}
-          fetchRecordings={this.state.recordingActions.fetchRecordings}
+          deleteRecording={this.props.deleteRecording}
+          fetchRecordings={this.props.fetchRecordings}
           loadingRecordings={this.props.recordings.processing}
-          saveRecording={this.state.recordingActions.saveRecording}
+          saveRecording={this.props.saveRecording}
           recordings={this.props.recordings.recordings}
           goToRecordings={this.props.goToRecordings}
-          startPlayer={this.state.playerActions.startPlayer}
+          startPlayer={this.props.startPlayer}
           navigation={this.props.navigation}
-          updateRecording={this.state.recordingActions.updateRecording}
+          updateRecording={this.props.updateRecording}
+          uploadRecording={this.props.uploadRecording}
         />
       </View>
     );
@@ -48,4 +86,4 @@ AudioRecorder.navigationOptions = {
   tabBarLabel: 'Setup',
 };
 
-export default connect(mapStateToProps)(AudioRecorder);
+export default connect(mapStateToProps, mapDispatchToProps)(AudioRecorder);

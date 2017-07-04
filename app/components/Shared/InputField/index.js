@@ -75,7 +75,7 @@ export default class InputField extends Component {
 const styles = StyleSheet.create({
   floater: {
     backgroundColor: 'transparent',
-    color: colors.shade40,
+    color: colors.shade60,
     fontSize: 16,
     left: 8,
     position: 'absolute',

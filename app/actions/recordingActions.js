@@ -2,14 +2,15 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { AudioUtils } from 'react-native-audio';
 
 import Schemas from '../realmSchemas';
-import { recordingLocation } from '../constants';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 import { RecordingActionTypes } from './ActionTypes';
+import { DisplayTime, MapRecordingFromAPI } from '../mappers/recordingMapper';
 
 const {
   deleteRecordingTypes,
   fetchRecordingsTypes,
   updateRecordingTypes,
+  uploadRecordingTypes,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
 } = RecordingActionTypes;
@@ -17,7 +18,6 @@ const {
 const realm = Schemas.RecordingSchema;
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
-const RECORDING_SYNCED = 'RECORDING_SYNCED';
 
 const validate = (recordings) => {
   const directory = AudioUtils.DocumentDirectoryPath;
@@ -49,8 +49,17 @@ export const syncDownRecordings = () => (
     dispatch({ type: syncDownRecordingsTypes.processing });
     fetchRecordingsFromAPI(dispatch, [], 0)
       .then((recordings) => {
-        console.log('Recordings: ', recordings);
-        dispatch({ type: syncDownRecordingsTypes.success, recordings });
+        realm.write(() => {
+          const result = recordings.map((x) => {
+            const rec = MapRecordingFromAPI(x);
+            realm.create(rec);
+            return {
+              ...rec,
+              durationDisplay: DisplayTime(rec.duration * 1000),
+            };
+          });
+          dispatch({ type: syncDownRecordingsTypes.success, recordings: result });
+        });
       })
       .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
   }
@@ -146,57 +155,74 @@ export const updateRecording = recording => (
   }
 );
 
-export const uploadSong = (recording, user) => (
+export const uploadRecording = (recording, user) => (
   (dispatch) => {
-    const form = new FormData();
-    form.append('duration', recording.duration);
-    form.append('name', recording.name);
-    form.append('size', '1000kb');
-    form.append('extension', '.aac');
-    let data = '';
-    RNFetchBlob.fs.readStream(
-    // file path
-    `${recordingLocation}/${recording.name}.aac`,
-    // encoding, should be one of `base64`, `utf8`, `ascii`
-    'base64',
-    // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
-    // when reading file in BASE64 encoding, buffer size must be multiples of 3.
-    4095)
-    .then((ifstream) => {
-      ifstream.open();
+    console.log('Recording: ', recording);
+    console.log('User: ', user);
+    if (recording == null || user == null) {
+      return dispatch({ type: uploadRecordingTypes.error });
+    }
 
-      ifstream.onData((chunk) => {
-        // when encoding is `ascii`, chunk will be an array contains numbers
-        // otherwise it will be a string
-        data += chunk;
-      });
+    dispatch({ type: uploadRecordingTypes.processing });
 
-      ifstream.onError((err) => {
-        logErrorToCrashlytics(err);
-      });
+    new Promise((resolve, reject) => {
+      try {
+        /* eslint-disable no-undef */
+        const form = new FormData();
+        /* eslint-enable */
 
-      ifstream.onEnd(() => {
-        form.append('file', data);
-        fetch('http://beta.noteable.me/post-blob', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'multipart/form-data',
-            Authorization: user.jwt,
-          },
-          body: form,
-        })
-        .then(res => res.json())
-        .then((song) => {
-          realm.write(() => {
-            recording.isSynced = true;
-            recording.id = song.id;
+        form.append('duration', recording.duration);
+        form.append('name', recording.name);
+        form.append('size', recording.size);
+        form.append('extension', '.aac');
+        let data = '';
+        RNFetchBlob.fs.readStream(
+        recording.path,
+        // encoding, should be one of `base64`, `utf8`, `ascii`
+        'base64',
+        // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
+        // when reading file in BASE64 encoding, buffer size must be multiples of 3.
+        4095)
+        .then((ifstream) => {
+          ifstream.open();
+
+          ifstream.onData((chunk) => {
+            // when encoding is `ascii`, chunk will be an array contains numbers
+            // otherwise it will be a string
+            data += chunk;
           });
-          const recordings = realm.objects('Recording');
-          dispatch({ type: RECORDING_SYNCED, recordings });
+
+          ifstream.onError((err) => {
+            logErrorToCrashlytics(err);
+          });
+
+          ifstream.onEnd(() => {
+            form.append('file', data);
+            fetch('http://beta.noteable.me/api/v1/recordings', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data',
+                Authorization: user.jwt,
+              },
+              body: form,
+            })
+            .then(res => res.json())
+            .then((song) => {
+              console.log(song);
+              realm.write(() => {
+                realm.create('Recording', { id: recording.id, isSynced: true, resourceId: song.id }, true);
+                resolve({ ...recording, isSynced: true });
+              });
+            });
+          });
         });
-      });
-    });
+      } catch (e) {
+        console.log('error ', e);
+        reject(e);
+      }
+    }).then(update => dispatch({ type: uploadRecordingTypes.success, recording: update }))
+    .catch(error => dispatch({ type: uploadRecordingTypes.error, error }));
   }
 );
 

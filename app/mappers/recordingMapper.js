@@ -46,30 +46,60 @@ export const DisplayTime = (currentTime) => {
   name: dbMusic.name,
  */
 
-export const MapRecordingFromAPI = source => ({
+export const MapRecordingToAPI = source => ({
+  createdDate: source.dateCreated,
+  description: source.description,
+  duration: source.duration,
+  modifiedDate: source.dateModified,
   name: source.name,
-  path: source.audioUrl,
+  id: source.resourceId,
+  isSynced: source.isSynced,
+  size: source.size,
+});
+
+export const MapRecordingFromAPI = source => ({
+  audioUrl: source.audioUrl,
   dateCreated: source.createdDate,
   dateModified: source.modifiedDate,
-  durationDisplay: DisplayTime(source.duration * 1000),
-  duration: source.duraton,
-  size: source.size,
   description: source.description,
-  id: source.id,
+  duration: source.duraton,
   isSynced: true,
+  name: source.name,
+  resourceId: source.id,
+  size: source.size,
 });
 
 export const MapRecordingFromDB = dbRecording => ({
-  name: dbRecording.name,
-  path: dbRecording.path,
   dateCreated: dbRecording.dateCreated,
   dateModified: dbRecording.dateModified,
-  size: dbRecording.size,
+  description: dbRecording.description,
   durationDisplay: DisplayTime(dbRecording.duration * 1000),
   duration: dbRecording.duration,
-  description: dbRecording.description,
   id: dbRecording.id,
   isSynced: dbRecording.isSynced,
+  name: dbRecording.name,
+  path: dbRecording.path || dbRecording.audioUrl,
+  resourceId: dbRecording.resourceId,
+  size: dbRecording.size,
+});
+
+export const MapRecordingsToAssocArray = (recordingsList) => {
+  const recordings = {
+    local: {},
+    networked: {},
+  };
+
+  recordingsList.forEach((recording) => {
+    if (recording.resourceId === null) {
+      recordings.local[recording.id] = recording;
+    } else {
+      recordings.networked[recording.resourceId] = recording;
+    }
+  });
+};
+
+const MergeRecordingsLists = (oldRecordings, newRecordings) => oldRecordings.concat(newRecordings).map((recording) => {
+
 });
 
 export const MergeRecordings = (oldRecordings, newRecordings) => oldRecordings.map((old) => {

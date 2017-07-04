@@ -50,6 +50,7 @@ export default class Audio extends PureComponent {
     saveRecording: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
+    uploadRecording: PropTypes.func.isRequired,
   };
 
   state = {
@@ -324,6 +325,7 @@ export default class Audio extends PureComponent {
             startPlayer={this.props.startPlayer}
             loadingRecordings={this.props.loadingRecordings}
             editRecording={this.editRecording}
+            uploadRecording={this.props.uploadRecording}
           />
         </View>
         <Modal

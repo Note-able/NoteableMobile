@@ -14,6 +14,7 @@ const {
   saveRecordingsTypes,
   syncDownRecordingsTypes,
   updateRecordingTypes,
+  uploadRecordingTypes,
 } = RecordingActionTypes;
 
 const {
@@ -65,6 +66,16 @@ const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
     case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
       return { ...state, recordingsError: error, processing: false };
+    case uploadRecordingTypes.success:
+      return {
+        ...state,
+        recordings: state.recordings.map((rec) => {
+          if (rec.id === action.recording.id) {
+            return action.recording;
+          }
+          return rec;
+        }),
+      };
     case saveRecordingsTypes.processing:
     case fetchRecordingsTypes.processing:
       return { ...state, processing: true };
@@ -171,7 +182,6 @@ const Users = (state = { user: {} }, action) => {
       };
     case loginFacebookTypes.success:
     case fetchSignInTypes.success:
-      console.log(state.user, user);
       return {
         ...state,
         isProcessing: false,

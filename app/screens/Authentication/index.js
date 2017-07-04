@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -38,6 +39,7 @@ class Authentication extends Component {
 
   state = {
     screen: 'Login',
+    isProcessing: false,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,7 +49,33 @@ class Authentication extends Component {
 
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {
       this.props.navigation.navigate('Home');
+    } else if (this.props.users.error) {
+      this.setState({
+        isProcessing: false,
+        error: this.props.users.error,
+      });
     }
+  }
+
+  registerUser = (user) => {
+    this.props.registerUser(user);
+    this.setState({
+      isProcessing: true,
+    });
+  }
+
+  loginFacebook = (accessToken) => {
+    this.props.loginFacebook(accessToken);
+    this.setState({
+      isProcessing: true,
+    });
+  }
+
+  signInLocal = (email, password) => {
+    this.props.signInLocal(email, password);
+    this.setState({
+      isProcessing: true,
+    });
   }
 
   render() {
@@ -60,20 +88,24 @@ class Authentication extends Component {
           colors={[colorRGBA.green, colorRGBA.lightGreen, colors.shade0]}
           style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
         />
+        {this.state.isProcessing ?
+          <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', position: 'absolute', zIndex: 10, backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
+            <ActivityIndicator style={{ position: 'absolute' }} animating size="large" />
+          </View> : null}
         <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={() => this.props.navigation.navigate('Home')}>
           <Icon name="close" size={24} style={{ backgroundColor: 'transparent', width: 24, height: 24, margin: 10 }} color={colors.shade200} />
         </TouchableOpacity>
         <Text style={{ color: colors.shade90, fontSize: 20 }}>{this.state.screen}</Text>
         {this.state.screen === 'Register' ?
           <Register
-            submitRegister={this.props.registerUser}
+            submitRegister={this.registerUser}
             switchToLogin={() => this.setState({ screen: 'Login' })}
-            loginFacebook={this.props.loginFacebook}
+            loginFacebook={this.loginFacebook}
           /> :
           <Login
-            submitLogin={this.props.signInLocal}
+            submitLogin={this.signInLocal}
             switchToRegister={() => this.setState({ screen: 'Register' })}
-            loginFacebook={this.props.loginFacebook}
+            loginFacebook={this.loginFacebook}
           />
         }
       </View>
