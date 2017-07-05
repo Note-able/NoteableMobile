@@ -4,7 +4,7 @@ import { AudioUtils } from 'react-native-audio';
 import Schemas from '../realmSchemas';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 import { RecordingActionTypes } from './ActionTypes';
-import { DisplayTime, MapRecordingFromAPI } from '../mappers/recordingMapper';
+import { DisplayTime, MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
 
 const {
   deleteRecordingTypes,
@@ -80,30 +80,25 @@ export const fetchRecordings = (filter, search) => (
       } catch (e) {
         return reject(e);
       }
-    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings }))
+    }).then(recordings => dispatch({ type: fetchRecordingsTypes.success, recordings: MapRecordingsToAssocArray(recordings, MapRecordingFromDB) }))
     .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
   }
 );
 
+// Maps recordings to associative array of proper display type.
 export const addRecording = recording => (
   (dispatch) => {
     dispatch({ type: saveRecordingsTypes.processing });
     new Promise((resolve, reject) => {
       try {
         realm.write(() => {
-          const record = realm.objects('Recording').filtered(`name = "${recording.name}"`);
-
-          if (record.length !== 0) {
-            realm.create('Recording', { ...recording, name: `${recording.name} (1)` });
-          } else {
-            realm.create('Recording', recording);
-          }
+          realm.create('Recording', recording);
         });
-        return resolve([...realm.objects('Recording').sorted('id', true)]);
+        return resolve([...validate(realm.objects('Recording').sorted('id', true))]);
       } catch (e) {
         return reject(e);
       }
-    }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings }))
+    }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings: MapRecordingsToAssocArray(recordings, MapRecordingFromDB) }))
     .catch(error => dispatch({ type: saveRecordingsTypes.error, error }));
   }
 );
@@ -118,11 +113,8 @@ export const deleteRecording = recording => (
         resolve(recording.id);
       });
     }
-  }).then(id => dispatch({ type: deleteRecordingTypes.success, id }))
-    .catch((error) => {
-      logErrorToCrashlytics(error);
-      dispatch({ type: deleteRecordingTypes.error, error });
-    })
+  }).then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
+    .catch(error => dispatch({ type: deleteRecordingTypes.error, error }))
 );
 
 export const updateRecording = recording => (
@@ -150,18 +142,18 @@ export const updateRecording = recording => (
       } catch (e) {
         return reject(e);
       }
-    }).then(record => dispatch({ type: updateRecordingTypes.success, record }))
+    }).then(record => dispatch({ type: updateRecordingTypes.success, record: MapRecordingFromDB(record) }))
     .catch(error => dispatch({ type: updateRecordingTypes.error, error }));
   }
 );
 
-export const uploadRecording = (recording, user) => (
+export const uploadRecording = (rec, user) => (
   (dispatch) => {
-    console.log('Recording: ', recording);
-    console.log('User: ', user);
-    if (recording == null || user == null) {
+    if (rec == null || user == null) {
       return dispatch({ type: uploadRecordingTypes.error });
     }
+
+    const recording = MapRecordingToAPI(rec);
 
     dispatch({ type: uploadRecordingTypes.processing });
 
@@ -209,7 +201,6 @@ export const uploadRecording = (recording, user) => (
             })
             .then(res => res.json())
             .then((song) => {
-              console.log(song);
               realm.write(() => {
                 realm.create('Recording', { id: recording.id, isSynced: true, resourceId: song.id }, true);
                 resolve({ ...recording, isSynced: true });
@@ -218,7 +209,6 @@ export const uploadRecording = (recording, user) => (
           });
         });
       } catch (e) {
-        console.log('error ', e);
         reject(e);
       }
     }).then(update => dispatch({ type: uploadRecordingTypes.success, recording: update }))

@@ -16,7 +16,6 @@ import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import Schemas from '../../realmSchemas';
 import { CustomModal, Recordings } from '../../components/Shared';
 import { DisplayTime } from '../../mappers/recordingMapper';
@@ -24,14 +23,10 @@ import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
 import { logErrorToCrashlytics } from '../../util';
 
-// RNFetchBlob.fs.lstat(`${AudioUtils.DocumentDirectoryPath}`).then((result) => {
-//   console.log(result.filename);
-//   result.forEach(r => RNFetchBlob.fs.unlink(r.path));
-// });
-
 const realm = Schemas.RecordingSchema;
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
+
 const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
 let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1 || 1;
 
@@ -39,14 +34,7 @@ export default class Audio extends PureComponent {
   static propTypes = {
     fetchRecordings: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
-    recordings: PropTypes.arrayOf(PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      path: PropTypes.string.isRequired,
-      duration: PropTypes.number,
-      description: PropTypes.string,
-      isSynced: PropTypes.bool.isRequired,
-      id: PropTypes.number.isRequired,
-    })),
+    recordings: PropTypes.shape({}),
     saveRecording: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
@@ -90,7 +78,7 @@ export default class Audio extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      recordings: nextProps.recordings || [],
+      recordings: nextProps.recordings,
     });
   }
 

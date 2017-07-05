@@ -24,12 +24,7 @@ export default class Recordings extends Component {
     editRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
     uploadRecording: PropTypes.func.isRequired,
-    recordings: PropTypes.arrayOf(PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      duration: PropTypes.number.isRequired,
-      description: PropTypes.string,
-      path: PropTypes.string.isRequired,
-    })),
+    recordings: PropTypes.shape({}),
     startPlayer: PropTypes.func.isRequired,
     currentUser: PropTypes.shape({}),
   };
@@ -51,7 +46,7 @@ export default class Recordings extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.recordings.length === 0 && nextProps.recordings.length !== 0) {
+    if (this.props.recordings != null && this.props.recordings.order.length === 0 && nextProps.recordings.order.length !== 0) {
       Animated.timing(
         this.state.recordingsOpacity, {
           easing: Easing.cubic,
@@ -65,15 +60,15 @@ export default class Recordings extends Component {
     const animations = [];
     let oldOptions = null;
 
-    if (this.state.showOptions && this.state[this.state.showOptions.id]._value !== 0) {
+    if (this.state.showOptions && this.state[this.state.showOptions]._value !== 0) {
       oldOptions = this.state.showOptions;
     }
 
     this.setState({
-      showOptions: this.props.recordings.find(x => x.id === recordingId),
+      showOptions: this.props.recordings.order.find(x => x === recordingId),
     });
 
-    if (oldOptions == null || oldOptions.id !== recordingId) {
+    if (oldOptions == null || oldOptions !== recordingId) {
       animations.push(Animated.spring(
         this.state[recordingId], {
           easing: Easing.quad,
@@ -83,14 +78,14 @@ export default class Recordings extends Component {
     }
 
     if (oldOptions != null) {
-      if (oldOptions.id === recordingId) {
+      if (oldOptions === recordingId) {
         this.setState({
           showOptions: null,
         });
       }
 
       animations.push(Animated.spring(
-        this.state[oldOptions.id], {
+        this.state[oldOptions], {
           easing: Easing.linear,
           toValue: 0,
           duration: 50,
@@ -124,42 +119,45 @@ export default class Recordings extends Component {
         <Animated.View
           style={{ opacity: this.state.recordingsOpacity }}
         >
-          {this.props.recordings.map(recording => (
-            <Animated.View
-              style={[
-                styles.row,
-                this.state[recording.id] == null ? null : {
-                  transform: [{ translateX: this.state[recording.id].interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -1 * OPTIONS_WIDTH],
-                  }) }],
-                },
-              ]}
-              key={recording.id}
-            >
-              <Recording
-                primaryAction={() => this.startPlayer(recording)}
-                name={recording.name}
-                isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
-                isPlaying={this.state.activeRecording === recording.id}
-                openMoreMenu={() => this.showOptions(recording.id)}
-                secondaryDetails={recording.durationDisplay}
-                primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
-              />
-              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
-                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
-                  <Icon name="delete" size={25} color={colors.shade90} />
-                </TouchableHighlight>
-                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
-                  <Icon name="create" size={25} color={colors.shade90} />
-                </TouchableHighlight>
-                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.uploadRecording(recording, this.props.currentUser)}>
-                  <Icon name="cloud-upload" size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced ? colors.green : colors.shade60)} />
-                </TouchableHighlight>
-              </View>
-            </Animated.View>
-              ),
-            )}
+          {this.props.recordings.order.map((rec) => {
+            const recording = this.props.recordings.local[rec] || this.props.recordings.networked[rec];
+            return (
+              <Animated.View
+                style={[
+                  styles.row,
+                  this.state[recording.id] == null ? null : {
+                    transform: [{ translateX: this.state[recording.id].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, -1 * OPTIONS_WIDTH],
+                    }) }],
+                  },
+                ]}
+                key={recording.id}
+              >
+                <Recording
+                  primaryAction={() => this.startPlayer(recording)}
+                  name={recording.name}
+                  isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
+                  isPlaying={this.state.activeRecording === recording.id}
+                  openMoreMenu={() => this.showOptions(recording.id)}
+                  secondaryDetails={recording.durationDisplay}
+                  primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
+                />
+                <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
+                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
+                    <Icon name="delete" size={25} color={colors.shade90} />
+                  </TouchableHighlight>
+                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
+                    <Icon name="create" size={25} color={colors.shade90} />
+                  </TouchableHighlight>
+                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.uploadRecording(recording, this.props.currentUser)}>
+                    <Icon name="cloud-upload" size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced ? colors.green : colors.shade60)} />
+                  </TouchableHighlight>
+                </View>
+              </Animated.View>
+            );
+          },
+        )}
         </Animated.View>
       </ScrollView>
     );

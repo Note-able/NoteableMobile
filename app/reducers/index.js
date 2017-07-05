@@ -1,5 +1,6 @@
+/** eslint-disable no-duplicate-case */
 import { combineReducers } from 'redux';
-import { MapRecordingFromAPI, MapRecordingFromDB, MergeRecordings } from '../mappers/recordingMapper';
+import { MergeRecordings } from '../mappers/recordingMapper';
 import {
   AccountActionTypes,
   PlayerActionTypes,
@@ -33,56 +34,87 @@ const {
   networkingFailureType,
 } = SystemMessageActionTypes;
 
-const Recordings = (state = { recordings: [], shouldPlay: false }, action) => {
-  const { type, recordings, audio, currentRecording, error } = action;
-  const { shouldPlay } = state;
+const DEFAULT_RECORDINGS_STATE = {
+  recordings: {
+    local: {},
+    networked: {},
+    order: [],
+  },
+  processing: false,
+  search: '',
+};
+
+const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
+  const { type, error } = action;
+  console.log(type);
   switch (type) {
+    case saveRecordingsTypes.error:
+    case fetchRecordingsTypes.error:
+    case deleteRecordingTypes.error:
+    case updateRecordingTypes.error:
+    case uploadRecordingTypes.error:
+      logErrorToCrashlytics(error);
+      return { ...state, error, processing: false };
+    // eslint-disable no-fallthrough
+    case saveRecordingsTypes.success:
+    case fetchRecordingsTypes.success:
+      return {
+        ...state,
+        recordings: action.recordings,
+        processing: false,
+        search: action.search,
+      };
     case deleteRecordingTypes.success:
       return {
         ...state,
-        recordings: state.recordings.filter(recording => recording.id !== action.id),
+        processing: false,
+        recordings: {
+          ...state.recordings,
+          local: state.recordings.local.filter(x => x.id !== action.deletedId),
+          networked: state.recordings.networked.filter(x => x.id !== action.deletedId),
+        },
       };
     case updateRecordingTypes.success:
       return {
         ...state,
-        recordings: state.recordings.map((recording) => {
-          if (recording.id === action.record.id) {
-            return MapRecordingFromDB(action.record);
-          }
-          return recording;
-        }),
+        processing: false,
+        recordings: {
+          ...state.recordings,
+          local: state.recordings.local[action.record.id] == null ? state.recordings.local : {
+            ...state.recordings.local,
+            [action.record.id]: action.record,
+          },
+          networked: state.recordings.networked[action.record.resourceId] == null ? state.recordings.networked : {
+            ...state.recordings.networked,
+            [action.record.resourceId]: action.record,
+          },
+        },
       };
     case syncDownRecordingsTypes.success:
       return {
         ...state,
-        recordings: MergeRecordings(state.recordings, recordings.map(x => MapRecordingFromAPI(x))),
+        recordings: MergeRecordings(state.recordings, action.recordings),
         processing: false,
       };
-    case saveRecordingsTypes.success:
-    case fetchRecordingsTypes.success:
-    case 'RECORDING_SYNCED':
-      return { ...state, recordings: recordings.map(x => MapRecordingFromDB(x)), processing: false, search: action.search };
-    case deleteRecordingTypes.error:
-    case saveRecordingsTypes.error:
-    case fetchRecordingsTypes.error:
-      return { ...state, recordingsError: error, processing: false };
     case uploadRecordingTypes.success:
       return {
         ...state,
-        recordings: state.recordings.map((rec) => {
-          if (rec.id === action.recording.id) {
-            return action.recording;
-          }
-          return rec;
-        }),
+        processing: false,
+        recordings: {
+          ...state.recordings,
+          local: state.recordings.local.filter(x => x.id !== action.recording.id),
+          networked: {
+            ...state.recordings.networked,
+            [action.recording.resourceId]: action.recording,
+          },
+        },
       };
+    case updateRecordingTypes.processing:
     case saveRecordingsTypes.processing:
     case fetchRecordingsTypes.processing:
+    case uploadRecordingTypes.processing:
+    case syncDownRecordingsTypes.processing:
       return { ...state, processing: true };
-    case 'INITIALIZE_PLAYER':
-      return { ...state, audio, currentRecording, shouldPlay: true };
-    case 'TOGGLE_PLAY_FLAG':
-      return { ...state, shouldPlay: !shouldPlay };
     default:
       return state;
   }
@@ -256,3 +288,5 @@ export const appReducer = combineReducers({
   SystemMessage,
   Users,
 });
+
+/** eslint-enable */

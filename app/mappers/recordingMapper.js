@@ -83,38 +83,38 @@ export const MapRecordingFromDB = dbRecording => ({
   size: dbRecording.size,
 });
 
-export const MapRecordingsToAssocArray = (recordingsList) => {
+export const MapRecordingsToAssocArray = (recordingsList, mapFunc) => {
   const recordings = {
     local: {},
     networked: {},
+    order: [],
   };
 
   recordingsList.forEach((recording) => {
-    if (recording.resourceId === null) {
-      recordings.local[recording.id] = recording;
+    if (recording.resourceId == null) {
+      recordings.local[recording.id] = mapFunc ? mapFunc(recording) : recording;
     } else {
-      recordings.networked[recording.resourceId] = recording;
+      recordings.networked[recording.resourceId] = mapFunc ? mapFunc(recording) : recording;
     }
+
+    recordings.order.push(recording.resourceId || recording.id);
   });
+
+  return recordings;
 };
 
-const MergeRecordingsLists = (oldRecordings, newRecordings) => oldRecordings.concat(newRecordings).map((recording) => {
+export const MergeRecordings = (oldRecordings, newRecordings) => {
+  const recordings = oldRecordings.networked;
+  newRecordings.forEach((recording) => {
+    if (recordings[recording.resourceId] == null || recording.dateModified > recordings[recording.resourceId].dateModified) {
+      recordings[recording.resourceId] = recording;
+    } else {
+      recordings[recording.resourceId].audioUrl = recording.audioUrl;
+    }
+  });
 
-});
-
-export const MergeRecordings = (oldRecordings, newRecordings) => oldRecordings.map((old) => {
-  const dupe = newRecordings.find(rec => rec.id === old.resourceId);
-  if (dupe != null && dupe.dateModified > old.dateModified) {
-    return {
-      ...old,
-      ...dupe,
-    };
-  } else if (dupe != null) {
-    return {
-      ...dupe,
-      ...old,
-    };
-  }
-
-  return old;
-}).concat(newRecordings.filter(rec => oldRecordings.find(old => old.resourceId === rec.id) == null));
+  return {
+    ...oldRecordings,
+    networked: recordings,
+  };
+};
