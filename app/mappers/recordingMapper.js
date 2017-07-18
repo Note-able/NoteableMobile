@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const DisplayTime = (currentTime) => {
   let hour = Math.floor((currentTime / 360000)) % 24;
   let minute = Math.floor((currentTime / 60000)) % 60;
@@ -34,12 +36,10 @@ export const DisplayTime = (currentTime) => {
  * audioUrl: dbMusic.audio_url,
   createdDate: dbMusic.created_date,
   coverUrl: dbMusic.cover_url,
-
   author: dbMusic.author,                 <-- don't care
   modifiedDate: dbMusic.modified_date,
   size: dbMusic.size,
   isDeleted: !!dbMusic.is_deleted,
-
   description: dbMusic.description,
   duration: dbMusic.duration,
   id: dbMusic.id,
@@ -52,6 +52,7 @@ export const MapRecordingToAPI = source => ({
   duration: source.duration,
   modifiedDate: source.dateModified,
   name: source.name,
+  path: source.path,
   id: source.resourceId,
   isSynced: source.isSynced,
   size: source.size,
@@ -59,14 +60,14 @@ export const MapRecordingToAPI = source => ({
 
 export const MapRecordingFromAPI = source => ({
   audioUrl: source.audioUrl,
-  dateCreated: source.createdDate,
-  dateModified: source.modifiedDate,
+  dateCreated: moment(source.createdDate).toDate(),
+  dateModified: moment(source.modifiedDate).toDate(),
   description: source.description,
-  duration: source.duraton,
+  duration: parseInt(source.duration === '' ? 0 : source.duration, 10),
   isSynced: true,
   name: source.name,
   resourceId: source.id,
-  size: source.size,
+  size: parseInt(source.size.match(/\d*/)[0] === '' ? 0 : source.size.match(/\d*/)[0], 10),
 });
 
 export const MapRecordingFromDB = dbRecording => ({
@@ -94,27 +95,11 @@ export const MapRecordingsToAssocArray = (recordingsList, mapFunc) => {
     if (recording.resourceId == null) {
       recordings.local[recording.id] = mapFunc ? mapFunc(recording) : recording;
     } else {
-      recordings.networked[recording.resourceId] = mapFunc ? mapFunc(recording) : recording;
+      recordings.networked[recording.id] = mapFunc ? mapFunc(recording) : recording;
     }
 
-    recordings.order.push(recording.resourceId || recording.id);
+    recordings.order.push(recording.id);
   });
 
   return recordings;
-};
-
-export const MergeRecordings = (oldRecordings, newRecordings) => {
-  const recordings = oldRecordings.networked;
-  newRecordings.forEach((recording) => {
-    if (recordings[recording.resourceId] == null || recording.dateModified > recordings[recording.resourceId].dateModified) {
-      recordings[recording.resourceId] = recording;
-    } else {
-      recordings[recording.resourceId].audioUrl = recording.audioUrl;
-    }
-  });
-
-  return {
-    ...oldRecordings,
-    networked: recordings,
-  };
 };

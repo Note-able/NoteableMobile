@@ -11,11 +11,9 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import styles from './styles.js';
-import Schemas from '../../../realmSchemas';
 import { Recording } from '../';
 import { colors } from '../../../styles';
 
-const realm = Schemas.RecordingSchema;
 const OPTIONS_WIDTH = 175;
 
 export default class Recordings extends Component {

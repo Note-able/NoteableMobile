@@ -7,7 +7,6 @@ import {
 export default StyleSheet.create({
   recordings: {
     backgroundColor: 'transparent',
-    maxHeight: 350,
     minHeight: 275,
     justifyContent: 'flex-start',
     overflow: 'scroll',

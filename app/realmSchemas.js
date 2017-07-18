@@ -8,46 +8,68 @@ import Realm from 'realm';
 // import moment from 'moment';
 
 // const recordingsMigration = (oldRealm, newRealm) => {
-//   if (oldRealm.schemaVersion < 1) {
+//   if (oldRealm.schemaVersion < 5) {
 //     const oldObjects = oldRealm.objects('Recording');
 //     const newObjects = newRealm.objects('Recording');
 
 //     // loop through all objects and set the name property in the new schema
 //     for (let i = 0; i < oldObjects.length; i += 1) {
-//       newObjects[i].resourceId = 0;
+//       newObjects[i].audioUrl = '';
 //     }
 //   }
 // };
 
 const RecordingSchemas = [
   {
-    schemaVersion: 0,
+    schemaVersion: 5,
     schema: [{
       name: 'Recording',
       primaryKey: 'id',
       properties: {
         name: 'string',
         path: 'string',
-        duration: 'double',
+        duration: { type: 'double', optional: true },
         description: 'string',
         isSynced: 'bool',
         id: 'int',
         dateCreated: 'date',
         dateModified: 'date',
-        resourceId: 'int',
-        size: 'int',
+        resourceId: { type: 'int', default: 0 },
+        size: { type: 'int', optional: true },
         audioUrl: 'string',
       },
     }],
   },
+  // {
+  //   schemaVersion: 6,
+  //   schema: [{
+  //     name: 'Recording',
+  //     primaryKey: 'id',
+  //     properties: {
+  //       name: 'string',
+  //       path: 'string',
+  //       duration: { type: 'double', optional: true },
+  //       description: 'string',
+  //       isSynced: 'bool',
+  //       id: 'int',
+  //       dateCreated: 'date',
+  //       dateModified: 'date',
+  //       resourceId: { type: 'int', default: 0 },
+  //       size: { type: 'int', optional: true },
+  //       audioUrl: { type: 'string', default: '' },
+  //     },
+  //   }],
+  //   migration: recordingsMigration,
+  // },
 ];
 
-let nextSchemaIndex = Realm.schemaVersion(Realm.defaultPath);
-while (nextSchemaIndex < RecordingSchemas.length) {
-  /* eslint-disable no-plusplus */
-  const migratedRealm = new Realm(RecordingSchemas[nextSchemaIndex++]);
-  migratedRealm.close();
-}
+// console.log(Realm.defaultPath);
+// let nextSchemaIndex = Realm.schemaVersion(Realm.defaultPath);
+// while (nextSchemaIndex < RecordingSchemas.length) {
+//   /* eslint-disable no-plusplus */
+//   const migratedRealm = new Realm(RecordingSchemas[nextSchemaIndex++]);
+//   migratedRealm.close();
+// }
 
 const GetId = (realm) => {
   const result = realm.sorted('id', true);
@@ -59,6 +81,6 @@ const GetId = (realm) => {
 };
 
 export default {
-  RecordingSchema: new Realm([RecordingSchemas[RecordingSchemas.length - 1]]),
+  RecordingSchema: new Realm([RecordingSchemas[0]]),
   GetId,
 };

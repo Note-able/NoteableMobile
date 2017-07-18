@@ -46,7 +46,7 @@ const DEFAULT_RECORDINGS_STATE = {
 
 const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
   const { type, error } = action;
-  console.log(type);
+  console.log(type, error);
   switch (type) {
     case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
@@ -70,8 +70,15 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
         processing: false,
         recordings: {
           ...state.recordings,
-          local: state.recordings.local.filter(x => x.id !== action.deletedId),
-          networked: state.recordings.networked.filter(x => x.id !== action.deletedId),
+          local: {
+            ...state.recordings.local,
+            [action.deletedId]: null,
+          },
+          networked: {
+            ...state.recordings.networked,
+            [action.deletedId]: null,
+          },
+          order: state.recordings.order.filter(x => x !== action.deletedId),
         },
       };
     case updateRecordingTypes.success:
@@ -86,14 +93,14 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
           },
           networked: state.recordings.networked[action.record.resourceId] == null ? state.recordings.networked : {
             ...state.recordings.networked,
-            [action.record.resourceId]: action.record,
+            [action.record.id]: action.record,
           },
         },
       };
     case syncDownRecordingsTypes.success:
       return {
         ...state,
-        recordings: MergeRecordings(state.recordings, action.recordings),
+        recordings: action.recordings,
         processing: false,
       };
     case uploadRecordingTypes.success:
@@ -102,10 +109,13 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
         processing: false,
         recordings: {
           ...state.recordings,
-          local: state.recordings.local.filter(x => x.id !== action.recording.id),
+          local: {
+            ...state.recordings.local,
+            [action.deletedId]: null,
+          },
           networked: {
             ...state.recordings.networked,
-            [action.recording.resourceId]: action.recording,
+            [action.recording.id]: action.recording,
           },
         },
       };
