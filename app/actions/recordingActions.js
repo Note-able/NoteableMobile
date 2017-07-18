@@ -193,7 +193,6 @@ export const uploadRecording = (rec, user) => (
           4095)
           .then((ifstream) => {
             ifstream.open();
-
             ifstream.onData((chunk) => {
               // when encoding is `ascii`, chunk will be an array contains numbers
               // otherwise it will be a string
@@ -231,6 +230,21 @@ export const uploadRecording = (rec, user) => (
       }).then(update => dispatch({ type: uploadRecordingTypes.success, recording: update }))
       .catch(error => dispatch({ type: uploadRecordingTypes.error, error }));
     }
+  }
+);
+
+export const downloadRecording = recording => (
+  (dispatch) => {
+    dispatch({ type: downloadRecordingTypes.processing });
+
+    RNFetchBlob
+    .config({
+      path: `${AudioUtils.DocumentDirectoryPath}/${moment().format('HHmmss')}.aac`,
+    })
+    .fetch('GET', recording.audioURL)
+    .then((response) => {
+      console.log(response);
+    });
   }
 );
 
