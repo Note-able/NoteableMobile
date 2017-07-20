@@ -21,8 +21,7 @@ const checkStatus = () => {
 export const startPlayer = recording => (
   (dispatch) => {
     dispatch({ type: startPlayerTypes.processing });
-
-    if (recording.path != null && !recording.path.startsWith('http')) {
+    if (recording.path !== '') {
       const sound = new Sound(recording.path, '', (error) => {
         if (error) {
           return dispatch({ type: startPlayerTypes.error, error });
@@ -33,8 +32,7 @@ export const startPlayer = recording => (
     } else {
       const sound = {
         play: (callback) => {
-          console.log(recording.path);
-          ReactNativeAudioStreaming.play(recording.path, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
+          ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
           DeviceEventEmitter.addListener(
             'AudioBridgeEvent', (evt) => {
               console.log(evt);
