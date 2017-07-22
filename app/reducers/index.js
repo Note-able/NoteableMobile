@@ -11,6 +11,7 @@ import { logErrorToCrashlytics } from '../util.js';
 
 const {
   deleteRecordingTypes,
+  downloadRecordingTypes,
   fetchRecordingsTypes,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
@@ -53,6 +54,7 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case deleteRecordingTypes.error:
     case updateRecordingTypes.error:
     case uploadRecordingTypes.error:
+    case downloadRecordingTypes.error:
       logErrorToCrashlytics(error);
       return { ...state, error, processing: false };
     // eslint-disable no-fallthrough
@@ -81,6 +83,7 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
           order: state.recordings.order.filter(x => x !== action.deletedId),
         },
       };
+    case downloadRecordingTypes.success:
     case updateRecordingTypes.success:
       return {
         ...state,

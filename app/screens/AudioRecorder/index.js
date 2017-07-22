@@ -8,6 +8,7 @@ import Audio from './Audio.js';
 import {
   addRecording,
   deleteRecording,
+  downloadRecording,
   fetchRecordings,
   syncDownRecordings,
   updateRecording,
@@ -27,7 +28,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  deleteRecording: recording => dispatch(deleteRecording(recording)),
+  deleteRecording: (recording, user) => dispatch(deleteRecording(recording, user)),
+  downloadRecording: recording => dispatch(downloadRecording(recording)),
   fetchRecordings: () => dispatch(fetchRecordings()),
   filterRecordings: filter => dispatch(fetchRecordings(filter)),
   updateRecording: recording => dispatch(updateRecording(recording)),
@@ -42,6 +44,7 @@ const mapDispatchToProps = dispatch => ({
 class AudioRecorder extends Component {
   static propTypes = {
     deleteRecording: PropTypes.func.isRequired,
+    downloadRecording: PropTypes.func.isRequired,
     fetchRecordings: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
     saveRecording: PropTypes.func.isRequired,
@@ -67,6 +70,7 @@ class AudioRecorder extends Component {
       <View style={{ flex: 1 }}>
         <Audio
           deleteRecording={this.props.deleteRecording}
+          downloadRecording={this.props.downloadRecording}
           fetchRecordings={this.props.fetchRecordings}
           loadingRecordings={this.props.recordings.processing}
           saveRecording={this.props.saveRecording}

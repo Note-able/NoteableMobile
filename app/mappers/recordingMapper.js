@@ -79,7 +79,8 @@ export const MapRecordingFromDB = dbRecording => ({
   id: dbRecording.id,
   isSynced: dbRecording.isSynced,
   name: dbRecording.name,
-  path: dbRecording.path || dbRecording.audioUrl,
+  audioUrl: dbRecording.audioUrl,
+  path: dbRecording.path,
   resourceId: dbRecording.resourceId,
   size: dbRecording.size,
 });
