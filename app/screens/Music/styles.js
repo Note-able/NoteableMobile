@@ -11,6 +11,7 @@ export default StyleSheet.create({
     backgroundColor: colors.shade0,
     height: '100%',
     marginTop: 20,
+    position: 'relative',
   },
   headerBar: {
     backgroundColor: colors.shade0,
@@ -38,12 +39,12 @@ export default StyleSheet.create({
     color: colors.shade140,
     fontSize: 14,
     height: 28,
+    paddingVertical: 0,
     paddingHorizontal: 6,
     width: '100%',
   },
   filterContainer: {
     backgroundColor: colors.shade0,
-    height: 0,
     left: 20,
     overflow: 'hidden',
     position: 'absolute',

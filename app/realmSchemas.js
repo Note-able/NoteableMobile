@@ -19,8 +19,8 @@ import Realm from 'realm';
 //   }
 // };
 
-const RecordingSchemas = [
-  {
+const RecordingSchemas = {
+  5: {
     schemaVersion: 5,
     schema: [{
       name: 'Recording',
@@ -61,7 +61,7 @@ const RecordingSchemas = [
   //   }],
   //   migration: recordingsMigration,
   // },
-];
+};
 
 // console.log(Realm.defaultPath);
 // let nextSchemaIndex = Realm.schemaVersion(Realm.defaultPath);
@@ -80,7 +80,9 @@ const GetId = (realm) => {
   return result[0].id;
 };
 
+const RecordingSchema = new Realm([RecordingSchemas[5]]);
+
 export default {
-  RecordingSchema: new Realm([RecordingSchemas[0]]),
+  RecordingSchema,
   GetId,
 };

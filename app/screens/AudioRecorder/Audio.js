@@ -311,12 +311,14 @@ export default class Audio extends PureComponent {
             loadingRecordings={this.props.loadingRecordings}
             editRecording={this.editRecording}
             uploadRecording={this.props.uploadRecording}
+            downloadRecording={() => { console.log('download'); }}
           />
         </View>
         <Modal
           animationType={'slide'}
           transparent
           visible={this.state.modal}
+          onRequestClose={() => { this.setState({ modal: true }); }}
         >
           <CustomModal
             initialValue={this.state.fileName}

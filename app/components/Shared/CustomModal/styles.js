@@ -36,6 +36,7 @@ export default StyleSheet.create({
     height: 32,
     marginVertical: 4,
     paddingHorizontal: 4,
+    paddingVertical: 0,
     width: '100%',
   },
   inputLabel: {

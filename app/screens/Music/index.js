@@ -84,12 +84,13 @@ class Music extends Component {
   showFilter = () => {
     this.setState({
       options: this.state.options === 'filter' ? '' : 'filter',
-      height: new Animated.Value(0),
+      filterOpen: !this.state.filterOpen,
     }, () => {
+      this.state.height.setValue(this.state.filterOpen ? 0 : 120);
       Animated.timing(
         this.state.height, {
-          easing: Easing.linear,
-          toValue: 120,
+          easing: Easing.ease,
+          toValue: this.state.filterOpen ? 120 : 0,
           duration: 100,
         },
       ).start();
@@ -138,10 +139,10 @@ class Music extends Component {
             <Icon name="filter-list" size={28} style={{ width: 28, height: 28 }} color={colors.shade90} />
           </TouchableHighlight>
           <View style={styles.searchInput}>
-            <TextInput style={styles.input} value={this.state.search} onFocus={() => this.setState({ options: 'search' })} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} />
+            <TextInput style={styles.input} value={this.state.search} onFocus={() => this.setState({ options: 'search' })} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} underlineColorAndroid="transparent" />
           </View>
         </View>
-        {this.state.options === 'filter' ? <Animated.View style={[styles.filterContainer, { height: this.state.height }]}>
+        <Animated.View style={[styles.filterContainer, { height: this.state.height }]}>
           <TouchableHighlight style={styles.filterOption} onPress={() => this.filter('duration')}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: colors.shade90, fontSize: 14 }}>Length</Text>
@@ -160,7 +161,7 @@ class Music extends Component {
               {this.state.activeFilter === 'name' ? check : null}
             </View>
           </TouchableHighlight>
-        </Animated.View> : null }
+        </Animated.View>
         <LinearGradient
           start={{ x: 0.0, y: 0.0 }}
           end={{ x: 0.9, y: 0.9 }}
@@ -182,6 +183,7 @@ class Music extends Component {
           animationType={'none'}
           transparent
           visible={this.state.modal != null}
+          onRequestClose={() => { this.setState({ modal: null }); }}
         >
           <CustomModal
             initialValue={this.state.fileName}

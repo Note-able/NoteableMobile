@@ -7,8 +7,6 @@ import {
 export default StyleSheet.create({
   footerContainer: {
     backgroundColor: colors.shade0,
-    bottom: 0,
-    position: 'absolute',
     width: '100%',
     ...shadowProps,
   },
