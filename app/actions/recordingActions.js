@@ -56,6 +56,11 @@ const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) 
     return fetchRecordingsFromAPI(dispatch, recordings, iteration, token, offset + 20);
   }, (error) => { throw error; });
 
+export const getRecordingTitle = () => {
+  const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
+  return [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1 || 1;
+};
+
 export const syncDownRecordings = () => (
   async (dispatch) => {
     const user = await AsyncStorage.getItem(USER);

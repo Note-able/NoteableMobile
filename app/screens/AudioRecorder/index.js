@@ -7,6 +7,7 @@ import Audio from './Audio.js';
 
 import {
   addRecording,
+  getRecordingTitle,
   deleteRecording,
   downloadRecording,
   fetchRecordings,
@@ -69,6 +70,7 @@ class AudioRecorder extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Audio
+          getRecordingTitle={getRecordingTitle}
           deleteRecording={this.props.deleteRecording}
           downloadRecording={this.props.downloadRecording}
           fetchRecordings={this.props.fetchRecordings}

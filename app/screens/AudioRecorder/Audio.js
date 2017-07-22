@@ -27,9 +27,6 @@ const realm = Schemas.RecordingSchema;
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
 
-const untitled = realm.objects('Recording').filtered('name BEGINSWITH "Untitled "');
-let untitledTitle = [...untitled].filter(x => x.name.split(' ').length === 2).map(x => parseInt(x.name.split(' ')[1], 10)).sort((a, b) => b - a)[0] + 1 || 1;
-
 export default class Audio extends PureComponent {
   static propTypes = {
     fetchRecordings: PropTypes.func.isRequired,
@@ -48,7 +45,7 @@ export default class Audio extends PureComponent {
     isPlaying: false,
     reviewMode: false,
     finished: false,
-    fileName: `Untitled ${untitledTitle}`,
+    fileName: `Untitled ${this.props.getRecordingTitle()}`,
     recordingLeft: 0,
     recordings: this.props.recordings || [],
     didSave: false,
