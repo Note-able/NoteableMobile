@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {
   deleteRecording,
+  downloadRecording,
   fetchRecordings,
   updateRecording,
   uploadRecording,
@@ -38,6 +39,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   deleteRecording: recording => dispatch(deleteRecording(recording)),
+  downloadRecording: recording => dispatch(downloadRecording(recording)),
   fetchRecordings: () => dispatch(fetchRecordings()),
   filterRecordings: filter => dispatch(fetchRecordings(filter)),
   updateRecording: recording => dispatch(updateRecording(recording)),
@@ -168,6 +170,7 @@ class Music extends Component {
         />
         <Recordings
           deleteRecording={this.props.deleteRecording}
+          downloadRecording={this.props.downloadRecording}
           recordings={this.props.recordings.recordings}
           startPlayer={this.props.startPlayer}
           editRecording={this.editRecording}

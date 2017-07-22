@@ -19,6 +19,7 @@ const OPTIONS_WIDTH = 175;
 export default class Recordings extends Component {
   static propTypes = {
     deleteRecording: PropTypes.func.isRequired,
+    downloadRecording: PropTypes.func.isRequired,
     editRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
     uploadRecording: PropTypes.func.isRequired,
@@ -148,7 +149,7 @@ export default class Recordings extends Component {
                   <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
                     <Icon name="create" size={25} color={colors.shade90} />
                   </TouchableHighlight>
-                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.uploadRecording(recording, this.props.currentUser)}>
+                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => recording.path === '' ? this.props.downloadRecording(recording) : this.props.uploadRecording(recording, this.props.currentUser)}>
                     <Icon name={recording.path === '' ? 'file-download' : 'cloud-upload'} size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced && recording.path !== '' ? colors.green : colors.shade90)} />
                   </TouchableHighlight>
                 </View>

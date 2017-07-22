@@ -19,6 +19,12 @@ export const fetchUtil = {
     },
     body: JSON.stringify(body),
   }),
+  delete: ({ url, auth }) => fetch(url, {
+    method: 'DELETE',
+    headers: {
+      Authorization: auth,
+    },
+  }),
 };
 /* eslint-enable */
 

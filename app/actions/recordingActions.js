@@ -32,6 +32,17 @@ const validate = (recordings) => {
   });
 };
 
+const removeRecording = (recording, resolve) => {
+  if (recording.path !== '') {
+    RNFetchBlob.fs.unlink(recording.path);
+  }
+  realm.write(() => {
+    const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
+    realm.delete(recordings);
+    resolve(recording.id);
+  });
+};
+
 const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `http://beta.noteable.me/api/v1/recordings?offset=${offset}`, auth: token })
 .then(response => response.json(), (error) => { throw error; })
   .then((result) => {
@@ -122,14 +133,23 @@ export const addRecording = recording => (
 );
 
 export const deleteRecording = recording => (
-  dispatch => new Promise((resolve) => {
+  dispatch => new Promise(async (resolve) => {
     dispatch({ type: deleteRecordingTypes.processing });
-    RNFetchBlob.fs.unlink(recording.path);
-    realm.write(() => {
-      const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
-      realm.delete(recordings);
-      resolve(recording.id);
-    });
+    const user = await AsyncStorage.getItem(USER);
+
+    if (user != null) {
+      fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0);
+      fetchUtil.delete({ url: `http://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
+        .then((response) => {
+          if (response.status === 204) {
+            removeRecording(recording, resolve);
+          } else {
+            throw new Error('Failed delete');
+          }
+        });
+    } else {
+      removeRecording(recording, resolve);
+    }
   }).then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
     .catch(error => dispatch({ type: deleteRecordingTypes.error, error }))
 );
@@ -236,15 +256,20 @@ export const uploadRecording = (rec, user) => (
 export const downloadRecording = recording => (
   (dispatch) => {
     dispatch({ type: downloadRecordingTypes.processing });
+    const fileName = `${AudioUtils.DocumentDirectoryPath}/${moment().format('HHmmss')}.aac`;
 
     RNFetchBlob
-    .config({
-      path: `${AudioUtils.DocumentDirectoryPath}/${moment().format('HHmmss')}.aac`,
-    })
-    .fetch('GET', recording.audioURL)
-    .then((response) => {
-      console.log(response);
-    });
+      .config({
+        path: fileName,
+      })
+      .fetch('GET', recording.audioUrl)
+      .then((response) => {
+        realm.write(() => {
+          realm.create('Recording', { id: recording.id, path: response.data }, true);
+          dispatch({ type: downloadRecordingTypes.success, record: { ...recording, path: fileName } });
+        });
+      })
+      .catch(error => dispatch({ type: downloadRecordingTypes.error, error }));
   }
 );
 
