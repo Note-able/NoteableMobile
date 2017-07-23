@@ -143,11 +143,11 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sound')
     compile project(':react-native-audio-streaming')
     compile project(':react-native-fabric')
     compile project(':realm')
     compile project(':react-native-vector-icons')
-    compile project(':react-native-sound')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-fetch-blob')
     compile(project(':react-native-fbsdk')){
