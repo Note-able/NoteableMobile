@@ -206,6 +206,8 @@ export default class Audio extends PureComponent {
         return;
       }
 
+      let untitledTitle = this.props.getRecordingTitle();
+
       this.props.saveRecording({
         name: recording.fileName,
         path: this.state.audioPath,

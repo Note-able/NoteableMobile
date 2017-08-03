@@ -31,6 +31,7 @@ export default class Recordings extends Component {
   state = {
     showOptions: null,
     recordingsOpacity: new Animated.Value(0),
+    recordings: this.props.recordings,
   }
 
   componentDidMount() {
@@ -45,6 +46,10 @@ export default class Recordings extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setState({
+      recordings: nextProps.recordings,
+    });
+
     if (this.props.recordings != null && this.props.recordings.order.length === 0 && nextProps.recordings.order.length !== 0) {
       Animated.timing(
         this.state.recordingsOpacity, {
@@ -64,7 +69,7 @@ export default class Recordings extends Component {
     }
 
     this.setState({
-      showOptions: this.props.recordings.order.find(x => x === recordingId),
+      showOptions: this.state.recordings.order.find(x => x === recordingId),
     });
 
     if (oldOptions == null || oldOptions !== recordingId) {
@@ -118,8 +123,8 @@ export default class Recordings extends Component {
         <Animated.View
           style={{ opacity: this.state.recordingsOpacity }}
         >
-          {this.props.recordings.order.map((rec) => {
-            const recording = this.props.recordings.local[rec] || this.props.recordings.networked[rec];
+          {this.state.recordings.order.map((rec) => {
+            const recording = this.state.recordings.local[rec] || this.state.recordings.networked[rec];
             return (
               <Animated.View
                 style={[

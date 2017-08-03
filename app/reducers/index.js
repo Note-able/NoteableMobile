@@ -47,7 +47,6 @@ const DEFAULT_RECORDINGS_STATE = {
 
 const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
   const { type, error } = action;
-  console.log(type, error);
   switch (type) {
     case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
@@ -55,7 +54,9 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case updateRecordingTypes.error:
     case uploadRecordingTypes.error:
     case downloadRecordingTypes.error:
-      logErrorToCrashlytics(error);
+    case syncDownRecordingsTypes.error:
+      console.log(type, error || 'failure');
+      logErrorToCrashlytics(error || 'failure');
       return { ...state, error, processing: false };
     // eslint-disable no-fallthrough
     case saveRecordingsTypes.success:

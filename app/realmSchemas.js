@@ -80,7 +80,7 @@ const GetId = (realm) => {
   return result[0].id;
 };
 
-const RecordingSchema = new Realm([RecordingSchemas[5]]);
+const RecordingSchema = new Realm(RecordingSchemas[5]);
 
 export default {
   RecordingSchema,

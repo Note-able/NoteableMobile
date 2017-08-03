@@ -76,14 +76,14 @@ export const syncDownRecordings = () => (
             } catch (e) { }
 
             const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
-            if (current != null || rec.dateModified >= current.dateModified) {
-              console.log(id, rec);
+            if (current != null && rec.dateModified >= current.dateModified) {
               realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
-              console.log([...realm.objects('Recording').filtered(`id = ${id}`)]);
+            } else if (current == null) {
+              realm.create('Recording', { ...rec, path: '', id }, true);
             }
           });
-          const result = [...validate(recordings.sorted('id', true))];
-          dispatch({ type: syncDownRecordingsTypes.success, recordings: result });
+          const result = [...validate(realm.objects('Recording').sorted('id', true))];
+          dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
         });
       })
       .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
@@ -241,10 +241,9 @@ export const uploadRecording = (rec, user) => (
               })
               .then(res => res.json())
               .then((song) => {
-                console.log(song);
                 realm.write(() => {
                   realm.create('Recording', { id: parseInt(rec.id, 10), isSynced: true, resourceId: parseInt(song.id, 10) }, true);
-                  resolve({ ...recording, isSynced: true, resourceId: parseInt(song.id, 10) });
+                  resolve({ ...recording, isSynced: true, resourceId: song.id, id: rec.id });
                 });
               });
             });
@@ -252,7 +251,7 @@ export const uploadRecording = (rec, user) => (
         } catch (e) {
           reject(e);
         }
-      }).then(update => dispatch({ type: uploadRecordingTypes.success, recording: update }))
+      }).then(update => dispatch({ type: uploadRecordingTypes.success, recording: update, deletedId: rec.id }))
       .catch(error => dispatch({ type: uploadRecordingTypes.error, error }));
     }
   }

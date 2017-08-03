@@ -63,15 +63,18 @@ class Music extends Component {
     search: this.props.recordings.search || '',
     options: '',
     height: new Animated.Value(0),
+    recordings: this.props.recordings,
   };
 
   componentWillReceiveProps(nextProps) {
+    const stateUpdate = {};
     if (nextProps.screenProps.screen === 'Recordings' && this.state.screen !== 'Recordings') {
       this.props.fetchRecordings();
-      this.setState({
-        screen: 'Recordings',
-      });
+      stateUpdate.screen = 'Recordings';
     }
+
+    stateUpdate.recordings = nextProps.recordings;
+    this.setState(stateUpdate);
   }
 
   search = (search) => {
@@ -172,7 +175,7 @@ class Music extends Component {
         <Recordings
           deleteRecording={this.props.deleteRecording}
           downloadRecording={this.props.downloadRecording}
-          recordings={this.props.recordings.recordings}
+          recordings={this.state.recordings.recordings}
           startPlayer={this.props.startPlayer}
           editRecording={this.editRecording}
           uploadRecording={this.props.uploadRecording}
