@@ -85,6 +85,22 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
         },
       };
     case downloadRecordingTypes.success:
+      return {
+        ...state,
+        processing: false,
+        recordings: {
+          ...state.recordings,
+          local: state.recordings.local[action.record.id] != null ? {
+            ...state.recordings.local,
+            [action.record.id]: null,
+          } : state.recordings.local,
+          networked: {
+            ...state.recordings.networked,
+            [action.record.id]: action.record,
+          },
+        },
+      };
+
     case updateRecordingTypes.success:
       return {
         ...state,
