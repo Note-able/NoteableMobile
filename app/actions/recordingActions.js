@@ -5,12 +5,13 @@ import moment from 'moment';
 import Schemas from '../realmSchemas';
 import { fetchUtil, logErrorToCrashlytics } from '../util';
 import { RecordingActionTypes } from './ActionTypes';
-import { DisplayTime, MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
+import { MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
 
 const {
   deleteRecordingTypes,
   downloadRecordingTypes,
   fetchRecordingsTypes,
+  logoutRecordingType,
   updateRecordingTypes,
   uploadRecordingTypes,
   saveRecordingsTypes,
@@ -73,7 +74,7 @@ export const syncDownRecordings = () => (
             let current;
             try {
               current = realm.objects('Recording').filtered(`resourceId = ${rec.resourceId}`)[0];
-            } catch (e) { }
+            } catch (e) {}
 
             const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
             if (current != null && rec.dateModified >= current.dateModified) {
@@ -274,6 +275,20 @@ export const downloadRecording = recording => (
         });
       })
       .catch(error => dispatch({ type: downloadRecordingTypes.error, error }));
+  }
+);
+
+export const logout = () => (
+  (dispatch) => {
+    const recordings = [...realm.objects('Recording')];
+
+    recordings.forEach((record) => {
+      if (record.audioUrl != null && record.audioUrl !== '') {
+        removeRecording({ ...record }, () => {});
+      }
+    });
+
+    dispatch({ type: logoutRecordingType, recordings: MapRecordingsToAssocArray([...realm.objects('Recording')], MapRecordingFromDB) });
   }
 );
 

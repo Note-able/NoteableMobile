@@ -13,6 +13,7 @@ import {
   addRecording,
   deleteRecording,
   fetchRecordings,
+  logout as logoutRecording,
   updateRecording,
 } from '../../actions/recordingActions';
 
@@ -34,6 +35,7 @@ const mapDispatchToProps = dispatch => ({
     deleteRecording: recording => dispatch(deleteRecording(recording)),
     fetchRecordings: () => dispatch(fetchRecordings()),
     filterRecordings: filter => dispatch(fetchRecordings(filter)),
+    logout: () => dispatch(logoutRecording()),
     updateRecording: recording => dispatch(updateRecording(recording)),
     saveRecording: recording => dispatch(addRecording(recording)),
     searchRecordings: search => dispatch(fetchRecordings(null, search)),
@@ -65,6 +67,7 @@ class Settings extends Component {
   }
 
   logout = () => {
+    this.props.recordingActions.logout();
     this.props.accountActions.logout();
   }
 

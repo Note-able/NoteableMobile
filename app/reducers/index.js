@@ -13,6 +13,7 @@ const {
   deleteRecordingTypes,
   downloadRecordingTypes,
   fetchRecordingsTypes,
+  logoutRecordingType,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
   updateRecordingTypes,
@@ -60,6 +61,7 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
       return { ...state, error, processing: false };
     // eslint-disable no-fallthrough
     case saveRecordingsTypes.success:
+    case logoutRecordingType:
     case fetchRecordingsTypes.success:
       return {
         ...state,

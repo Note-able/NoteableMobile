@@ -87,6 +87,7 @@ class Home extends Component {
     systemMessage: null,
     isProcessing: true,
     isConnected: true,
+    recordings: this.props.recordings,
   };
 
   componentDidMount() {
@@ -105,6 +106,7 @@ class Home extends Component {
     this.setState({
       isProcessing,
       systemMessage: nextProps.systemMessage,
+      recordings: nextProps.recordings,
     });
   }
 
@@ -137,9 +139,11 @@ class Home extends Component {
       );
     }
 
+    console.log(this.state.recordings.isProcessing);
+
     return (
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
-        {this.state.systemMessage == null || this.state.systemMessage.message == null ? null : <SystemMessage message={this.state.systemMessage.message} kind={this.state.systemMessage.kind} />}
+        {(this.state.systemMessage == null || this.state.systemMessage.message == null) && !this.state.recordings.isProcessing ? null : <SystemMessage message={this.state.systemMessage.message} kind={this.state.systemMessage.kind} />}
         {this.state.isConnected ? null : <SystemMessage message="No internet connection" kind="error" />}
         <App
           onNavigationStateChange={this.navigationStateChange}
