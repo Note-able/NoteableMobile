@@ -95,26 +95,28 @@ class Footer extends Component {
       this.setState({
         timingBarWidth: new Animated.Value(0),
       }, () => {
-        this.state.player.sound.play(this.resetPlayer);
+        this.state.player.sound.play(this.resetPlayer).then(() => {
+          this.timingAnimation = Animated.timing(
+            this.state.timingBarWidth, {
+              easing: Easing.linear,
+              toValue: Dimensions.get('window').width,
+              duration: (this.state.player.recording.duration || this.state.player.sound.duration) * 1000,
+            },
+          );
+          this.timingAnimation.start();
+        });
+      });
+    } else {
+      this.state.player.sound.play(this.resetPlayer).then(() => {
         this.timingAnimation = Animated.timing(
           this.state.timingBarWidth, {
             easing: Easing.linear,
             toValue: Dimensions.get('window').width,
-            duration: this.state.player.recording.duration * 1000,
+            duration: ((this.state.player.recording.duration || this.state.player.sound.duration) * 1000) - (this.state.isPaused * 1000),
           },
         );
         this.timingAnimation.start();
       });
-    } else {
-      this.state.player.sound.play(this.resetPlayer);
-      this.timingAnimation = Animated.timing(
-        this.state.timingBarWidth, {
-          easing: Easing.linear,
-          toValue: Dimensions.get('window').width,
-          duration: (this.state.player.recording.duration * 1000) - (this.state.isPaused * 1000),
-        },
-      );
-      this.timingAnimation.start();
     }
   }
 
