@@ -30,6 +30,7 @@ const SAMPLE_RATE = 22050;
 export default class Audio extends PureComponent {
   static propTypes = {
     fetchRecordings: PropTypes.func.isRequired,
+    downloadRecording: PropTypes.func.isRequired,
     loadingRecordings: PropTypes.bool,
     recordings: PropTypes.shape({}),
     saveRecording: PropTypes.func.isRequired,
@@ -313,7 +314,7 @@ export default class Audio extends PureComponent {
             loadingRecordings={this.props.loadingRecordings}
             editRecording={this.editRecording}
             uploadRecording={this.props.uploadRecording}
-            downloadRecording={() => { console.log('download'); }}
+            downloadRecording={this.props.downloadRecording}
           />
         </View>
         <Modal
@@ -326,9 +327,11 @@ export default class Audio extends PureComponent {
             initialValue={this.state.fileName}
             cancel={() => {
               this.setState({ modal: false });
-              this.deleteRecording();
+              if (this.state.modal.id == null) {
+                this.deleteRecording();
+              }
             }}
-            cancelText="Delete"
+            cancelText={this.state.modal.id == null ? 'Delete' : 'Cancel'}
             save={recordingInfo => (this.state.modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
           />
         </Modal>
