@@ -49,7 +49,7 @@ const App = TabNavigator(appScreens, {
 
 const mapStateToProps = state => ({
   users: state.Users,
-  systemMessage: state.SystemMessage,
+  system: state.System,
   recordings: state.Recordings,
 });
 
@@ -78,16 +78,18 @@ class Home extends Component {
     accountActions: PropTypes.shape({}),
     users: PropTypes.shape({}),
     recordings: PropTypes.shape({}),
+    system: PropTypes.shape({}),
   }
 
   state = {
     users: this.props.users,
     navOpen: false,
     screen: '',
-    systemMessage: null,
+    systemMessage: this.props.system.systemMessage,
     isProcessing: true,
     isConnected: true,
     recordings: this.props.recordings,
+    network: this.props.system.network,
   };
 
   componentDidMount() {
@@ -103,12 +105,13 @@ class Home extends Component {
 
     this.setState({
       isProcessing: nextProps.isProcessing,
-      systemMessage: nextProps.systemMessage,
+      systemMessage: nextProps.system.systemMessage,
+      network: nextProps.system.network,
       recordings: nextProps.recordings,
     });
   }
 
-  handleConnectivityChange = reach => this.setState({ isConnected: reach !== 'none' });
+  handleConnectivityChange = reach => this.props.networkConnectivityChange(reach);
 
   getCurrentRouteName = (navigationState) => {
     if (!navigationState) {

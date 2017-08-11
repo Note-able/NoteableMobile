@@ -115,6 +115,7 @@ class Music extends Component {
         name: recording.name,
       },
       fileName: recording.name,
+      tags: recording.tags,
       recording,
     });
   }
@@ -130,6 +131,7 @@ class Music extends Component {
       recording: null,
       modal: null,
       fileName: '',
+      tags: '',
     });
   }
 
@@ -189,7 +191,8 @@ class Music extends Component {
           onRequestClose={() => { this.setState({ modal: null }); }}
         >
           <RecordingModal
-            initialValue={this.state.fileName}
+            initialFileName={this.state.fileName}
+            initialTags={this.state.tags}
             cancel={() => this.setState({ modal: null })}
             save={recordingInfo => this.updateRecording(recordingInfo)}
             cancelText="Cancel"

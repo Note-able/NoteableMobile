@@ -60,14 +60,20 @@ export const loginFacebook = authToken => (
     } else {
       dispatch({ type: loginFacebookTypes.processing });
 
-      fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', auth: null, body: { token: authToken } })
+      fetch('https://beta.noteable.me/auth/facebook/jwt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: authToken }),
+      })
       .then(response => response.json())
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: loginFacebookTypes.success, user });
       })
-      .catch(error => { dispatch({ type: loginFacebookTypes.error, error }); });
+      .catch((error) => { dispatch({ type: loginFacebookTypes.error, error }); });
     }
   }
 );

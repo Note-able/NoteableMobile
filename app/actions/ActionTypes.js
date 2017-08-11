@@ -27,3 +27,8 @@ export const AccountActionTypes = {
 export const SystemMessageActionTypes = {
   networkingFailureType: 'NETWORK_FAILURE',
 };
+
+export const SystemActionTypes = {
+  networkChangeType: 'NETWORK_CHANGE',
+  queueNetworkRequestType: 'QUEUE_NETWORK_REQUEST',
+};

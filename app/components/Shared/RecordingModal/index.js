@@ -16,8 +16,8 @@ export default class RecordingModal extends Component {
   };
 
   state = {
-    fileName: this.props.initialValue,
-    tags: '',
+    fileName: this.props.initialFileName || '',
+    tags: this.props.initialTags || '',
   };
 
   render() {

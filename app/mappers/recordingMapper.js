@@ -56,6 +56,7 @@ export const MapRecordingToAPI = source => ({
   id: source.resourceId,
   isSynced: source.isSynced,
   size: source.size,
+  tags: source.tags,
 });
 
 export const MapRecordingFromAPI = source => ({
@@ -68,6 +69,7 @@ export const MapRecordingFromAPI = source => ({
   name: source.name,
   resourceId: source.id,
   size: parseInt(source.size.match(/\d*/)[0] === '' ? 0 : source.size.match(/\d*/)[0], 10),
+  tags: source.tags,
 });
 
 export const MapRecordingFromDB = dbRecording => ({
@@ -83,6 +85,7 @@ export const MapRecordingFromDB = dbRecording => ({
   path: dbRecording.path,
   resourceId: dbRecording.resourceId,
   size: dbRecording.size,
+  tags: dbRecording.tags,
 });
 
 export const MapRecordingsToAssocArray = (recordingsList, mapFunc) => {

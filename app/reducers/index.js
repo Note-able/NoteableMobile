@@ -34,6 +34,7 @@ const {
 
 const {
   networkingFailureType,
+  networkChangedType,
 } = SystemMessageActionTypes;
 
 const DEFAULT_RECORDINGS_STATE = {
@@ -304,20 +305,31 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
   }
 };
 
-const SystemMessage = (state = {}, action) => {
+const System = (state = { systemMessage: {}, network: { connected: false } }, action) => {
   const { type } = action;
   switch (type) {
     case networkingFailureType:
       return {
         ...state,
-        message: 'No internet connection',
-        kind: 'error',
+        systemMessage: {
+          message: 'No internet connection',
+          kind: 'error',
+        },
       };
     case syncDownRecordingsTypes.processing:
       return {
         ...state,
-        message: 'Fetching recordings metadata',
-        kind: 'success',
+        systemMessage: {
+          message: 'Fetching recordings metadata',
+          kind: 'success',
+        },
+      };
+    case networkChangedType:
+      return {
+        ...state,
+        network: {
+          connected: true,
+        },
       };
     default:
       return state;
@@ -331,7 +343,7 @@ export const appReducer = combineReducers({
   messagesReducer,
   newsFeedReducer,
   eventsReducer,
-  SystemMessage,
+  System,
   Users,
 });
 

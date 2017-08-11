@@ -104,7 +104,7 @@ export const fetchRecordings = (filter, search) => (
           const result = [...validate(recordings.sorted(filter))];
           return resolve(result);
         } else if (search != null) {
-          const result = [...validate(recordings.sorted(filter).filtered(`name CONTAINS "${search}"`))];
+          const result = [...validate(recordings.filtered(`name CONTAINS "${search}" OR tags CONTAINS "${search}"`))];
           return resolve(result);
         }
         const result = [...validate(recordings.sorted('id', true))];
@@ -167,19 +167,9 @@ export const updateRecording = recording => (
       try {
         let record;
         realm.write(() => {
-          const rec = realm.objects('Recording');
-          let index = 0;
           record = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
-
-          while (rec.filtered(`name = "${recording.name}${index === 0 ? '' : ` (${index})`}"`).length !== 0) {
-            index += 1;
-          }
-
-          if (index !== 0) {
-            record.name = `${recording.name} (${index})`;
-          } else {
-            record.name = recording.name;
-          }
+          record.name = recording.name;
+          record.tags = recording.tags;
         });
         return resolve({ ...record });
       } catch (e) {

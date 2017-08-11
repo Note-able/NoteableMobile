@@ -20,8 +20,8 @@ import Realm from 'realm';
 // };
 
 const RecordingSchemas = {
-  5: {
-    schemaVersion: 5,
+  0: {
+    schemaVersion: 0,
     schema: [{
       name: 'Recording',
       primaryKey: 'id',
@@ -37,6 +37,7 @@ const RecordingSchemas = {
         resourceId: { type: 'int', default: -1 },
         size: { type: 'int', optional: true },
         audioUrl: { type: 'string', default: '' },
+        tags: { type: 'string', default: '' },
       },
     }],
   },
@@ -80,7 +81,7 @@ const GetId = (realm) => {
   return result[0].id;
 };
 
-const RecordingSchema = new Realm(RecordingSchemas[5]);
+const RecordingSchema = new Realm(RecordingSchemas[0]);
 
 export default {
   RecordingSchema,
