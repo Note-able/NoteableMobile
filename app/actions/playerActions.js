@@ -10,14 +10,6 @@ const {
   togglePlayerTypes,
 } = PlayerActionTypes;
 
-const checkStatus = () => {
-  ReactNativeAudioStreaming.getStatus((error, status) => {
-    console.log(error);
-    console.log('Status', status);
-  });
-  setTimeout(checkStatus, 500);
-};
-
 export const startPlayer = recording => (
   (dispatch) => {
     dispatch({ type: startPlayerTypes.processing });
