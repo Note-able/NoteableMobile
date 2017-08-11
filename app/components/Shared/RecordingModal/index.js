@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import styles from './styles';
 
-export default class CustomModal extends Component {
+export default class RecordingModal extends Component {
   static props = {
     cancel: PropTypes.func.isRequired,
     cancelText: PropTypes.string.isRequired,

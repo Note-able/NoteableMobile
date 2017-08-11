@@ -17,7 +17,7 @@ import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Schemas from '../../realmSchemas';
-import { CustomModal, Recordings } from '../../components/Shared';
+import { RecordingModal, Recordings } from '../../components/Shared';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
@@ -322,7 +322,7 @@ export default class Audio extends PureComponent {
           visible={this.state.modal}
           onRequestClose={() => { this.setState({ modal: true }); }}
         >
-          <CustomModal
+          <RecordingModal
             initialValue={this.state.fileName}
             cancel={() => {
               this.setState({ modal: false });

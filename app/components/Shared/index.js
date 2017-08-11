@@ -1,4 +1,4 @@
-import CustomModal from './CustomModal';
+import RecordingModal from './RecordingModal';
 import Footer from './Footer';
 import InputField from './InputField';
 import Recordings from './Recordings';
@@ -6,7 +6,7 @@ import Recording from './Recording';
 import SystemMessage from './SystemMessage';
 
 export {
-  CustomModal,
+  RecordingModal,
   Footer,
   InputField,
   Recording,

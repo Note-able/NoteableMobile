@@ -27,7 +27,7 @@ import {
 } from '../../actions/playerActions';
 
 import { colors, colorRGBA } from '../../styles';
-import { Recordings, CustomModal } from '../../components/Shared';
+import { Recordings, RecordingModal } from '../../components/Shared';
 import { debounceFunc } from '../../util.js';
 import styles from './styles.js';
 
@@ -188,10 +188,11 @@ class Music extends Component {
           visible={this.state.modal != null}
           onRequestClose={() => { this.setState({ modal: null }); }}
         >
-          <CustomModal
+          <RecordingModal
             initialValue={this.state.fileName}
             cancel={() => this.setState({ modal: null })}
             save={recordingInfo => this.updateRecording(recordingInfo)}
+            cancelText="Cancel"
           />
         </Modal>
       </ScrollView>
