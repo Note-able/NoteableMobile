@@ -6,6 +6,7 @@ import {
   PlayerActionTypes,
   RecordingActionTypes,
   SystemMessageActionTypes,
+  MessageActionTypes,
 } from '../actions/ActionTypes';
 import { logErrorToCrashlytics } from '../util.js';
 
@@ -35,6 +36,14 @@ const {
 const {
   networkingFailureType,
 } = SystemMessageActionTypes;
+
+const {
+  getConversations,
+  openConversation,
+  sendMessage,
+  searchMessages,
+  listMessages,
+} = MessageActionTypes;
 
 const DEFAULT_RECORDINGS_STATE = {
   recordings: {
@@ -167,19 +176,29 @@ const DEFAULT_MESSAGES_STATE = {
   },
 };
 
-const messagesReducer = (state = DEFAULT_MESSAGES_STATE, { type, conversation, userName, conversations, message }) => {
+const messagesReducer = (state = DEFAULT_MESSAGES_STATE, { type, conversation, userName, conversations, message, error }) => {
   switch (type) {
-    case 'HEADER_SEARCH':
+    case openConversation.error:
+    case getConversations.error:
+    case sendMessage.error:
+      console.log(type, error || 'failure');
+      logErrorToCrashlytics(error || 'failure');
+      return { ...state, isProcessing: false, error };
+    case openConversation.processing:
+    case getConversations.processing:
+    case sendMessage.processing:
+      return { ...state, isProcessing: true };
+    case searchMessages:
       return { ...state, nav: { search: true } };
-    case 'HEADER_LIST':
+    case listMessages:
       return { ...state, nav: { list: true } };
-    case 'MESSAGES/OPEN_CONVERSATION':
+    case openConversation.success:
       conversations = { ...state.conversations };
       conversations[conversation.id].messages = conversation.messages;
       return { ...state, nav: { conversation: true, name: userName }, conversations, selectedConversationId: conversation.id };
-    case 'MESSAGES/GET_CONVERSATIONS':
+    case getConversations.success:
       return { ...state, conversations };
-    case 'MESSAGES/SEND_MESSAGE':
+    case sendMessage.success:
       conversations = { ...state.conversations };
       conversation = { ...conversations[state.selectedConversationId] };
       conversation.messages.push(message);

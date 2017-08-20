@@ -27,3 +27,11 @@ export const AccountActionTypes = {
 export const SystemMessageActionTypes = {
   networkingFailureType: 'NETWORK_FAILURE',
 };
+
+export const MessageActionTypes = {
+  searchMessages: 'HEADER_SEARCH',
+  listMessages: 'HEADER_LIST',
+  openConversation: createAsyncActionTypes('OPEN_CONVERSATION'),
+  getConversations: createAsyncActionTypes('GET_CONVERSATIONS'),
+  sendMessage: createAsyncActionTypes('SEND_MESSAGE'),
+};

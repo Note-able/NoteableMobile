@@ -60,4 +60,7 @@ export default StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 6,
   },
+  messages: {
+    marginHorizontal: 8,
+  },
 });

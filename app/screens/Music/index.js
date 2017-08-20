@@ -100,6 +100,10 @@ class Music extends Component {
     });
   }
 
+  showMessages = () => {
+    this.props.screenProps.stackNavigation.navigate('Messages');
+  }
+
   filter = (filter) => {
     this.props.filterRecordings(filter);
     this.setState({
@@ -144,6 +148,9 @@ class Music extends Component {
           <View style={styles.searchInput}>
             <TextInput style={styles.input} value={this.state.search} onFocus={() => this.setState({ options: 'search' })} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} underlineColorAndroid="transparent" />
           </View>
+          <TouchableHighlight style={styles.messages} onPress={this.showMessages}>
+            <Icon name="chat" size={32} style={{ width: 32, height: 32 }} color="white" />
+          </TouchableHighlight>
         </View>
         <Animated.View style={[styles.filterContainer, { height: this.state.height }]}>
           <TouchableHighlight style={styles.filterOption} onPress={() => this.filter('duration')}>
