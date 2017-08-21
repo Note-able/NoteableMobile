@@ -29,7 +29,7 @@ export const registerUser = registration => (
     const { firstName, lastName, email, password } = registration;
     dispatch({ type: registerUserTypes.processing });
 
-    fetch('http://beta.noteable.me/api/v1/register', {
+    fetch('https://beta.noteable.me/api/v1/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,20 +60,14 @@ export const loginFacebook = authToken => (
     } else {
       dispatch({ type: loginFacebookTypes.processing });
 
-      fetch('http://beta.noteable.me/auth/facebook/jwt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: authToken }),
-      })
+      fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', auth: null, body: { token: authToken } })
       .then(response => response.json())
-      .catch(error => dispatch({ type: loginFacebookTypes.error, error }))
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: loginFacebookTypes.success, user });
-      });
+      })
+      .catch(error => { dispatch({ type: loginFacebookTypes.error, error }); });
     }
   }
 );
@@ -82,7 +76,7 @@ export const signInLocal = (email, password) => (
   (dispatch) => {
     dispatch({ type: fetchSignInTypes.processing });
 
-    fetch('http://beta.noteable.me/auth/local/jwt', {
+    fetch('https://beta.noteable.me/auth/local/jwt', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -149,7 +143,7 @@ export const onSignOut = () => (
 
 const signIn = (token, next) => {
   fetchUtil.postWithBody({
-    url: 'http://beta.noteable.me/auth/jwt',
+    url: 'https://beta.noteable.me/auth/jwt',
     body: {
       token,
     },
@@ -166,7 +160,7 @@ const signIn = (token, next) => {
 
 const fetchCurrentProfile = (user, next) => {
   fetchUtil.get({
-    url: 'http://beta.noteable.me/user/me',
+    url: 'https://beta.noteable.me/user/me',
     auth: user.jwt,
   })
   .then(response => response.json())

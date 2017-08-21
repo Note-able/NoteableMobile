@@ -97,14 +97,12 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let isProcessing = false;
     if (this.props.users.user == null && nextProps.users.user != null && !this.state.isProcessing) {
       this.props.recordingActions.syncDownRecordings();
-      isProcessing = true;
     }
 
     this.setState({
-      isProcessing,
+      isProcessing: nextProps.isProcessing,
       systemMessage: nextProps.systemMessage,
       recordings: nextProps.recordings,
     });

@@ -29,7 +29,7 @@ export default class Login extends Component {
   };
 
   facebookLogin = () => {
-    LoginManager.logInWithReadPermissions().then(
+    LoginManager.logInWithReadPermissions(['public_profile']).then(
       (result) => {
         if (!result.isCancelled) {
           AccessToken.getCurrentAccessToken().then(

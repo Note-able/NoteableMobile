@@ -48,7 +48,7 @@ class Authentication extends Component {
     }
 
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {
-      this.props.navigation.navigate('Home');
+      this.setState({ isProcessing: false }, () => { this.props.navigation.navigate('Home'); });
     } else if (this.props.users.error) {
       this.setState({
         isProcessing: false,

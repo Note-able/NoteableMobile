@@ -120,6 +120,7 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
         },
       };
     case syncDownRecordingsTypes.success:
+      console.log('recordings synced');
       return {
         ...state,
         recordings: action.recordings,
@@ -146,6 +147,7 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case fetchRecordingsTypes.processing:
     case uploadRecordingTypes.processing:
     case syncDownRecordingsTypes.processing:
+      console.log('syncing recordings');
       return { ...state, processing: true };
     default:
       return state;
@@ -224,6 +226,8 @@ const Users = (state = { user: {} }, action) => {
     case getCurrentUserTypes.processing:
     case registerUserTypes.processing:
     case logoutTypes.processing:
+    case loginFacebookTypes.processing:
+      console.log('sign in processing');
       return { ...state, isProcessing: true };
     case logoutTypes.success:
       return {
@@ -246,10 +250,20 @@ const Users = (state = { user: {} }, action) => {
       };
     case loginFacebookTypes.success:
     case fetchSignInTypes.success:
+      console.log('sign in succeeded');
+      console.log(user);
       return {
         ...state,
         isProcessing: false,
         user,
+      };
+    case fetchSignInTypes.error:
+    case loginFacebookTypes.error:
+      console.log('sign in errored');
+      return {
+        ...state,
+        isProcessing: false,
+        error,
       };
     case registerUserTypes.success:
       return {

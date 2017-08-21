@@ -44,7 +44,7 @@ const removeRecording = (recording, resolve) => {
   });
 };
 
-const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `http://beta.noteable.me/api/v1/recordings?offset=${offset}`, auth: token })
+const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `https://beta.noteable.me/api/v1/recordings?offset=${offset}`, auth: token })
 .then(response => response.json(), (error) => { throw error; })
   .then((result) => {
     iteration += 1;
@@ -145,7 +145,7 @@ export const deleteRecording = recording => (
 
     if (user != null) {
       fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0);
-      fetchUtil.delete({ url: `http://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
+      fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
         .then((response) => {
           if (response.status === 204) {
             removeRecording(recording, resolve);
@@ -231,7 +231,7 @@ export const uploadRecording = (rec, user) => (
 
             ifstream.onEnd(() => {
               form.append('file', data);
-              fetch('http://beta.noteable.me/api/v1/recordings', {
+              fetch('https://beta.noteable.me/api/v1/recordings', {
                 method: 'POST',
                 headers: {
                   Accept: 'application/json',
