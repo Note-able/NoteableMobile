@@ -29,10 +29,15 @@ export const fetchUtil = {
 /* eslint-enable */
 
 export const logErrorToCrashlytics = (error) => {
+  let loggableError = error;
+  if (typeof error === 'object') {
+    loggableError = JSON.stringify(error);
+  }
+
   if (Platform.OS === 'ios') {
-    Crashlytics.recordError(error);
+    Crashlytics.recordError(loggableError);
   } else {
-    Crashlytics.logException(error);
+    Crashlytics.logException(loggableError);
   }
 };
 
