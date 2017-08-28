@@ -6,8 +6,9 @@ import {
   PlayerActionTypes,
   RecordingActionTypes,
   SystemMessageActionTypes,
+  SystemActionTypes,
 } from '../actions/ActionTypes';
-import { logErrorToCrashlytics } from '../util.js';
+import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 
 const {
   deleteRecordingTypes,
@@ -34,8 +35,12 @@ const {
 
 const {
   networkingFailureType,
-  networkChangedType,
 } = SystemMessageActionTypes;
+
+const {
+  queueNetworkRequestType,
+  networkChangeType,
+} = SystemActionTypes;
 
 const DEFAULT_RECORDINGS_STATE = {
   recordings: {
@@ -60,7 +65,17 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
       console.log(type, error || 'failure');
       logErrorToCrashlytics(error || 'failure');
       return { ...state, error, processing: false };
-    // eslint-disable no-fallthrough
+    /* eslint-disable */
+    case saveRecordingsTypes.success:
+      logCustomToFabric('Recording Created');
+    case deleteRecordingTypes.success:
+      logCustomToFabric('Delete Recording');
+    case uploadRecordingTypes.success:
+      logCustomToFabric('Upload Recordings');
+    case downloadRecordingTypes.success:
+      logCustomToFabric('Download Recording');
+    case syncDownRecordingsTypes.success:
+      logCustomToFabric('Sync Down Recordings');
     case saveRecordingsTypes.success:
     case logoutRecordingType:
     case fetchRecordingsTypes.success:
@@ -143,8 +158,8 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
           },
         },
       };
-    case updateRecordingTypes.processing:
     case saveRecordingsTypes.processing:
+    case updateRecordingTypes.processing:
     case fetchRecordingsTypes.processing:
     case uploadRecordingTypes.processing:
     case syncDownRecordingsTypes.processing:
@@ -152,6 +167,8 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
       return { ...state, processing: true };
     default:
       return state;
+    /* eslint-enable */
+
   }
 };
 
@@ -305,7 +322,7 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
   }
 };
 
-const System = (state = { systemMessage: {}, network: { connected: false } }, action) => {
+const System = (state = { systemMessage: {}, network: { connected: '', queued: {} } }, action) => {
   const { type } = action;
   switch (type) {
     case networkingFailureType:
@@ -324,13 +341,41 @@ const System = (state = { systemMessage: {}, network: { connected: false } }, ac
           kind: 'success',
         },
       };
-    case networkChangedType:
+    case networkChangeType:
       return {
         ...state,
         network: {
-          connected: true,
+          connected: action.status,
         },
       };
+    case queueNetworkRequestType:
+      switch (action.request) {
+        case updateRecordingTypes.queue:
+          return {
+            ...state,
+            network: {
+              ...state.network,
+              queued: {
+                ...state.network.queued,
+                [updateRecordingTypes.queue]: {
+                  [action.recording.id]: action.recording,
+                },
+              },
+            },
+          };
+        case syncDownRecordingsTypes.queue:
+          return {
+            ...state,
+            network: {
+              ...state.network,
+              queued: {
+                ...state.network.queued,
+              },
+            },
+          };
+        default:
+          return state;
+      }
     default:
       return state;
   }

@@ -3,8 +3,8 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
 import Schemas from '../realmSchemas';
-import { fetchUtil, logErrorToCrashlytics } from '../util';
-import { RecordingActionTypes } from './ActionTypes';
+import { fetchUtil, logErrorToCrashlytics, logCustomToFabric } from '../util';
+import { RecordingActionTypes, SystemActionTypes } from './ActionTypes';
 import { MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
 
 const {
@@ -17,6 +17,10 @@ const {
   saveRecordingsTypes,
   syncDownRecordingsTypes,
 } = RecordingActionTypes;
+
+const {
+  queueNetworkRequestType,
+} = SystemActionTypes;
 
 const realm = Schemas.RecordingSchema;
 const USER = '@ACCOUNTS:CURRENT_USER';
@@ -63,8 +67,14 @@ export const getRecordingTitle = () => {
 };
 
 export const syncDownRecordings = () => (
-  async (dispatch) => {
+  async (dispatch, getState) => {
     const user = await AsyncStorage.getItem(USER);
+    const { System } = getState();
+    if (System.network.connected === 'none') {
+      dispatch({ type: queueNetworkRequestType, request: syncDownRecordingsTypes.queue });
+      return;
+    }
+
     dispatch({ type: syncDownRecordingsTypes.processing });
     fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
       .then((recordings) => {
@@ -120,7 +130,6 @@ export const fetchRecordings = (filter, search) => (
   }
 );
 
-// Maps recordings to associative array of proper display type.
 export const addRecording = recording => (
   (dispatch) => {
     dispatch({ type: saveRecordingsTypes.processing });
@@ -139,12 +148,17 @@ export const addRecording = recording => (
 );
 
 export const deleteRecording = recording => (
-  dispatch => new Promise(async (resolve) => {
+  (dispatch, getState) => new Promise(async (resolve) => {
     dispatch({ type: deleteRecordingTypes.processing });
     const user = await AsyncStorage.getItem(USER);
 
     if (user != null) {
-      fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0);
+      const { System } = getState();
+      if (System.network.connected === 'none') {
+        dispatch({ type: queueNetworkRequestType, request: deleteRecordingTypes.queue });
+        return;
+      }
+
       fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
         .then((response) => {
           if (response.status === 204) {
@@ -161,7 +175,7 @@ export const deleteRecording = recording => (
 );
 
 export const updateRecording = recording => (
-  (dispatch) => {
+  (dispatch, getState) => {
     dispatch({ type: updateRecordingTypes.processing });
     new Promise((resolve, reject) => {
       try {
@@ -175,17 +189,30 @@ export const updateRecording = recording => (
       } catch (e) {
         return reject(e);
       }
-    }).then(record => dispatch({ type: updateRecordingTypes.success, record: MapRecordingFromDB(record) }))
+    }).then((record) => {
+      const { System } = getState();
+      if (System.network.connected === 'none') {
+        dispatch({ type: queueNetworkRequestType, request: syncDownRecordingsTypes.queue, recording });
+      } else {
+        // make network requet to update network request.
+      }
+      dispatch({ type: updateRecordingTypes.success, record: MapRecordingFromDB(record) });
+    })
     .catch(error => dispatch({ type: updateRecordingTypes.error, error }));
   }
 );
 
 export const uploadRecording = (rec, user) => (
-  (dispatch) => {
+  (dispatch, getState) => {
     if (rec == null || user == null) {
       dispatch({ type: uploadRecordingTypes.error });
     } else {
       const recording = MapRecordingToAPI(rec);
+      const { System } = getState();
+      if (System.network.connected === 'none') {
+        dispatch({ type: queueNetworkRequestType, request: uploadRecordingTypes.queue, recording: rec, user });
+        return;
+      }
 
       dispatch({ type: uploadRecordingTypes.processing });
 
@@ -249,7 +276,13 @@ export const uploadRecording = (rec, user) => (
 );
 
 export const downloadRecording = recording => (
-  (dispatch) => {
+  (dispatch, getState) => {
+    const { System } = getState();
+    if (System.network.connected === 'none') {
+      dispatch({ type: queueNetworkRequestType, request: downloadRecordingTypes.queue });
+      return;
+    }
+
     dispatch({ type: downloadRecordingTypes.processing });
     const fileName = `${AudioUtils.DocumentDirectoryPath}/${moment().format('HHmmss')}.aac`;
 

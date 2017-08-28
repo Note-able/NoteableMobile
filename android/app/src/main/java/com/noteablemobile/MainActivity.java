@@ -2,6 +2,7 @@ package com.noteablemobile;
 
 import android.content.Intent;
 import com.facebook.react.ReactActivity;
+import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 
 public class MainActivity extends ReactActivity {

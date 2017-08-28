@@ -4,6 +4,7 @@ import {
   DeviceEventEmitter,
 } from 'react-native';
 import { PlayerActionTypes } from './ActionTypes.js';
+import { logCustomToFabric } from '../util';
 
 const {
   startPlayerTypes,
@@ -57,6 +58,7 @@ export const startPlayer = recording => (
         getCurrentTime: callback => callback(sound.currentTime),
       };
 
+      logCustomToFabric('Play Recording');
       return dispatch({ type: startPlayerTypes.success, sound, recording });
     }
   }

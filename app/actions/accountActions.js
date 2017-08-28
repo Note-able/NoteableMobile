@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
-import { fetchUtil, logErrorToCrashlytics } from '../util';
+import { fetchUtil, logCustomToFabric, logErrorToCrashlytics } from '../util';
 
 const {
   getCurrentUserTypes,
@@ -69,6 +69,7 @@ export const loginFacebook = authToken => (
       })
       .then(response => response.json())
       .then((result) => {
+        logCustomToFabric('User Login', user);
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: loginFacebookTypes.success, user });

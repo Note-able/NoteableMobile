@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { Crashlytics } from 'react-native-fabric';
+import { Answers, Crashlytics } from 'react-native-fabric';
 
 /* eslint-disable no-undef */
 export const fetchUtil = {
@@ -39,6 +39,12 @@ export const logErrorToCrashlytics = (error) => {
   } else {
     Crashlytics.logException(loggableError);
   }
+};
+
+export const logCustomToFabric = (eventType, properties) => {
+  console.log('logging custom event to fabric');
+  Answers.logCustom(eventType, properties);
+  Answers.logContentView(eventType);
 };
 
 export const debounceFunc = (name, func, delay) => {

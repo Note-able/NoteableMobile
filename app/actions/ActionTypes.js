@@ -1,4 +1,10 @@
-import { createAsyncActionTypes } from './util.js';
+export const createAsyncActionTypes = type => ({
+  processing: `PROCESSING.${type}`,
+  error: `ERROR.${type}`,
+  success: `SUCCESS.${type}`,
+  queue: `QUEUE.${type}`,
+});
+
 
 export const RecordingActionTypes = {
   deleteRecordingTypes: createAsyncActionTypes('DELETE_RECORDINGS'),
