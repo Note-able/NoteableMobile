@@ -55,6 +55,26 @@ const DEFAULT_RECORDINGS_STATE = {
 const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
   const { type, error } = action;
   switch (type) {
+    case saveRecordingsTypes.success:
+      logCustomToFabric('Recording Created');
+      break;
+    case deleteRecordingTypes.success:
+      logCustomToFabric('Delete Recording');
+      break;
+    case uploadRecordingTypes.success:
+      logCustomToFabric('Upload Recordings');
+      break;
+    case downloadRecordingTypes.success:
+      logCustomToFabric('Download Recording');
+      break;
+    case syncDownRecordingsTypes.success:
+      logCustomToFabric('Sync Down Recordings');
+      break;
+    default:
+      break;
+  }
+
+  switch (type) {
     case saveRecordingsTypes.error:
     case fetchRecordingsTypes.error:
     case deleteRecordingTypes.error:
@@ -62,20 +82,8 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case uploadRecordingTypes.error:
     case downloadRecordingTypes.error:
     case syncDownRecordingsTypes.error:
-      console.log(type, error || 'failure');
       logErrorToCrashlytics(error || 'failure');
       return { ...state, error, processing: false };
-    /* eslint-disable */
-    case saveRecordingsTypes.success:
-      logCustomToFabric('Recording Created');
-    case deleteRecordingTypes.success:
-      logCustomToFabric('Delete Recording');
-    case uploadRecordingTypes.success:
-      logCustomToFabric('Upload Recordings');
-    case downloadRecordingTypes.success:
-      logCustomToFabric('Download Recording');
-    case syncDownRecordingsTypes.success:
-      logCustomToFabric('Sync Down Recordings');
     case saveRecordingsTypes.success:
     case logoutRecordingType:
     case fetchRecordingsTypes.success:
@@ -136,7 +144,6 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
         },
       };
     case syncDownRecordingsTypes.success:
-      console.log('recordings synced');
       return {
         ...state,
         recordings: action.recordings,
@@ -163,12 +170,9 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case fetchRecordingsTypes.processing:
     case uploadRecordingTypes.processing:
     case syncDownRecordingsTypes.processing:
-      console.log('syncing recordings');
       return { ...state, processing: true };
     default:
       return state;
-    /* eslint-enable */
-
   }
 };
 
