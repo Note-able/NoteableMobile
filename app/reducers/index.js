@@ -28,6 +28,7 @@ const {
 const {
   fetchSignInTypes,
   getCurrentUserTypes,
+  getUserPreferencesTypes,
   loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
@@ -249,8 +250,12 @@ const Users = (state = { user: {} }, action) => {
     case registerUserTypes.processing:
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
-      console.log('sign in processing');
       return { ...state, isProcessing: true };
+    case getUserPreferencesTypes.success:
+      return {
+        ...state,
+        preferences: action.preferences,
+      };
     case logoutTypes.success:
       return {
         ...state,
@@ -272,8 +277,6 @@ const Users = (state = { user: {} }, action) => {
       };
     case loginFacebookTypes.success:
     case fetchSignInTypes.success:
-      console.log('sign in succeeded');
-      console.log(user);
       return {
         ...state,
         isProcessing: false,
@@ -281,7 +284,6 @@ const Users = (state = { user: {} }, action) => {
       };
     case fetchSignInTypes.error:
     case loginFacebookTypes.error:
-      console.log('sign in errored');
       return {
         ...state,
         isProcessing: false,

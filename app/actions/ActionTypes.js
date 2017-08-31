@@ -24,10 +24,12 @@ export const PlayerActionTypes = {
 
 export const AccountActionTypes = {
   getCurrentUserTypes: createAsyncActionTypes('GET_CURRENT_USER'),
+  getUserPreferencesTypes: createAsyncActionTypes('GET_USER_PREFERENCES'),
   fetchSignInTypes: createAsyncActionTypes('FETCH_SIGNIN'),
   loginFacebookTypes: createAsyncActionTypes('LOGIN_FACEBOOK'),
   logoutTypes: createAsyncActionTypes('LOGOUT_USER'),
   registerUserTypes: createAsyncActionTypes('REGISTER_USER'),
+  setUserPreferencesTypes: createAsyncActionTypes('SET_USER_PREFERENCES'),
 };
 
 export const SystemMessageActionTypes = {

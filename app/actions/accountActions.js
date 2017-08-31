@@ -1,13 +1,16 @@
 import { AsyncStorage } from 'react-native';
+import { preferenceKeys, defaultValuePreference } from '../constants';
 import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, logCustomToFabric, logErrorToCrashlytics } from '../util';
 
 const {
   getCurrentUserTypes,
+  getUserPreferencesTypes,
   fetchSignInTypes,
   logoutTypes,
   loginFacebookTypes,
   registerUserTypes,
+  setUserPreferencesTypes,
 } = AccountActionTypes;
 
 const USER = '@ACCOUNTS:CURRENT_USER';
@@ -176,3 +179,43 @@ const fetchCurrentProfile = (user, next) => {
   })
   .catch(error => logErrorToCrashlytics(error));
 };
+
+/** **************** */
+/** User Preferences */
+/** **************** */
+export const setUserPreferences = preferencePairs => (
+  async (dispatch) => {
+    try {
+      await AsyncStorage.multiSet(preferencePairs);
+      dispatch({ type: setUserPreferencesTypes.success });
+    } catch (error) {
+      dispatch({ type: setUserPreferencesTypes.error, error });
+    }
+  }
+);
+
+export const getUserPreferences = () => (
+  async (dispatch) => {
+    try {
+      const preferences = await AsyncStorage.multiGet(preferenceKeys);
+      dispatch({ type: getUserPreferencesTypes.success, preferences: mapPreferences(preferences) });
+    } catch (error) {
+      dispatch({ type: getUserPreferencesTypes.error, error });
+    }
+  }
+);
+
+const mapPreferences = preferences => preferenceKeys.reduce((accumulator, preferenceKey) => {
+  const current = preferences.find(x => x[0] === preferenceKey);
+
+  if (current == null) {
+    return {
+      ...accumulator,
+      [preferenceKey]: defaultValuePreference(preferenceKey),
+    };
+  }
+  return {
+    ...accumulator,
+    [preferenceKey]: current[1],
+  };
+}, {});
