@@ -4,7 +4,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
-  ScrollView,
+  FlatList,
   TouchableHighlight,
   View,
 } from 'react-native';
@@ -15,6 +15,7 @@ import { Recording } from '../';
 import { colors } from '../../../styles';
 
 const OPTIONS_WIDTH = 175;
+const ITEM_HEIGHT = 48;
 
 export default class Recordings extends Component {
   static propTypes = {
@@ -118,52 +119,56 @@ export default class Recordings extends Component {
 
   render() {
     return (
-      <ScrollView contentContainerStyle={styles.recordings} bounces>
-        {this.props.loadingRecordings ? <ActivityIndicator animating={this.props.loadingRecordings} size="large" style={{ marginTop: 20 }} /> : null }
-        <Animated.View
-          style={{ opacity: this.state.recordingsOpacity }}
-        >
-          {this.state.recordings.order.map((rec) => {
-            const recording = this.state.recordings.local[rec] || this.state.recordings.networked[rec];
-            return (
-              <Animated.View
-                style={[
-                  styles.row,
-                  this.state[recording.id] == null ? null : {
-                    transform: [{ translateX: this.state[recording.id].interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -1 * OPTIONS_WIDTH],
-                    }) }],
-                  },
-                ]}
-                key={recording.id}
-              >
-                <Recording
-                  primaryAction={() => this.startPlayer(recording)}
-                  name={recording.name}
-                  isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
-                  isPlaying={this.state.activeRecording === recording.id}
-                  openMoreMenu={() => this.showOptions(recording.id)}
-                  secondaryDetails={recording.durationDisplay}
-                  primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
-                />
-                <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
-                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
-                    <Icon name="delete" size={25} color={colors.shade90} />
-                  </TouchableHighlight>
-                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
-                    <Icon name="create" size={25} color={colors.shade90} />
-                  </TouchableHighlight>
-                  <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => recording.path === '' ? this.props.downloadRecording(recording) : this.props.uploadRecording(recording, this.props.currentUser)}>
-                    <Icon name={recording.path === '' ? 'file-download' : 'cloud-upload'} size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced && recording.path !== '' ? colors.green : colors.shade90)} />
-                  </TouchableHighlight>
-                </View>
-              </Animated.View>
-            );
-          },
+      <FlatList
+        contentContainerStyle={styles.recordings}
+        bounces
+        data={this.state.recordings.order}
+        getItemLayout={(data, index) => (
+          { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
         )}
-        </Animated.View>
-      </ScrollView>
+        initialNumToRender={12}
+        numColumns={3}
+        onRefresh={() => console.log('refresh meeee')}
+        refreshing={this.props.loadingRecordings || false}
+        renderItem={({ item }) => {
+          const recording = this.state.recordings.local[item] || this.state.recordings.networked[item];
+          return (
+            <Animated.View
+              style={[
+                styles.row,
+                this.state[recording.id] == null ? null : {
+                  transform: [{ translateX: this.state[recording.id].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -1 * OPTIONS_WIDTH],
+                  }) }],
+                },
+              ]}
+              key={recording.id}
+            >
+              <Recording
+                primaryAction={() => this.startPlayer(recording)}
+                name={recording.name}
+                isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
+                isPlaying={this.state.activeRecording === recording.id}
+                openMoreMenu={() => this.showOptions(recording.id)}
+                secondaryDetails={recording.durationDisplay}
+                primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
+              />
+              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
+                  <Icon name="delete" size={25} color={colors.shade90} />
+                </TouchableHighlight>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.editRecording(recording)}>
+                  <Icon name="create" size={25} color={colors.shade90} />
+                </TouchableHighlight>
+                <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => (recording.path === '' ? this.props.downloadRecording(recording) : this.props.uploadRecording(recording, this.props.currentUser))}>
+                  <Icon name={recording.path === '' ? 'file-download' : 'cloud-upload'} size={25} color={this.props.currentUser == null ? colors.shade40 : (recording.isSynced && recording.path !== '' ? colors.green : colors.shade90)} />
+                </TouchableHighlight>
+              </View>
+            </Animated.View>
+          );
+        }}
+      />
     );
   }
 }
