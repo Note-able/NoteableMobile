@@ -245,6 +245,29 @@ const eventsReducer = (state = { location: defaultRegion, events: [] }, { type, 
 const Users = (state = { user: {} }, action) => {
   const { type, error, user, profile } = action;
   switch (type) {
+    case loginFacebookTypes.success:
+      logCustomToFabric('Facebook Login');
+      break;
+    case logoutTypes.success:
+      logCustomToFabric('Logout');
+      break;
+    case fetchSignInTypes.success:
+      logCustomToFabric('Custom Login');
+      break;
+    case loginFacebookTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Facebook Login Error', error });
+      break;
+    case fetchSignInTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Custom Login Error', error });
+      break;
+    case logoutTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Logout Error', error });
+      break;
+    default:
+      break;
+  }
+
+  switch (type) {
     case fetchSignInTypes.processing:
     case getCurrentUserTypes.processing:
     case registerUserTypes.processing:

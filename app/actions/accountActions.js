@@ -1,7 +1,7 @@
 import { AsyncStorage } from 'react-native';
 import { preferenceKeys, defaultValuePreference } from '../constants';
 import { AccountActionTypes } from './ActionTypes.js';
-import { fetchUtil, logCustomToFabric, logErrorToCrashlytics } from '../util';
+import { fetchUtil } from '../util';
 
 const {
   getCurrentUserTypes,
@@ -72,7 +72,6 @@ export const loginFacebook = authToken => (
       })
       .then(response => response.json())
       .then((result) => {
-        logCustomToFabric('User Login', user);
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: loginFacebookTypes.success, user });
@@ -160,12 +159,12 @@ const signIn = (token, next) => {
   })
   .then(response => response.json())
   .then((json) => {
-    const { token, user } = json;
-    user.jwt = token;
+    const { t, user } = json;
+    user.jwt = t;
     AsyncStorage.setItem(USER, JSON.stringify(user));
     next(user);
   })
-  .catch(error => logErrorToCrashlytics(error));
+  .catch(error => console.warn(error));
 };
 
 const fetchCurrentProfile = (user, next) => {
@@ -177,7 +176,7 @@ const fetchCurrentProfile = (user, next) => {
   .then((profile) => {
     next(profile);
   })
-  .catch(error => logErrorToCrashlytics(error));
+  .catch(error => console.warn(error));
 };
 
 /** **************** */
