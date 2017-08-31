@@ -116,8 +116,11 @@ class Settings extends Component {
         <View style={{ borderBottomColor: colors.green, borderBottomWidth: 2, padding: 4, marginBottom: 8 }}>
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Network</Text>
         </View>
-        <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.celluarDataKey, value.toString()])} text="Use Cellular Data" value={this.state.preferences[preferenceKeyValues.celluarDataKey]} />
-        <Text style={{ color: colors.shade140, fontSize: 16 }}>Account</Text>
+        <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.celluarDataKey, value.toString()])} text="Use cellular data" value={this.state.preferences[preferenceKeyValues.celluarDataKey]} />
+        <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.autoDownloadKey, value.toString()])} text="Automatically download recordings" value={this.state.preferences[preferenceKeyValues.autoDownloadKey]} />
+        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 2, padding: 4, marginBottom: 8 }}>
+          <Text style={{ color: colors.shade140, fontSize: 16 }}>Account</Text>
+        </View>
         <TouchableOpacity onPress={isAuthenticated ? this.logout : this.login}>
           <View style={styles.authButton}>
             <Text>{isAuthenticated ? 'Signout' : 'Login'}</Text>
@@ -138,6 +141,7 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: 'center',
     marginTop: 12,
+    marginHorizontal: 4,
     width: 100,
   },
   toggleContainer: {
