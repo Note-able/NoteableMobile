@@ -42,9 +42,7 @@ export const logErrorToCrashlytics = (error) => {
 };
 
 export const logCustomToFabric = (eventType, properties) => {
-  console.log('logging custom event to fabric');
   Answers.logCustom(eventType, properties);
-  Answers.logContentView(eventType);
 };
 
 export const debounceFunc = (name, func, delay) => {
