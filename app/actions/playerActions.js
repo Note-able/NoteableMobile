@@ -47,7 +47,11 @@ export const startPlayer = recording => (
                 sound.currentTime = evt.progress;
                 resolve();
               } else if (evt.status === 'ERROR') {
-                reject();
+                if (sound.errorCount === 0) {
+                  ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
+                } else {
+                  reject();
+                }
               }
             },
           );
@@ -57,6 +61,7 @@ export const startPlayer = recording => (
         pause: ReactNativeAudioStreaming.pause,
         release: ReactNativeAudioStreaming.stop,
         getCurrentTime: callback => callback(sound.currentTime),
+        errorCount: 0,
       };
 
       logCustomToFabric('Play Recording');
