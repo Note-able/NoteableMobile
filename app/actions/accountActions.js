@@ -1,7 +1,6 @@
 import { AsyncStorage } from 'react-native';
-import { preferenceKeys, defaultValuePreference } from '../constants';
 import { AccountActionTypes } from './ActionTypes.js';
-import { fetchUtil } from '../util';
+import { fetchUtil, getPreferences } from '../util';
 
 const {
   getCurrentUserTypes,
@@ -32,27 +31,17 @@ export const registerUser = registration => (
     const { firstName, lastName, email, password } = registration;
     dispatch({ type: registerUserTypes.processing });
 
-    fetch('https://beta.noteable.me/api/v1/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
-        password,
-      }),
-    }).then((response) => {
-      if (response.status !== 200) {
-        throw new Error(`Failed to register user: ${response.statusText}`);
-      }
+    fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error(`Failed to register user: ${response.statusText}`);
+        }
 
-      return response.json();
-    }, error => dispatch({ type: registerUserTypes.error, error }))
-    .then((result) => {
-      dispatch({ type: registerUserTypes.success, registration, result });
-    });
+        return response.json();
+      }, error => dispatch({ type: registerUserTypes.error, error }))
+      .then((result) => {
+        dispatch({ type: registerUserTypes.success, registration, result });
+      });
   }
 );
 
@@ -63,13 +52,7 @@ export const loginFacebook = authToken => (
     } else {
       dispatch({ type: loginFacebookTypes.processing });
 
-      fetch('https://beta.noteable.me/auth/facebook/jwt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: authToken }),
-      })
+      fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', body: { token: authToken } })
       .then(response => response.json())
       .then((result) => {
         const { token, user } = result;
@@ -85,13 +68,7 @@ export const signInLocal = (email, password) => (
   (dispatch) => {
     dispatch({ type: fetchSignInTypes.processing });
 
-    fetch('https://beta.noteable.me/auth/local/jwt', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: email, password }),
-    })
+    fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/local/jwt', body: { username: email, password } })
     .then(response => response.json())
     .catch(error => dispatch({ type: fetchSignInTypes.error, error }))
     .then((result) => {
@@ -196,25 +173,10 @@ export const setUserPreferences = preferencePairs => (
 export const getUserPreferences = () => (
   async (dispatch) => {
     try {
-      const preferences = await AsyncStorage.multiGet(preferenceKeys);
-      dispatch({ type: getUserPreferencesTypes.success, preferences: mapPreferences(preferences) });
+      const preferences = await getPreferences();
+      dispatch({ type: getUserPreferencesTypes.success, preferences });
     } catch (error) {
       dispatch({ type: getUserPreferencesTypes.error, error });
     }
   }
 );
-
-const mapPreferences = preferences => preferenceKeys.reduce((accumulator, preferenceKey) => {
-  const current = preferences.find(x => x[0] === preferenceKey);
-
-  if (current == null) {
-    return {
-      ...accumulator,
-      [preferenceKey]: defaultValuePreference(preferenceKey),
-    };
-  }
-  return {
-    ...accumulator,
-    [preferenceKey]: current[1],
-  };
-}, {});

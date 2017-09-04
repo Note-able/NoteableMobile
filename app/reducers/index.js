@@ -40,6 +40,7 @@ const {
 
 const {
   queueNetworkRequestType,
+  networkPreferencesFailureType,
   networkChangeType,
 } = SystemActionTypes;
 
@@ -354,6 +355,14 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
 const System = (state = { systemMessage: {}, network: { connected: '', queued: {} } }, action) => {
   const { type } = action;
   switch (type) {
+    case networkPreferencesFailureType.cellular:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Cellular data not enabled',
+          kind: 'error',
+        },
+      };
     case networkingFailureType:
       return {
         ...state,

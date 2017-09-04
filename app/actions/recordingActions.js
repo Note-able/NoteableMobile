@@ -3,9 +3,10 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
 import Schemas from '../realmSchemas';
-import { fetchUtil, logErrorToCrashlytics, logCustomToFabric } from '../util';
+import { fetchUtil, logErrorToCrashlytics, getPreferences } from '../util';
 import { RecordingActionTypes, SystemActionTypes } from './ActionTypes';
 import { MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
+import { preferenceKeys } from '../constants';
 
 const {
   deleteRecordingTypes,
@@ -19,6 +20,7 @@ const {
 } = RecordingActionTypes;
 
 const {
+  networkPreferencesFailureType,
   queueNetworkRequestType,
 } = SystemActionTypes;
 
@@ -246,24 +248,28 @@ export const uploadRecording = (rec, user) => (
               logErrorToCrashlytics(err);
             });
 
-            ifstream.onEnd(() => {
+            ifstream.onEnd(async () => {
               form.append('file', data);
-              fetch('https://beta.noteable.me/api/v1/recordings', {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'multipart/form-data',
-                  Authorization: user.jwt,
-                },
-                body: form,
-              })
-              .then(res => res.json())
-              .then((song) => {
-                realm.write(() => {
-                  realm.create('Recording', { id: parseInt(rec.id, 10), isSynced: true, resourceId: parseInt(song.id, 10) }, true);
-                  resolve({ ...recording, isSynced: true, resourceId: song.id, id: rec.id });
-                });
-              });
+              let response;
+              try {
+                response = await fetchUtil.postWithBody({
+                  url: 'https://beta.noteable.me/api/v1/recordings',
+                  body: form,
+                  auth: user.jwt,
+                  headers: { 'Content-Type': 'multipart\form-data' },
+                }, getState);
+
+                response.json()
+                  .then((song) => {
+                    realm.write(() => {
+                      realm.create('Recording', { id: parseInt(rec.id, 10), isSynced: true, resourceId: parseInt(song.id, 10) }, true);
+                      resolve({ ...recording, isSynced: true, resourceId: song.id, id: rec.id });
+                    });
+                  });
+              } catch (error) {
+                console.log(networkPreferencesFailureType, error.message);
+                dispatch({ type: networkPreferencesFailureType[error.message] });
+              }
             });
           });
         } catch (e) {
@@ -276,9 +282,13 @@ export const uploadRecording = (rec, user) => (
 );
 
 export const downloadRecording = recording => (
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
     const { System } = getState();
-    if (System.network.connected === 'none') {
+    const userPreferences = await getPreferences();
+    if (System.network.connected === 'cellular' && userPreferences[preferenceKeys.celluarDataKey] !== 'true') {
+      dispatch({ type: networkPreferencesFailureType.celllar });
+      return;
+    } else if (System.network.connected === 'none') {
       dispatch({ type: queueNetworkRequestType, request: downloadRecordingTypes.queue });
       return;
     }

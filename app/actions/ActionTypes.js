@@ -38,5 +38,10 @@ export const SystemMessageActionTypes = {
 
 export const SystemActionTypes = {
   networkChangeType: 'NETWORK_CHANGE',
+  networkPreferencesFailureType: {
+    cellular: 'NETWORK_PREFERENCES_CELLULAR',
+    wifi: 'NETWORK_PREFERENCES_CELLULAR',
+    network: SystemMessageActionTypes.networkingFailureType,
+  },
   queueNetworkRequestType: 'QUEUE_NETWORK_REQUEST',
 };
