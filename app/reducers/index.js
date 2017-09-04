@@ -375,7 +375,7 @@ const System = (state = { systemMessage: {}, network: { connected: '', queued: {
       return {
         ...state,
         systemMessage: {
-          message: 'Fetching recordings metadata',
+          message: 'Syncing down',
           kind: 'success',
         },
       };
