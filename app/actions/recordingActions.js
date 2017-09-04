@@ -237,6 +237,7 @@ export const uploadRecording = (rec, user) => (
           form.append('duration', recording.duration);
           form.append('name', recording.name);
           form.append('size', recording.size);
+          form.append('tags', recording.tags);
           form.append('extension', '.aac');
           let data = '';
           RNFetchBlob.fs.readStream(
