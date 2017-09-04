@@ -34,6 +34,7 @@ const mapDispatchToProps = dispatch => ({
   fetchRecordings: () => dispatch(fetchRecordings()),
   filterRecordings: filter => dispatch(fetchRecordings(filter)),
   updateRecording: recording => dispatch(updateRecording(recording)),
+  removeRecording: recording => dispatch(removeRecording(recording)),
   saveRecording: recording => dispatch(addRecording(recording)),
   searchRecordings: search => dispatch(fetchRecordings(null, search)),
   syncDownRecordings: () => dispatch(syncDownRecordings()),
@@ -48,8 +49,10 @@ class AudioRecorder extends Component {
     downloadRecording: PropTypes.func.isRequired,
     fetchRecordings: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
+    removeRecording: PropTypes.func.isRequired,
     saveRecording: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
+    syncDownRecordings: PropTypes.func.isRequired,
     uploadRecording: PropTypes.func.isRequired,
   };
 
@@ -82,6 +85,8 @@ class AudioRecorder extends Component {
           navigation={this.props.navigation}
           updateRecording={this.props.updateRecording}
           uploadRecording={this.props.uploadRecording}
+          syncDownRecordings={this.props.syncDownRecordings}
+          removeRecording={this.props.removeRecording}
         />
       </View>
     );

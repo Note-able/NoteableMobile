@@ -21,7 +21,7 @@ export const runBackgroundRequests = () => (
       stopOnTerminate: false,
     }, () => {
       const { System } = getState();
-      if (System.network.connected !== 'none' && System.network.queue.length !== 0) {
+      if (System.network.connected !== 'none' && System.network.queue != null && System.network.queue.length !== 0) {
         logCustomToFabric('Offline Update Requested');
       }
 

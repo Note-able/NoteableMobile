@@ -35,6 +35,7 @@ export default class Audio extends PureComponent {
     recordings: PropTypes.shape({}),
     saveRecording: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
+    syncDownRecordings: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
     uploadRecording: PropTypes.func.isRequired,
   };
@@ -315,6 +316,7 @@ export default class Audio extends PureComponent {
             editRecording={this.editRecording}
             uploadRecording={this.props.uploadRecording}
             downloadRecording={this.props.downloadRecording}
+            syncDownRecordings={this.props.syncDownRecordings}
           />
         </View>
         <Modal

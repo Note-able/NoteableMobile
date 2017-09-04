@@ -113,12 +113,11 @@ class Settings extends Component {
     const isAuthenticated = this.props.users.user != null;
     return (
       <View style={{ flex: 1, paddingTop: 40, paddingHorizontal: 20, backgroundColor: colors.shade0, height: '100%', width: '100%' }}>
-        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 2, padding: 4, marginBottom: 8 }}>
+        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 1, padding: 4, marginBottom: 8 }}>
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Network</Text>
         </View>
         <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.celluarDataKey, value.toString()])} text="Use cellular data for downloads" value={this.state.preferences[preferenceKeyValues.celluarDataKey]} />
-        <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.autoDownloadKey, value.toString()])} text="Automatically download recordings" value={this.state.preferences[preferenceKeyValues.autoDownloadKey]} />
-        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 2, padding: 4, marginBottom: 8 }}>
+        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 1, padding: 4, marginBottom: 8 }}>
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Account</Text>
         </View>
         <TouchableOpacity onPress={isAuthenticated ? this.logout : this.login}>

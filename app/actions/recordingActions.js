@@ -39,7 +39,7 @@ const validate = (recordings) => {
   });
 };
 
-const removeRecording = (recording, resolve) => {
+const removeLocalRecording = (recording, resolve) => {
   if (recording.path !== '') {
     RNFetchBlob.fs.unlink(recording.path);
   }
@@ -49,6 +49,15 @@ const removeRecording = (recording, resolve) => {
     resolve(recording.id);
   });
 };
+
+export const removeRecording = recording => (
+  (dispatch) => {
+    RNFetchBlob.fs.unlink(recording.path);
+    const result = [...validate(realm.objects('Recording').sorted('id', true))];
+    const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
+    dispatch({ type: fetchRecordingsTypes.success, recordings });
+  }
+);
 
 const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `https://beta.noteable.me/api/v1/recordings?offset=${offset}`, auth: token })
 .then(response => response.json(), (error) => { throw error; })
@@ -96,10 +105,11 @@ export const syncDownRecordings = () => (
             }
           });
           const result = [...validate(realm.objects('Recording').sorted('id', true))];
+          console.log(MapRecordingsToAssocArray(result, MapRecordingFromDB));
           dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
         });
       })
-      .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
+      .catch((error) => { console.log(error); dispatch({ type: syncDownRecordingsTypes.error, error }); });
   }
 );
 
@@ -164,13 +174,13 @@ export const deleteRecording = recording => (
       fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
         .then((response) => {
           if (response.status === 204) {
-            removeRecording(recording, resolve);
+            removeLocalRecording(recording, resolve);
           } else {
             throw new Error('Failed delete');
           }
         });
     } else {
-      removeRecording(recording, resolve);
+      removeLocalRecording(recording, resolve);
     }
   }).then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
     .catch(error => dispatch({ type: deleteRecordingTypes.error, error }))
@@ -317,7 +327,7 @@ export const logout = () => (
 
     recordings.forEach((record) => {
       if (record.audioUrl != null && record.audioUrl !== '') {
-        removeRecording({ ...record }, () => {});
+        removeLocalRecording({ ...record }, () => {});
       }
     });
 

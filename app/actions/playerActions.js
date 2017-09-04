@@ -31,6 +31,7 @@ export const startPlayer = recording => (
         resume: reactNativeSound.resume,
         getCurrentTime: reactNativeSound.getCurrentTime,
         pause: reactNativeSound.pause,
+        release: reactNativeSound.release,
       };
     } else {
       const sound = {

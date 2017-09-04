@@ -18,6 +18,8 @@ import {
   deleteRecording,
   downloadRecording,
   fetchRecordings,
+  removeRecording,
+  syncDownRecordings,
   updateRecording,
   uploadRecording,
 } from '../../actions/recordingActions';
@@ -46,6 +48,8 @@ const mapDispatchToProps = dispatch => ({
   uploadRecording: (recording, user) => dispatch(uploadRecording(recording, user)),
   searchRecordings: search => dispatch(fetchRecordings(null, search)),
   startPlayer: recording => dispatch(startPlayer(recording)),
+  syncDownRecordings: () => dispatch(syncDownRecordings()),
+  removeRecording: recording => dispatch(removeRecording(recording)),
 });
 
 class Music extends Component {
@@ -57,6 +61,8 @@ class Music extends Component {
     uploadRecording: PropTypes.func.isRequired,
     searchRecordings: PropTypes.func.isRequired,
     startPlayer: PropTypes.func.isRequired,
+    syncDownRecordings: PropTypes.func.isRequired,
+    removeRecording: PropTypes.func.isRequired,
   };
 
   state = {
@@ -181,6 +187,8 @@ class Music extends Component {
           startPlayer={this.props.startPlayer}
           editRecording={this.editRecording}
           uploadRecording={this.props.uploadRecording}
+          syncDownRecordings={this.props.syncDownRecordings}
+          removeRecording={this.props.removeRecording}
           currentUser={this.props.users.user}
         />
         {/* Modal */}
