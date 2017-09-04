@@ -105,11 +105,10 @@ export const syncDownRecordings = () => (
             }
           });
           const result = [...validate(realm.objects('Recording').sorted('id', true))];
-          console.log(MapRecordingsToAssocArray(result, MapRecordingFromDB));
           dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
         });
       })
-      .catch((error) => { console.log(error); dispatch({ type: syncDownRecordingsTypes.error, error }); });
+      .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
   }
 );
 
@@ -278,7 +277,6 @@ export const uploadRecording = (rec, user) => (
                     });
                   });
               } catch (error) {
-                console.log(networkPreferencesFailureType, error.message);
                 dispatch({ type: networkPreferencesFailureType[error.message] });
               }
             });

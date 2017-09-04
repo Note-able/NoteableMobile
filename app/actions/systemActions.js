@@ -28,7 +28,6 @@ export const runBackgroundRequests = () => (
       BackgroundFetch.finish();
     }, (error) => {
       logErrorToCrashlytics(error);
-      console.log('[js] RNBackgroundFetch failed to start');
     });
   }
 );
