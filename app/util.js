@@ -23,12 +23,11 @@ export const fetchUtil = {
   postWithBody: ({ url, auth, body, headers }, getState) => {
     const fetchParams = {
       method: 'POST',
-      headers: {
+      headers: headers || {
         Authorization: auth,
         'Content-Type': 'application/json',
-        ...headers,
       },
-      body: JSON.stringify(body),
+      body: body.append == null ? JSON.stringify(body) : body,
     };
 
     if (getState == null) {

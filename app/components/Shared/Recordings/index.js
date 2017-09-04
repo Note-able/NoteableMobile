@@ -133,28 +133,9 @@ export default class Recordings extends Component {
         renderItem={({ item }) => {
           const recording = this.state.recordings.local[item] || this.state.recordings.networked[item];
           return (
-            <Animated.View
-              style={[
-                styles.row,
-                this.state[recording.id] == null ? null : {
-                  transform: [{ translateX: this.state[recording.id].interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -1 * OPTIONS_WIDTH],
-                  }) }],
-                },
-              ]}
-              key={recording.id}
-            >
-              <Recording
-                primaryAction={() => this.startPlayer(recording)}
-                name={recording.name}
-                isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
-                isPlaying={this.state.activeRecording === recording.id}
-                openMoreMenu={() => this.showOptions(recording.id)}
-                secondaryDetails={recording.durationDisplay}
-                primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
-              />
-              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH }]}>
+            <View key={recording.id}>
+
+              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH, position: 'absolute', right: 0 }]}>
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
                   <Icon name="delete" size={25} color={colors.shade90} />
                 </TouchableHighlight>
@@ -170,7 +151,28 @@ export default class Recordings extends Component {
                   </TouchableHighlight>
                 }
               </View>
-            </Animated.View>
+              <Animated.View
+                style={[
+                  styles.row,
+                  this.state[recording.id] == null ? null : {
+                    transform: [{ translateX: this.state[recording.id].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, -1 * OPTIONS_WIDTH],
+                    }) }],
+                  },
+                ]}
+              >
+                <Recording
+                  primaryAction={() => this.startPlayer(recording)}
+                  name={recording.name}
+                  isOpen={this.state.showOptions != null && this.state.showOptions.id === recording.id}
+                  isPlaying={this.state.activeRecording === recording.id}
+                  openMoreMenu={() => this.showOptions(recording.id)}
+                  secondaryDetails={recording.durationDisplay}
+                  primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
+                />
+              </Animated.View>
+            </View>
           );
         }}
       />

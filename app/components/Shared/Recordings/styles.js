@@ -18,7 +18,7 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     height: 48,
     flexDirection: 'row',
-    width: '100%',
+    zIndex: 1,
   },
   rowContent: {
     flexDirection: 'row',

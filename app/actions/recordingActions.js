@@ -53,9 +53,13 @@ const removeLocalRecording = (recording, resolve) => {
 export const removeRecording = recording => (
   (dispatch) => {
     RNFetchBlob.fs.unlink(recording.path);
-    const result = [...validate(realm.objects('Recording').sorted('id', true))];
-    const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
-    dispatch({ type: fetchRecordingsTypes.success, recordings });
+    realm.write(() => {
+      const rec = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
+      rec.path = '';
+      const result = [...validate(realm.objects('Recording').sorted('id', true))];
+      const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
+      dispatch({ type: fetchRecordingsTypes.success, recordings });
+    });
   }
 );
 
@@ -265,8 +269,11 @@ export const uploadRecording = (rec, user) => (
                 response = await fetchUtil.postWithBody({
                   url: 'https://beta.noteable.me/api/v1/recordings',
                   body: form,
-                  auth: user.jwt,
-                  headers: { 'Content-Type': 'multipart\form-data' },
+                  headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: user.jwt,
+                  },
                 }, getState);
 
                 response.json()

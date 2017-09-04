@@ -144,7 +144,7 @@ class Music extends Component {
   render() {
     const check = <Icon name="check" size={18} style={{ width: 18, height: 18, marginRight: 4 }} color={colors.green} />;
     return (
-      <ScrollView contentContainerStyle={styles.recordingsContainer} bounces={false}>
+      <View style={styles.recordingsContainer}>
         <View style={styles.headerBar}>
           <TouchableHighlight style={styles.sortOptions} onPress={this.showFilter}>
             <Icon name="filter-list" size={28} style={{ width: 28, height: 28 }} color={colors.shade90} />
@@ -206,7 +206,7 @@ class Music extends Component {
             cancelText="Cancel"
           />
         </Modal>
-      </ScrollView>
+      </View>
     );
   }
 }
