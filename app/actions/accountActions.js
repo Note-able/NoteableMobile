@@ -29,6 +29,7 @@ export const getCurrentUser = () => (
 export const registerUser = registration => (
   (dispatch) => {
     const { firstName, lastName, email, password } = registration;
+
     dispatch({ type: registerUserTypes.processing });
 
     fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })

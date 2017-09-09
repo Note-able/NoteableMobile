@@ -44,7 +44,7 @@ class Authentication extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.users.registration == null && nextProps.users.registration != null) {
-      this.props.signInLocal(nextProps.registration.email, nextProps.registration.password);
+      this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
     }
 
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {

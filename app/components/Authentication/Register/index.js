@@ -67,7 +67,6 @@ export default class Register extends Component {
             autoCorrect: false,
             maxLength: 100,
             onChangeText: text => this.setState({ lastName: text }),
-            onEndEditing: () => this._email.focusInput(),
             returnKeyType: 'next',
             style: styles.inputTextField,
             value: this.state.lastName,

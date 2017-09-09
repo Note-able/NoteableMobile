@@ -11,6 +11,7 @@ import {
   deleteRecording,
   downloadRecording,
   fetchRecordings,
+  removeRecording,
   syncDownRecordings,
   updateRecording,
   uploadRecording,

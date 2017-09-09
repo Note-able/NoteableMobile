@@ -264,6 +264,9 @@ const Users = (state = { user: {} }, action) => {
     case logoutTypes.error:
       logErrorToCrashlytics({ customMessage: 'Logout Error', error });
       break;
+    case registerUserTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Register Error', error });
+      break;
     default:
       break;
   }
@@ -293,6 +296,7 @@ const Users = (state = { user: {} }, action) => {
         isProcessing: false,
       };
     case logoutTypes.error:
+    case registerUserTypes.error:
     case getCurrentUserTypes.error:
       return {
         ...state,

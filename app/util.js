@@ -21,14 +21,21 @@ export const fetchUtil = {
     return asyncFetchWithPreferences(url, fetchParams, getState);
   },
   postWithBody: ({ url, auth, body, headers }, getState) => {
+    const header = headers || {
+      'Content-Type': 'application/json',
+    };
+
+    if (auth != null) {
+      header.Authorization = auth;
+    }
+
     const fetchParams = {
       method: 'POST',
-      headers: headers || {
-        Authorization: auth,
-        'Content-Type': 'application/json',
-      },
+      headers: header,
       body: body.append == null ? JSON.stringify(body) : body,
     };
+
+    console.log(fetchParams);
 
     if (getState == null) {
       return fetch(url, fetchParams);
