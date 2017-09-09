@@ -102,10 +102,14 @@ export const syncDownRecordings = () => (
             } catch (e) {}
 
             const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
-            if (current != null && rec.dateModified >= current.dateModified) {
-              realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
-            } else if (current == null) {
-              realm.create('Recording', { ...rec, path: '', id }, true);
+            try {
+              if (current != null && rec.dateModified >= current.dateModified) {
+                realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
+              } else if (current == null) {
+                realm.create('Recording', { ...rec, path: '', id }, true);
+              }
+            } catch (e) {
+              dispatch({ type: syncDownRecordingsTypes.error, error: e });
             }
           });
           const result = [...validate(realm.objects('Recording').sorted('id', true))];

@@ -35,8 +35,6 @@ export const fetchUtil = {
       body: body.append == null ? JSON.stringify(body) : body,
     };
 
-    console.log(fetchParams);
-
     if (getState == null) {
       return fetch(url, fetchParams);
     }

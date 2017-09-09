@@ -67,9 +67,9 @@ export const MapRecordingFromAPI = source => ({
   duration: parseInt(source.duration === '' ? 0 : source.duration, 10),
   isSynced: true,
   name: source.name,
-  resourceId: source.id,
+  resourceId: parseInt(source.id, 10),
   size: parseInt(source.size.match(/\d*/)[0] === '' ? 0 : source.size.match(/\d*/)[0], 10),
-  tags: source.tags || '',
+  tags: source.tags.join() || '',
 });
 
 export const MapRecordingFromDB = dbRecording => ({
