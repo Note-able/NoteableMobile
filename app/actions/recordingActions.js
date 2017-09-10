@@ -129,7 +129,7 @@ export const fetchRecordings = (filter, search) => (
         const recordings = realm.objects('Recording');
         if (recordings == null) {
           return resolve([]);
-        } else if (filter != null) {
+        } else if (filter != null && filter !== 'date') {
           const result = [...validate(recordings.sorted(filter))];
           return resolve(result);
         } else if (search != null) {

@@ -41,7 +41,7 @@ import {
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
-  initialRouteName: 'Recordings',
+  initialRouteName: 'Record',
   tabBarOptions: {
     activeTintColor: 'blue',
     labelStyle: {

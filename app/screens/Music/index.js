@@ -66,6 +66,7 @@ class Music extends Component {
   };
 
   state = {
+    activeFilter: 'date',
     search: this.props.recordings.search || '',
     options: '',
     height: new Animated.Value(0),
