@@ -338,6 +338,14 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
   const { type, error } = action;
   switch (type) {
     case startPlayerTypes.success:
+      logCustomToFabric('Play Recording');
+      break;
+    default:
+      break;
+  }
+
+  switch (type) {
+    case startPlayerTypes.success:
       if (state.sound != null) {
         state.sound.stop();
         state.sound.release();
