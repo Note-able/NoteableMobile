@@ -59,6 +59,9 @@ class Footer extends Component {
       isPaused: 0,
     });
 
+    this.state.player.sound.stop();
+    this.state.player.sound.release();
+
     this.hideTimeout = setTimeout(() => {
       this.setState({
         showPlayer: false,
