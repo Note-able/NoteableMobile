@@ -72,6 +72,21 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case syncDownRecordingsTypes.success:
       logCustomToFabric('Sync Down Recordings');
       break;
+    case saveRecordingsTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Save Recordings Error', error });
+      break;
+    case deleteRecordingTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Delete Recordings Error', error });
+      break;
+    case uploadRecordingTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Upload Recordings Error', error });
+      break;
+    case downloadRecordingTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Download Recordings Error', error });
+      break;
+    case syncDownRecordingsTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Sync Recordings Error', error });
+      break;
     default:
       break;
   }
