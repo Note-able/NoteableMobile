@@ -134,7 +134,6 @@ export default class Recordings extends Component {
           const recording = this.state.recordings.local[item] || this.state.recordings.networked[item];
           return (
             <View key={recording.id}>
-
               <View style={[styles.rowOptions, { width: OPTIONS_WIDTH, position: 'absolute', right: 0 }]}>
                 <TouchableHighlight style={{ width: 25, height: 25, margin: 10 }} onPress={() => this.props.deleteRecording(recording)}>
                   <Icon name="delete" size={25} color={colors.shade90} />

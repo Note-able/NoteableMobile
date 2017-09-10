@@ -39,6 +39,7 @@ export default class Audio extends PureComponent {
     syncDownRecordings: PropTypes.func.isRequired,
     updateRecording: PropTypes.func.isRequired,
     uploadRecording: PropTypes.func.isRequired,
+    currentUser: PropTypes.shape({}),
   };
 
   state = {
@@ -311,14 +312,15 @@ export default class Audio extends PureComponent {
           </View>
           <Recordings
             deleteRecording={this.props.deleteRecording}
+            downloadRecording={this.props.downloadRecording}
             recordings={this.state.recordings}
             startPlayer={this.props.startPlayer}
-            loadingRecordings={this.props.loadingRecordings}
             editRecording={this.editRecording}
             uploadRecording={this.props.uploadRecording}
-            downloadRecording={this.props.downloadRecording}
             syncDownRecordings={this.props.syncDownRecordings}
             removeRecording={this.props.removeRecording}
+            currentUser={this.props.currentUser}
+            loadingRecordings={this.props.loadingRecordings}
           />
         </View>
         <Modal

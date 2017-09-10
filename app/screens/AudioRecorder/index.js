@@ -27,6 +27,7 @@ import {
 
 const mapStateToProps = state => ({
   recordings: state.Recordings,
+  users: state.Users,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -88,6 +89,7 @@ class AudioRecorder extends Component {
           uploadRecording={this.props.uploadRecording}
           syncDownRecordings={this.props.syncDownRecordings}
           removeRecording={this.props.removeRecording}
+          currentUser={this.props.users.user}
         />
       </View>
     );

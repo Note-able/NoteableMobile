@@ -190,6 +190,7 @@ class Music extends Component {
           uploadRecording={this.props.uploadRecording}
           syncDownRecordings={this.props.syncDownRecordings}
           removeRecording={this.props.removeRecording}
+          loadingRecordings={this.props.recordings.processing}
           currentUser={this.props.users.user}
         />
         {/* Modal */}

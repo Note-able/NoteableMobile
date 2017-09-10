@@ -16,7 +16,7 @@ export default StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomColor: 'transparent',
     borderBottomWidth: 1,
-    height: 48,
+    height: 56,
     flexDirection: 'row',
     zIndex: 1,
   },
