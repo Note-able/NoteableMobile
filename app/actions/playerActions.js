@@ -64,7 +64,6 @@ export const startPlayer = recording => (
         errorCount: 0,
       };
 
-      logCustomToFabric('Play Recording');
       return dispatch({ type: startPlayerTypes.success, sound, recording });
     }
   }
