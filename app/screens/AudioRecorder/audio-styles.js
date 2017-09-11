@@ -7,11 +7,11 @@ const WINDOW_WIDTH = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   container: {
+    position: 'absolute',
     backgroundColor: colors.shade0,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    height: '100%',
   },
   timingBar: {
     alignSelf: 'flex-end',
@@ -225,5 +225,26 @@ export default StyleSheet.create({
     fontSize: 14,
     paddingBottom: 2,
     paddingTop: 2,
+  },
+  metronomeMenu: {
+    backgroundColor: 'rgba(100, 100, 100, 0.3)',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  metronomeOnText: {
+    color: colors.green,
+  },
+  metronomeLabel: {
+    color: colors.white,
+    fontSize: 14,
+    padding: 10,
+  },
+  metronomeInput: {
+    marginLeft: -10,
+    width: 50,
+    fontSize: 16,
+    color: colors.white,
   },
 });
