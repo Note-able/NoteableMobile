@@ -129,7 +129,8 @@ export default class Recordings extends Component {
         )}
         initialNumToRender={12}
         onRefresh={this.props.syncDownRecordings}
-        refreshing={this.props.loadingRecordings || false}
+        refreshing={false}
+        removeClippedSubviews={false}
         renderItem={({ item }) => {
           const recording = this.state.recordings.local[item] || this.state.recordings.networked[item];
           return (

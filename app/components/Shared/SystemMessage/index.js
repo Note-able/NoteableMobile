@@ -17,6 +17,8 @@ export default class SystemMessage extends Component {
   state = {
     topAnimation: new Animated.Value(0),
     opacityAnimation: new Animated.Value(0),
+    message: this.props.message,
+    kind: this.props.kind,
   }
 
   componentDidMount() {
@@ -43,7 +45,14 @@ export default class SystemMessage extends Component {
     }, 5000);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.message !== this.state.oldMessage && nextProps.message !== '') {
+      this.setState({ message: nextProps.message, kind: nextProps.kind });
+    }
+  }
+
   close() {
+    this.setState({ oldMessage: this.state.message, message: '' });
     const top = Animated.timing(
       this.state.topAnimation, {
         duration: 300,

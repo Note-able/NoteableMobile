@@ -422,10 +422,15 @@ const System = (state = { systemMessage: {}, network: { connected: '', queued: {
           kind: 'success',
         },
       };
+    case syncDownRecordingsTypes.success:
+    case syncDownRecordingsTypes.error:
+    case downloadRecordingTypes.success:
+    case downloadRecordingTypes.error:
+    case uploadRecordingTypes.error:
     case uploadRecordingTypes.success:
       return {
         ...state,
-        systemMessage: null,
+        systemMessage: {},
       };
     case networkChangeType:
       return {
