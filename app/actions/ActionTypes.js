@@ -11,6 +11,7 @@ export const RecordingActionTypes = {
   downloadRecordingTypes: createAsyncActionTypes('DOWNLOAD_RECORDINGS'),
   fetchRecordingsTypes: createAsyncActionTypes('FETCH_RECORDINGS'),
   logoutRecordingType: 'LOGOUT_RECORDINGS',
+  removeRecordingErrorType: 'REMOVE_RECORDING_TYPE',
   saveRecordingsTypes: createAsyncActionTypes('SAVE_RECORDINGS'),
   syncDownRecordingsTypes: createAsyncActionTypes('SYNC_DOWN'),
   updateRecordingTypes: createAsyncActionTypes('UPDATE_RECORDING'),

@@ -15,6 +15,7 @@ const {
   logoutRecordingType,
   updateRecordingTypes,
   uploadRecordingTypes,
+  removeRecordingErrorType,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
 } = RecordingActionTypes;
@@ -54,11 +55,15 @@ export const removeRecording = recording => (
   (dispatch) => {
     RNFetchBlob.fs.unlink(recording.path);
     realm.write(() => {
-      const rec = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
-      rec.path = '';
-      const result = [...validate(realm.objects('Recording').sorted('id', true))];
-      const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
-      dispatch({ type: fetchRecordingsTypes.success, recordings });
+      try {
+        const rec = realm.objects('Recording').filtered(`id = ${recording.id}`)[0];
+        rec.path = '';
+        const result = [...validate(realm.objects('Recording').sorted('id', true))];
+        const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
+        dispatch({ type: fetchRecordingsTypes.success, recordings });
+      } catch (error) {
+        dispatch({ type: removeRecordingErrorType, error });
+      }
     });
   }
 );
@@ -94,26 +99,24 @@ export const syncDownRecordings = () => (
     fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
       .then((recordings) => {
         realm.write(() => {
-          recordings.forEach((x) => {
-            const rec = MapRecordingFromAPI(x);
-            let current;
-            try {
-              current = realm.objects('Recording').filtered(`resourceId = ${rec.resourceId}`)[0];
-            } catch (e) {}
+          try {
+            recordings.forEach((x) => {
+              const rec = MapRecordingFromAPI(x);
+              const current = realm.objects('Recording').filtered(`resourceId = ${rec.resourceId}`)[0];
+              const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
 
-            const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
-            try {
               if (current != null && rec.dateModified >= current.dateModified) {
                 realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
               } else if (current == null) {
                 realm.create('Recording', { ...rec, path: '', id }, true);
               }
-            } catch (e) {
-              dispatch({ type: syncDownRecordingsTypes.error, error: e });
-            }
-          });
-          const result = [...validate(realm.objects('Recording').sorted('id', true))];
-          dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
+            });
+
+            const result = [...validate(realm.objects('Recording').sorted('id', true))];
+            dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
+          } catch (e) {
+            dispatch({ type: syncDownRecordingsTypes.error, error: e });
+          }
         });
       })
       .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
@@ -169,25 +172,31 @@ export const addRecording = recording => (
 export const deleteRecording = recording => (
   (dispatch, getState) => new Promise(async (resolve) => {
     dispatch({ type: deleteRecordingTypes.processing });
-    const user = await AsyncStorage.getItem(USER);
 
-    if (user != null) {
-      const { System } = getState();
-      if (System.network.connected === 'none') {
-        dispatch({ type: queueNetworkRequestType, request: deleteRecordingTypes.queue });
-        return;
+    try {
+      const user = await AsyncStorage.getItem(USER);
+
+      if (user != null) {
+        const { System } = getState();
+        if (System.network.connected === 'none') {
+          dispatch({ type: queueNetworkRequestType, request: deleteRecordingTypes.queue });
+          return;
+        }
+
+        fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
+          .then((response) => {
+            if (response.status === 204) {
+              removeLocalRecording(recording, resolve);
+            } else {
+              throw new Error('Failed delete');
+            }
+          })
+          .catch((error) => { throw error; });
+      } else {
+        removeLocalRecording(recording, resolve);
       }
-
-      fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
-        .then((response) => {
-          if (response.status === 204) {
-            removeLocalRecording(recording, resolve);
-          } else {
-            throw new Error('Failed delete');
-          }
-        });
-    } else {
-      removeLocalRecording(recording, resolve);
+    } catch (error) {
+      dispatch({ type: deleteRecordingTypes.error, error });
     }
   }).then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
     .catch(error => dispatch({ type: deleteRecordingTypes.error, error }))
@@ -226,7 +235,15 @@ export const uploadRecording = (rec, user) => (
     if (rec == null || user == null) {
       dispatch({ type: uploadRecordingTypes.error });
     } else {
-      const recording = MapRecordingToAPI(rec);
+      let recording;
+
+      try {
+        recording = MapRecordingToAPI(rec);
+      } catch (error) {
+        dispatch({ type: uploadRecordingTypes.error, error });
+        return;
+      }
+
       const { System } = getState();
       if (System.network.connected === 'none') {
         dispatch({ type: queueNetworkRequestType, request: uploadRecordingTypes.queue, recording: rec, user });
@@ -288,7 +305,7 @@ export const uploadRecording = (rec, user) => (
                     });
                   });
               } catch (error) {
-                dispatch({ type: networkPreferencesFailureType[error.message] });
+                throw error;
               }
             });
           });

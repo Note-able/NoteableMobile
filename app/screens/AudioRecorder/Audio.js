@@ -277,6 +277,10 @@ export default class Audio extends PureComponent {
     });
   }
 
+  uploadRecording = (recording) => {
+    this.props.uploadRecording(recording, this.props.currentUser);
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -316,7 +320,7 @@ export default class Audio extends PureComponent {
             recordings={this.state.recordings}
             startPlayer={this.props.startPlayer}
             editRecording={this.editRecording}
-            uploadRecording={this.props.uploadRecording}
+            uploadRecording={this.uploadRecording}
             syncDownRecordings={this.props.syncDownRecordings}
             removeRecording={this.props.removeRecording}
             currentUser={this.props.currentUser}

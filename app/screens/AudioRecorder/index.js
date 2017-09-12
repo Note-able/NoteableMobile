@@ -42,7 +42,7 @@ const mapDispatchToProps = dispatch => ({
   syncDownRecordings: () => dispatch(syncDownRecordings()),
   startPlayer: recording => dispatch(startPlayer(recording)),
   getCurrentUser: () => dispatch(getCurrentUser()),
-  uploadRecording: recording => dispatch(uploadRecording(recording)),
+  uploadRecording: (recording, user) => dispatch(uploadRecording(recording, user)),
 });
 
 class AudioRecorder extends Component {

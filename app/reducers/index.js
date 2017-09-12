@@ -1,6 +1,5 @@
 /** eslint-disable no-duplicate-case */
 import { combineReducers } from 'redux';
-import { MergeRecordings } from '../mappers/recordingMapper';
 import {
   AccountActionTypes,
   PlayerActionTypes,
@@ -15,6 +14,7 @@ const {
   downloadRecordingTypes,
   fetchRecordingsTypes,
   logoutRecordingType,
+  removeRecordingErrorType,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
   updateRecordingTypes,
@@ -87,6 +87,9 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case syncDownRecordingsTypes.error:
       logErrorToCrashlytics({ customMessage: 'Sync Recordings Error', error });
       break;
+    case removeRecordingErrorType:
+      logErrorToCrashlytics({ customMessage: 'Remove Recording Error', error });
+      break;
     default:
       break;
   }
@@ -99,7 +102,6 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case uploadRecordingTypes.error:
     case downloadRecordingTypes.error:
     case syncDownRecordingsTypes.error:
-      logErrorToCrashlytics(error || 'failure');
       return { ...state, error, processing: false };
     case saveRecordingsTypes.success:
     case logoutRecordingType:
@@ -143,7 +145,6 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
           },
         },
       };
-
     case updateRecordingTypes.success:
       return {
         ...state,
@@ -185,7 +186,6 @@ const Recordings = (state = DEFAULT_RECORDINGS_STATE, action) => {
     case saveRecordingsTypes.processing:
     case updateRecordingTypes.processing:
     case fetchRecordingsTypes.processing:
-    case uploadRecordingTypes.processing:
     case syncDownRecordingsTypes.processing:
       return { ...state, processing: true };
     default:
@@ -405,6 +405,27 @@ const System = (state = { systemMessage: {}, network: { connected: '', queued: {
           message: 'Syncing down',
           kind: 'success',
         },
+      };
+    case uploadRecordingTypes.processing:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Uploading',
+          kind: 'success',
+        },
+      };
+    case downloadRecordingTypes.processing:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Downloading',
+          kind: 'success',
+        },
+      };
+    case uploadRecordingTypes.success:
+      return {
+        ...state,
+        systemMessage: null,
       };
     case networkChangeType:
       return {
