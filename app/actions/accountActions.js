@@ -56,15 +56,7 @@ export const loginFacebook = authToken => (
       dispatch({ type: loginFacebookTypes.processing });
 
       fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', body: { token: authToken } })
-      .then((response) => {
-        if (response.status !== 200) {
-          if (response.statusText == null) {
-            throw new Error('Could not sign user in');
-          }
-        }
-
-        return response.json();
-      })
+      .then(response => response.json())
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
@@ -88,7 +80,6 @@ export const signInLocal = (email, password) => (
         return response.json();
       }, error => dispatch({ type: registerUserTypes.error, error }))
       .then((result) => {
-        console.log(result);
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: fetchSignInTypes.success, user });

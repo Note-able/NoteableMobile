@@ -422,11 +422,26 @@ const System = (state = { systemMessage: {}, authMessage: {}, network: { connect
           kind: 'success',
         },
       };
+    case loginFacebookTypes.processing:
+      return {
+        ...state,
+        authMessage: {
+          message: 'Logging in.',
+          kind: 'success',
+        },
+      };
+    case loginFacebookTypes.error:
+      return {
+        ...state,
+        authMessage: {
+          message: 'An error occurred logging in with Facebook.',
+        },
+      };
     case fetchSignInTypes.processing:
       return {
         ...state,
         authMessage: {
-          message: 'Logging in',
+          message: 'Logging in.',
           kind: 'success',
         },
       };
@@ -434,7 +449,7 @@ const System = (state = { systemMessage: {}, authMessage: {}, network: { connect
       return {
         ...state,
         authMessage: {
-          message: 'Failed to log in with this email',
+          message: 'Failed to log in with this email.',
           kind: 'error',
         },
       };
@@ -442,7 +457,7 @@ const System = (state = { systemMessage: {}, authMessage: {}, network: { connect
       return {
         ...state,
         authMessage: {
-          message: 'Registering user',
+          message: 'Registering user.',
           kind: 'success',
         },
       };

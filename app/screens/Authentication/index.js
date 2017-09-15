@@ -54,7 +54,6 @@ class Authentication extends Component {
       // this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
     }
 
-    console.log(nextProps.system);
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {
       this.setState({ isProcessing: false, authMessage: nextProps.system.authMessage }, () => { this.props.navigation.navigate('Home'); });
     } else if (this.props.users.error) {
@@ -81,7 +80,7 @@ class Authentication extends Component {
   }
 
   loginFacebook = (accessToken) => {
-    if (this.state.isProcessing) {
+    if (!this.state.isProcessing) {
       this.props.loginFacebook(accessToken);
       this.setState({
         isProcessing: true,
