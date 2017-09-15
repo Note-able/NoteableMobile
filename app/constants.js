@@ -21,3 +21,8 @@ export const defaultValuePreference = (key) => {
 /** Data Constants */
 export const dbName = 'noteable';
 export const recordingLocation = `${RNFetchBlob.fs.dirs.DocumentDir}`;
+
+/** Text Constants */
+
+export const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+

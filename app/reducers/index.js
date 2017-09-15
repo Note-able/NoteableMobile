@@ -379,7 +379,7 @@ const Player = (state = { isPlaying: false, sound: null, recording: null }, acti
   }
 };
 
-const System = (state = { systemMessage: {}, network: { connected: '', queued: {} } }, action) => {
+const System = (state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } }, action) => {
   const { type } = action;
   switch (type) {
     case networkPreferencesFailureType.cellular:
@@ -419,6 +419,47 @@ const System = (state = { systemMessage: {}, network: { connected: '', queued: {
         ...state,
         systemMessage: {
           message: 'Downloading',
+          kind: 'success',
+        },
+      };
+    case fetchSignInTypes.processing:
+      return {
+        ...state,
+        authMessage: {
+          message: 'Logging in',
+          kind: 'success',
+        },
+      };
+    case fetchSignInTypes.error:
+      return {
+        ...state,
+        authMessage: {
+          message: 'Failed to log in with this email',
+          kind: 'error',
+        },
+      };
+    case registerUserTypes.processing:
+      return {
+        ...state,
+        authMessage: {
+          message: 'Registering user',
+          kind: 'success',
+        },
+      };
+    case registerUserTypes.error:
+      return {
+        ...state,
+        authMessage: {
+          message: action.error.message,
+          kind: 'error',
+        },
+      };
+    case registerUserTypes.success:
+    case fetchSignInTypes.success:
+      return {
+        ...state,
+        authMessage: {
+          message: 'Success',
           kind: 'success',
         },
       };

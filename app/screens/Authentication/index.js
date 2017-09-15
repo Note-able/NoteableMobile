@@ -12,6 +12,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { colors, colorRGBA } from '../../styles';
 import { Login, Register } from '../../components/Authentication';
+
+import {
+  SystemMessage,
+} from '../../components/Shared';
+
 import {
   getUser,
   loginFacebook,
@@ -21,6 +26,7 @@ import {
 
 const mapStateToProps = state => ({
   users: state.Users,
+  system: state.System,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -40,47 +46,64 @@ class Authentication extends Component {
   state = {
     screen: 'Login',
     isProcessing: false,
+    authMessage: this.props.system.authMessage,
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.users.registration == null && nextProps.users.registration != null) {
-      this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
+      // this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
     }
 
+    console.log(nextProps.system);
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {
-      this.setState({ isProcessing: false }, () => { this.props.navigation.navigate('Home'); });
+      this.setState({ isProcessing: false, authMessage: nextProps.system.authMessage }, () => { this.props.navigation.navigate('Home'); });
     } else if (this.props.users.error) {
       this.setState({
         isProcessing: false,
         error: this.props.users.error,
+        authMessage: nextProps.system.authMessage,
+      });
+    } else {
+      this.setState({
+        isProcessing: nextProps.isProcessing,
+        authMessage: nextProps.system.authMessage,
       });
     }
   }
 
   registerUser = (user) => {
-    this.props.registerUser(user);
-    this.setState({
-      isProcessing: true,
-    });
+    if (!this.state.isProcessing) {
+      this.props.registerUser(user);
+      this.setState({
+        isProcessing: true,
+      });
+    }
   }
 
   loginFacebook = (accessToken) => {
-    this.props.loginFacebook(accessToken);
-    this.setState({
-      isProcessing: true,
-    });
+    if (this.state.isProcessing) {
+      this.props.loginFacebook(accessToken);
+      this.setState({
+        isProcessing: true,
+      });
+    }
   }
 
   signInLocal = (email, password) => {
-    this.props.signInLocal(email, password);
-    this.setState({
-      isProcessing: true,
-    });
+    if (!this.state.isProcessing) {
+      this.props.signInLocal(email, password);
+      this.setState({
+        isProcessing: true,
+      });
+    }
   }
 
   render() {
     return (
       <View style={styles.container}>
+        <View style={{ width: '100%', position: 'absolute', top: -20, zIndex: 100 }}>
+          {(this.state.authMessage == null || this.state.authMessage.message == null) ? null : <SystemMessage message={this.state.authMessage.message} kind={this.state.authMessage.kind} />}
+        </View>
         <LinearGradient
           start={{ x: 1.0, y: 0.0 }}
           end={{ x: 0.1, y: 0.9 }}

@@ -35,14 +35,16 @@ export const registerUser = registration => (
     fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })
       .then((response) => {
         if (response.status !== 200) {
-          throw new Error(`Failed to register user: ${response.statusText}`);
+          if (response.statusText == null) {
+            throw new Error('Failed to register with a user with that email');
+          }
         }
 
         return response.json();
       }, error => dispatch({ type: registerUserTypes.error, error }))
       .then((result) => {
         dispatch({ type: registerUserTypes.success, registration, result });
-      });
+      }, error => dispatch({ type: registerUserTypes.error, error }));
   }
 );
 
@@ -54,7 +56,15 @@ export const loginFacebook = authToken => (
       dispatch({ type: loginFacebookTypes.processing });
 
       fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', body: { token: authToken } })
-      .then(response => response.json())
+      .then((response) => {
+        if (response.status !== 200) {
+          if (response.statusText == null) {
+            throw new Error('Could not sign user in');
+          }
+        }
+
+        return response.json();
+      })
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
@@ -70,13 +80,19 @@ export const signInLocal = (email, password) => (
     dispatch({ type: fetchSignInTypes.processing });
 
     fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/local/jwt', body: { username: email, password } })
-    .then(response => response.json())
-    .catch(error => dispatch({ type: fetchSignInTypes.error, error }))
-    .then((result) => {
-      const { token, user } = result;
-      AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
-      dispatch({ type: fetchSignInTypes.success, user });
-    });
+      .then((response) => {
+        if (response.status < 200 || response.status >= 300) {
+          throw new Error('Could not sign user in');
+        }
+
+        return response.json();
+      }, error => dispatch({ type: registerUserTypes.error, error }))
+      .then((result) => {
+        console.log(result);
+        const { token, user } = result;
+        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        dispatch({ type: fetchSignInTypes.success, user });
+      }, error => dispatch({ type: registerUserTypes.error, error }));
   }
 );
 

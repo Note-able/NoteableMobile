@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
   Easing,
   StyleSheet,
   Text,
+  TouchableOpacity,
 } from 'react-native';
 import { colors } from '../../../styles';
 
-export default class SystemMessage extends Component {
+export default class SystemMessage extends PureComponent {
   static propTypes = {
     message: PropTypes.string.isRequired,
     kind: PropTypes.string.isRequired,
@@ -22,6 +23,20 @@ export default class SystemMessage extends Component {
   }
 
   componentDidMount() {
+    this.start();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('Showing: ', nextProps.message, this.state.oldMessage);
+    if (nextProps.message !== this.state.oldMessage && nextProps.message !== '') {
+      this.setState({ message: nextProps.message, kind: nextProps.kind, oldMessage: this.state.message });
+      if (this.timeout == null) {
+        this.start();
+      }
+    }
+  }
+
+  start = () => {
     const top = Animated.timing(
       this.state.topAnimation, {
         duration: 400,
@@ -40,18 +55,17 @@ export default class SystemMessage extends Component {
 
     Animated.parallel([top, opacity]).start();
 
-    setTimeout(() => {
+    this.setState({
+      oldMessage: this.state.message,
+    });
+
+    this.timeout = setTimeout(() => {
+      this.timeout = null;
       this.close();
     }, 5000);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.message !== this.state.oldMessage && nextProps.message !== '') {
-      this.setState({ message: nextProps.message, kind: nextProps.kind });
-    }
-  }
-
-  close() {
+  close = () => {
     this.setState({ oldMessage: this.state.message, message: '' });
     const top = Animated.timing(
       this.state.topAnimation, {
@@ -73,9 +87,12 @@ export default class SystemMessage extends Component {
   }
 
   render() {
+    console.log('rendered');
     return (
-      <Animated.View style={[styles.messageContainer, { opacity: this.state.opacityAnimation, transform: [{ translateY: this.state.topAnimation }], backgroundColor: this.props.kind === 'error' ? colors.error : colors.success }]}>
-        <Text style={styles.message}>{this.props.message}</Text>
+      <Animated.View style={[styles.messageContainer, { opacity: this.state.opacityAnimation, transform: [{ translateY: this.state.topAnimation }], backgroundColor: this.state.kind === 'error' ? colors.error : colors.success }]}>
+        <TouchableOpacity style={{ width: '100%', height: '100%', justifyContent: 'center' }} onPress={() => this.close()}>
+          <Text style={styles.message}>{this.state.message}</Text>
+        </TouchableOpacity>
       </Animated.View>
     );
   }
