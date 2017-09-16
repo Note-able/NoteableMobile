@@ -34,9 +34,9 @@ import { debounceFunc } from '../../util.js';
 import styles from './styles.js';
 
 const mapStateToProps = state => ({
-  recordings: state.Recordings,
-  player: state.Player,
-  users: state.Users,
+  recordings: state.RecordingsReducer,
+  player: state.PlayerReducer,
+  users: state.AccountReducer,
 });
 
 const mapDispatchToProps = dispatch => ({

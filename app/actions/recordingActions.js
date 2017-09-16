@@ -89,8 +89,8 @@ export const getRecordingTitle = () => {
 export const syncDownRecordings = () => (
   async (dispatch, getState) => {
     const user = await AsyncStorage.getItem(USER);
-    const { System } = getState();
-    if (System.network.connected === 'none') {
+    const { SystemReducer } = getState();
+    if (SystemReducer.network.connected === 'none') {
       dispatch({ type: queueNetworkRequestType, request: syncDownRecordingsTypes.queue });
       return;
     }
@@ -177,8 +177,8 @@ export const deleteRecording = recording => (
       const user = await AsyncStorage.getItem(USER);
 
       if (user != null) {
-        const { System } = getState();
-        if (System.network.connected === 'none') {
+        const { SystemReducer } = getState();
+        if (SystemReducer.network.connected === 'none') {
           dispatch({ type: queueNetworkRequestType, request: deleteRecordingTypes.queue });
           return;
         }
@@ -218,8 +218,8 @@ export const updateRecording = recording => (
         return reject(e);
       }
     }).then((record) => {
-      const { System } = getState();
-      if (System.network.connected === 'none') {
+      const { SystemReducer } = getState();
+      if (SystemReducer.network.connected === 'none') {
         dispatch({ type: queueNetworkRequestType, request: syncDownRecordingsTypes.queue, recording });
       } else {
         // make network requet to update network request.
@@ -244,8 +244,8 @@ export const uploadRecording = (rec, user) => (
         return;
       }
 
-      const { System } = getState();
-      if (System.network.connected === 'none') {
+      const { SystemReducer } = getState();
+      if (SystemReducer.network.connected === 'none') {
         dispatch({ type: queueNetworkRequestType, request: uploadRecordingTypes.queue, recording: rec, user });
         return;
       }
@@ -320,9 +320,9 @@ export const uploadRecording = (rec, user) => (
 
 export const downloadRecording = recording => (
   async (dispatch, getState) => {
-    const { System } = getState();
+    const { SystemReducer } = getState();
     const userPreferences = await getPreferences();
-    if (System.network.connected === 'cellular' && userPreferences[preferenceKeys.celluarDataKey] !== 'true') {
+    if (SystemReducer.network.connected === 'cellular' && userPreferences[preferenceKeys.celluarDataKey] !== 'true') {
       dispatch({ type: networkPreferencesFailureType.celllar });
       return;
     } else if (System.network.connected === 'none') {

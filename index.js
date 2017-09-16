@@ -5,7 +5,7 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { Answers } from 'react-native-fabric';
 import { StackNavigator } from 'react-navigation';
-import { appReducer } from './app/reducers';
+import appReducer from './app/reducers';
 import { getAlreadySignedInUser } from './app/actions/accountActions';
 import { appScreens } from './screens';
 

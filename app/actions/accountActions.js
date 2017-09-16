@@ -32,12 +32,13 @@ export const registerUser = registration => (
 
     dispatch({ type: registerUserTypes.processing });
 
-    fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })
+    return fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })
       .then((response) => {
-        if (response.status !== 200) {
+        if (response.status < 200 || response.status >= 300) {
           if (response.statusText == null) {
             throw new Error('Failed to register with a user with that email');
           }
+          throw new Error(response.statusText);
         }
 
         return response.json();
@@ -71,19 +72,19 @@ export const signInLocal = (email, password) => (
   (dispatch) => {
     dispatch({ type: fetchSignInTypes.processing });
 
-    fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/local/jwt', body: { username: email, password } })
+    return fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/local/jwt', body: { username: email, password } })
       .then((response) => {
         if (response.status < 200 || response.status >= 300) {
           throw new Error('Could not sign user in');
         }
 
         return response.json();
-      }, error => dispatch({ type: registerUserTypes.error, error }))
+      }, error => dispatch({ type: fetchSignInTypes.error, error }))
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
         dispatch({ type: fetchSignInTypes.success, user });
-      }, error => dispatch({ type: registerUserTypes.error, error }));
+      }, error => dispatch({ type: fetchSignInTypes.error, error }));
   }
 );
 
@@ -108,49 +109,14 @@ export const getUser = user => (
   }
 );
 
-export const onSignIn = token => (
-  async function (dispatch) {
-    const currentUser = await AsyncStorage.getItem(USER);
-    if (!currentUser) {
-      signIn(token, (user) => { dispatch({ type: 'USER/SIGNIN', user }); });
-    } else {
-      dispatch({ type: 'USER/SIGNIN', user: JSON.parse(currentUser) });
-    }
-  }
-);
-
 export const getAlreadySignedInUser = () => (
-  async function (dispatch) {
+  async (dispatch) => {
     const user = await AsyncStorage.getItem(USER);
     if (user) {
-      dispatch({ type: 'USER/SIGNIN', user: JSON.parse(user) });
+      dispatch({ type: fetchSignInTypes.success, user: JSON.parse(user) });
     }
   }
 );
-
-export const onSignOut = () => (
-  (dispatch) => {
-    AsyncStorage.setItem(USER, null);
-    dispatch({ type: 'USER/SIGNOUT' });
-  }
-);
-
-const signIn = (token, next) => {
-  fetchUtil.postWithBody({
-    url: 'https://beta.noteable.me/auth/jwt',
-    body: {
-      token,
-    },
-  })
-  .then(response => response.json())
-  .then((json) => {
-    const { t, user } = json;
-    user.jwt = t;
-    AsyncStorage.setItem(USER, JSON.stringify(user));
-    next(user);
-  })
-  .catch(error => console.warn(error));
-};
 
 const fetchCurrentProfile = (user, next) => {
   fetchUtil.get({

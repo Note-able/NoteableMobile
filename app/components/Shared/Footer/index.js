@@ -24,7 +24,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mapStateToProps = state => ({
-  player: state.Player,
+  player: state.PlayerReducer,
 });
 
 class Footer extends Component {

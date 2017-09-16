@@ -8,8 +8,8 @@ const {
 
 export const networkConnectivityChange = status => (
   (dispatch, getState) => {
-    const { System } = getState();
-    if (System.network.connected == null || System.network.connected !== status) {
+    const { SystemReducer } = getState();
+    if (SystemReducer.network.connected == null || SystemReducer.network.connected !== status) {
       dispatch({ type: networkChangeType, status });
     }
   }
@@ -20,8 +20,8 @@ export const runBackgroundRequests = () => (
     BackgroundFetch.configure({
       stopOnTerminate: false,
     }, () => {
-      const { System } = getState();
-      if (System.network.connected !== 'none' && System.network.queue != null && System.network.queue.length !== 0) {
+      const { SystemReducer } = getState();
+      if (SystemReducer.network.connected !== 'none' && SystemReducer.network.queue != null && SystemReducer.network.queue.length !== 0) {
         logCustomToFabric('Offline Update Requested');
       }
 

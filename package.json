@@ -4,7 +4,12 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "deploy-crashlytics": "cd android && ./gradlew assembleRelease crashlyticsUploadDistributionRelease"
+    "deploy-crashlytics": "cd android && ./gradlew assembleRelease crashlyticsUploadDistributionRelease",
+    "test": "jest",
+    "test:watch": "npm test -- --watch"
+  },
+  "jest": {
+    "preset": "react-native"
   },
   "dependencies": {
     "moment": "^2.18.1",
@@ -31,10 +36,18 @@
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.1",
+    "babel-jest": "^21.0.2",
+    "chai": "^4.1.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.10.3"
+    "eslint-plugin-react": "^6.10.3",
+    "jest": "^21.1.0",
+    "mocha": "^3.5.3",
+    "nock": "^9.0.14",
+    "node-fetch": "^1.7.3",
+    "redux-mock-store": "^1.3.0",
+    "whatwg-fetch": "^2.0.3"
   }
 }

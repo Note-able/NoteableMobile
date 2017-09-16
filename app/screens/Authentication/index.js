@@ -25,8 +25,8 @@ import {
 } from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
-  users: state.Users,
-  system: state.System,
+  users: state.AccountReducer,
+  system: state.SystemReducer,
 });
 
 const mapDispatchToProps = dispatch => ({

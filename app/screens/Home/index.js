@@ -55,9 +55,9 @@ const App = TabNavigator(appScreens, {
 });
 
 const mapStateToProps = state => ({
-  users: state.Users,
-  system: state.System,
-  recordings: state.Recordings,
+  users: state.AccountReducer,
+  system: state.SystemReducer,
+  recordings: state.RecordingsReducer,
 });
 
 const mapDispatchToProps = dispatch => ({
