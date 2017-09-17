@@ -9,7 +9,8 @@
     "test:watch": "npm test -- --watch"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "verbose": true
   },
   "dependencies": {
     "moment": "^2.18.1",

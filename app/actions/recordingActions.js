@@ -96,7 +96,7 @@ export const syncDownRecordings = () => (
     }
 
     dispatch({ type: syncDownRecordingsTypes.processing });
-    fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
+    return fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
       .then((recordings) => {
         realm.write(() => {
           try {
@@ -115,11 +115,11 @@ export const syncDownRecordings = () => (
             const result = [...validate(realm.objects('Recording').sorted('id', true))];
             dispatch({ type: syncDownRecordingsTypes.success, recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB) });
           } catch (e) {
-            dispatch({ type: syncDownRecordingsTypes.error, error: e });
+            dispatch({ type: syncDownRecordingsTypes.error, error: e.message });
           }
         });
       })
-      .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error }));
+      .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error: error.message }));
   }
 );
 
@@ -127,7 +127,7 @@ export const fetchRecordings = (filter, search) => (
   (dispatch) => {
     dispatch({ type: fetchRecordingsTypes.processing });
 
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         const recordings = realm.objects('Recording');
         if (recordings == null) {
@@ -148,7 +148,7 @@ export const fetchRecordings = (filter, search) => (
       const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
       dispatch({ type: fetchRecordingsTypes.success, recordings });
     })
-    .catch(e => dispatch({ type: fetchRecordingsTypes.error, error: e }));
+    .catch(error => dispatch({ type: fetchRecordingsTypes.error, error: error.message }));
   }
 );
 

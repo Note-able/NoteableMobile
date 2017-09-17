@@ -15,10 +15,23 @@ export const fetchUtil = {
     };
 
     if (getState == null) {
-      return fetch(url, fetchParams);
+      return fetch(url, fetchParams)
+        .then((response) => {
+          if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.status);
+          }
+
+          return response;
+        });
     }
 
-    return asyncFetchWithPreferences(url, fetchParams, getState);
+    return asyncFetchWithPreferences(url, fetchParams, getState)
+      .then((response) => {
+        if (repsonse.status < 200 || response.status >= 300) {
+          throw new Error(response.statusText);
+        }
+        return response;
+      });
   },
   postWithBody: ({ url, auth, body, headers }, getState) => {
     const header = headers || {
