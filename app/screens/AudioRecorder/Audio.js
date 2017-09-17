@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableHighlight,
   TouchableOpacity,
-  Picker,
   Image,
   Animated,
   Dimensions,
@@ -22,6 +21,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Schemas from '../../realmSchemas';
 import { RecordingModal, Recordings } from '../../components';
+import Select from '../../components/Select';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
@@ -68,17 +68,17 @@ export default class Audio extends PureComponent {
     isTiming: false,
     metronomeMenuWidth: 0,
     metronomeMenuHeight: 0,
+    metronomeMenuOpacity: 0,
     metronomeState: metronomeStates.off,
     metronomeBPM: '120',
     countIn: '2',
-    timeSignature: '4,4',
+    timeSignature: { value: '4,4', display: '4/4' },
   };
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
     this.metronomeSound = new Sound('metronome.wav', Sound.MAIN_BUNDLE);
-    this.metronomeSound2 = new Sound('metronome.wav', Sound.MAIN_BUNDLE);
 
     AudioRecorder.onProgress = () => {};
     AudioRecorder.onFinished = () => {
@@ -343,7 +343,7 @@ export default class Audio extends PureComponent {
           },
         ),
       ]);
-      this.metronomeTimingAnimation.start();
+      this.metronomeTimingAnimation.start(() => this.setState({ metronomeMenuVisible: !showMetronomeMenu }));
     });
   }
 
@@ -389,7 +389,7 @@ export default class Audio extends PureComponent {
       return;
     }
 
-    const [beatCount, barCount] = timeSignature.split(',');
+    const [beatCount, barCount] = timeSignature.value.split(',');
     const BPM = parseInt(metronomeBPM, 10);
     this.metronomeCount = 0;
     this.metronomeInterval = setInterval(() => this.playMetronome(parseInt(countIn, 10) * beatCount, barCount, metronomeState === metronomeStates.countIn), 60000 / BPM);
@@ -402,23 +402,18 @@ export default class Audio extends PureComponent {
         clearInterval(this.metronomeInterval);
         this.metronomeInterval = null;
       } else {
-        this.metronomeSound.setVolume(0.5).play();
+        this.metronomeSound.play();
         this.metronomeCount += 1;
       }
     } else {
-      if (this.metronomeCount % barCount === 0) {
-        // TODO: Use different accent sound instead
-        this.metronomeSound.setVolume(1).play();
-      } else {
-        this.metronomeSound.setVolume(0.5).play();
-      }
+      this.metronomeSound.play();
       this.metronomeCount += 1;
     }
   }
 
   render() {
-    const { metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature } = this.state;
-    const metronomeMenuProps = { metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
+    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature } = this.state;
+    const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
     return (
       <View style={styles.container}>
         <LinearGradient
@@ -497,34 +492,36 @@ export default class Audio extends PureComponent {
   }
 }
 
-const MetronomeMenu = ({ metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => (
-  <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
-    <Animated.View style={[styles.metronomeMenu, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
-      <TouchableHighlight onPress={onMetronomeStateChange} style={styles.metronomeMenuTouchableHighlight}>
-        <Text style={[styles.metronomeLabel, metronomeState !== metronomeStates.off ? styles.metronomeOnText : null, { width: 90 }]}>{ metronomeState }</Text>
-      </TouchableHighlight>
-      <Text style={styles.metronomeLabel}>BPM:</Text>
-      <TextInput
-        onChangeText={onBPMChange}
-        value={metronomeBPM}
-        style={styles.metronomeInput}
-        underlineColorAndroid="transparent"
-      />
-      <Text style={styles.metronomeLabel}>Count In:</Text>
-      <TextInput
-        onChangeText={onCountInChange}
-        value={countIn}
-        style={styles.metronomeInput}
-        underlineColorAndroid="transparent"
-      />
-      <Picker
-        style={{ color: colors.white, minWidth: 90, backgroundColor: 'transparent', flex: 1 }}
-        onValueChange={onTimeSigantureChange}
-        selectedValue={timeSignature}
-        underlineColorAndroid="transparent"
-      >
-        {timeSignatures.map(ts => (<Picker.Item key={ts.value} value={ts.value} label={ts.display} />))}
-      </Picker>
-    </Animated.View>
-  </View>
-);
+const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => {
+  return (
+    <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View style={[styles.metronomeMenuContainer, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
+        {showMetronomeMenu && (<View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
+          <TouchableHighlight onPress={onMetronomeStateChange} style={styles.metronomeMenuTouchableHighlight}>
+            <Text style={[styles.metronomeLabel, metronomeState !== metronomeStates.off ? styles.metronomeOnText : null, { width: 90 }]}>{ metronomeState }</Text>
+          </TouchableHighlight>
+          <Text style={styles.metronomeLabel}>BPM:</Text>
+          <TextInput
+            onChangeText={onBPMChange}
+            value={metronomeBPM}
+            style={styles.metronomeInput}
+            underlineColorAndroid="transparent"
+          />
+          <Text style={styles.metronomeLabel}>Count In:</Text>
+          <TextInput
+            onChangeText={onCountInChange}
+            value={countIn}
+            style={styles.metronomeInput}
+            underlineColorAndroid="transparent"
+          />
+          <Select
+            onValueChange={onTimeSigantureChange}
+            selectedValue={timeSignature}
+            options={timeSignatures}
+          />
+        </View>)}
+      </Animated.View>
+    </View>
+  );
+};
+

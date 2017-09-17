@@ -11,7 +11,10 @@ export default StyleSheet.create({
     backgroundColor: colors.shade0,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
+    paddingTop: 30,
+    width: WINDOW_WIDTH,
+    height: '100%',
   },
   timingBar: {
     alignSelf: 'flex-end',
@@ -199,7 +202,7 @@ export default StyleSheet.create({
     flex: 1,
   },
   recordingsContainer: {
-    height: 250,
+    height: 200,
     width: '100%',
   },
   header: {
@@ -226,12 +229,15 @@ export default StyleSheet.create({
     paddingBottom: 2,
     paddingTop: 2,
   },
-  metronomeMenu: {
+  metronomeMenuContainer: {
     backgroundColor: 'rgba(100, 100, 100, 0.3)',
+    paddingHorizontal: 20,
+  },
+  metronomeMenu: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    height: 50,
   },
   metronomeOnText: {
     color: colors.green,
