@@ -19,6 +19,7 @@ import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Metronome } from '../../nativeModules';
 import Schemas from '../../realmSchemas';
 import { RecordingModal, Recordings } from '../../components';
 import Select from '../../components/Select';
@@ -216,25 +217,21 @@ export default class Audio extends PureComponent {
         await this.startRecording();
       }
     } else {
-      let modal = true;
-      let reviewMode = true;
-      if (this.metronomeInterval) {
-        clearInterval(this.metronomeInterval);
-        this.metronomeInterval = null;
-      }
-      const { recording } = this.state;
-      if (recording) {
+      const { recordingStarted } = this.state;
+      if (recordingStarted) {
         await AudioRecorder.stopRecording();
-      } else {
-        modal = false;
-        reviewMode = false;
       }
-      this.setState({ stoppedRecording: true, recording: false, reviewMode, modal });
+      const modal = !!recordingStarted;
+      const reviewMode = !!recordingStarted;
+      Metronome.stop();
+      console.log(`started? ${recordingStarted}`);
+      this.setState({ recordingStarted: false, stoppedRecording: true, recording: false, reviewMode, modal });
     }
   }
 
   async startRecording() {
     try {
+      this.setState({ recordingStarted: true });
       this.toggleTiming();
       await AudioRecorder.startRecording();
     } catch (err) {
@@ -392,23 +389,7 @@ export default class Audio extends PureComponent {
     const [beatCount, barCount] = timeSignature.value.split(',');
     const BPM = parseInt(metronomeBPM, 10);
     this.metronomeCount = 0;
-    this.metronomeInterval = setInterval(() => this.playMetronome(parseInt(countIn, 10) * beatCount, barCount, metronomeState === metronomeStates.countIn), 60000 / BPM);
-  }
-
-  playMetronome = (countLimit, barCount, countIn) => {
-    if (this.metronomeCount === countLimit) {
-      this.startRecording();
-      if (countIn) {
-        clearInterval(this.metronomeInterval);
-        this.metronomeInterval = null;
-      } else {
-        this.metronomeSound.play();
-        this.metronomeCount += 1;
-      }
-    } else {
-      this.metronomeSound.play();
-      this.metronomeCount += 1;
-    }
+    Metronome.start(parseInt(countIn, 10) * beatCount, BPM, parseInt(beatCount, 10), metronomeState === metronomeStates.always, () => { this.startRecording(); });
   }
 
   render() {
