@@ -96,7 +96,7 @@ export const MapRecordingsToAssocArray = (recordingsList, mapFunc) => {
   };
 
   recordingsList.forEach((recording) => {
-    if (recording.resourceId == null) {
+    if (recording.resourceId === -1) {
       recordings.local[recording.id] = mapFunc ? mapFunc(recording) : recording;
     } else {
       recordings.networked[recording.id] = mapFunc ? mapFunc(recording) : recording;

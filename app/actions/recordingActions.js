@@ -155,17 +155,17 @@ export const fetchRecordings = (filter, search) => (
 export const addRecording = recording => (
   (dispatch) => {
     dispatch({ type: saveRecordingsTypes.processing });
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         realm.write(() => {
-          realm.create('Recording', { ...recording, audioUrl: '', resourceId: 0 });
+          realm.create('Recording', { ...recording, audioUrl: '' });
         });
         return resolve([...validate(realm.objects('Recording').sorted('id', true))]);
       } catch (e) {
         return reject(e);
       }
     }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings: MapRecordingsToAssocArray(recordings, MapRecordingFromDB) }))
-    .catch(error => dispatch({ type: saveRecordingsTypes.error, error }));
+    .catch(error => dispatch({ type: error.message, error }));
   }
 );
 
