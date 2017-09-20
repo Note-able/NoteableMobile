@@ -31,6 +31,7 @@ export default StyleSheet.create({
   button: {
     alignItems: 'center',
     height: 44,
+    flex: 1,
     justifyContent: 'center',
   },
   player: {

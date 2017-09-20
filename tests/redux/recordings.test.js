@@ -6,7 +6,7 @@ import fetch from 'node-fetch';
 import './mock.js';
 import Schemas from '../../app/realmSchemas';
 import { RecordingActionTypes, SystemActionTypes } from '../../app/actions/ActionTypes';
-import { fakeRecordings, fakeResult as res, fakeAddRecording, fakeNetworkedRecording } from './defaults';
+import { fakeRecordings, fakeResult as res, fakeAddRecording } from './defaults';
 import {
   addRecording,
   deleteRecording,
@@ -24,12 +24,10 @@ const {
 
 const {
   deleteRecordingTypes,
-  downloadRecordingTypes,
   fetchRecordingsTypes,
   logoutRecordingType,
   updateRecordingTypes,
   uploadRecordingTypes,
-  removeRecordingErrorType,
   saveRecordingsTypes,
   syncDownRecordingsTypes,
 } = RecordingActionTypes;
