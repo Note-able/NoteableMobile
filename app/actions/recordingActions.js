@@ -40,12 +40,17 @@ const validate = (recordings) => {
   });
 };
 
-const removeLocalRecording = (recording, resolve) => {
+const removeLocalRecording = (recording, resolve, reject) => {
   if (recording.path !== '') {
     RNFetchBlob.fs.unlink(recording.path);
   }
+
   realm.write(() => {
     const recordings = realm.objects('Recording').filtered(`id = ${recording.id}`);
+    if (recordings.length === 0) {
+      reject('Recording does not exist.');
+    }
+
     realm.delete(recordings);
     resolve(recording.id);
   });
@@ -165,18 +170,18 @@ export const addRecording = recording => (
         return reject(e);
       }
     }).then(recordings => dispatch({ type: saveRecordingsTypes.success, recordings: MapRecordingsToAssocArray(recordings, MapRecordingFromDB) }))
-    .catch(error => dispatch({ type: error.message, error }));
+    .catch(error => dispatch({ type: saveRecordingsTypes.error, error: error.message }));
   }
 );
 
 export const deleteRecording = recording => (
-  (dispatch, getState) => new Promise(async (resolve) => {
+  (dispatch, getState) => new Promise(async (resolve, reject) => {
     dispatch({ type: deleteRecordingTypes.processing });
 
     try {
       const user = await AsyncStorage.getItem(USER);
 
-      if (user != null) {
+      if (user != null && recording.isSynced) {
         const { SystemReducer } = getState();
         if (SystemReducer.network.connected === 'none') {
           dispatch({ type: queueNetworkRequestType, request: deleteRecordingTypes.queue });
@@ -186,20 +191,20 @@ export const deleteRecording = recording => (
         fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
           .then((response) => {
             if (response.status === 204) {
-              removeLocalRecording(recording, resolve);
+              removeLocalRecording(recording, resolve, reject);
             } else {
               throw new Error('Failed delete');
             }
           })
-          .catch((error) => { throw error; });
+          .catch(error => reject(error));
       } else {
-        removeLocalRecording(recording, resolve);
+        removeLocalRecording(recording, resolve, reject);
       }
     } catch (error) {
-      dispatch({ type: deleteRecordingTypes.error, error });
+      reject(error);
     }
   }).then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
-    .catch(error => dispatch({ type: deleteRecordingTypes.error, error }))
+    .catch(error => dispatch({ type: deleteRecordingTypes.error, error: error.message || 'Failed delete' }))
 );
 
 export const updateRecording = recording => (

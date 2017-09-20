@@ -1,15 +1,10 @@
-import Schemas from '../../app/realmSchemas';
-
-const realm = Schemas.RecordingSchema;
-realm.write(() => {
-  const recordings = realm.objects('Recording');
-  realm.delete(recordings);
-});
-
 /* eslint-disable no-undef */
 jest.mock('react-native-fabric', () => ({}));
 jest.mock('react-native-fetch-blob', () => ({
-  fs: { dirs: { DocumentDir: '' } },
+  fs: {
+    dirs: { DocumentDir: '' },
+    unlink: () => {},
+  },
 }));
 jest.mock('react-native-audio', () => ({
   AudioUtils: {

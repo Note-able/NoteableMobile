@@ -4,8 +4,9 @@ import nock from 'nock';
 import { expect, assert } from 'chai';
 import fetch from 'node-fetch';
 import './mock.js';
+import Schemas from '../../app/realmSchemas';
 import { RecordingActionTypes, SystemActionTypes } from '../../app/actions/ActionTypes';
-import { fakeRecordings, fakeResult as res, fakeAddRecording } from './defaults';
+import { fakeRecordings, fakeResult as res, fakeAddRecording, fakeNetworkedRecording } from './defaults';
 import {
   addRecording,
   deleteRecording,
@@ -15,6 +16,7 @@ import {
   getRecordingTitle,
 } from '../../app/actions/recordingActions';
 
+const realm = Schemas.RecordingSchema;
 const {
   networkPreferencesFailureType,
   queueNetworkRequestType,
@@ -46,13 +48,6 @@ describe('Recordings actions', () => {
     nock.cleanAll();
   });
 
-  beforeEach(() => {
-    fakeResult = {
-      ...fakeResult,
-      order: fakeResult.order.sort((a, b) => b - a),
-    };
-  });
-
   it('Gets the default recording title', () => {
     expect(getRecordingTitle()).equals(1);
   });
@@ -62,6 +57,18 @@ describe('Recordings actions', () => {
   });
 
   describe('Sync', () => {
+    beforeEach(() => {
+      fakeResult = {
+        ...fakeResult,
+        order: fakeResult.order.sort((a, b) => b - a),
+      };
+
+      realm.write(() => {
+        const recordings = realm.objects('Recording');
+        realm.delete(recordings);
+      });
+    });
+
     describe('On wifi', () => {
       const mockState = {
         SystemReducer: {
@@ -71,7 +78,7 @@ describe('Recordings actions', () => {
         },
       };
 
-      it('Sync down recordings', () => {
+      it('Sync down recordings', async () => {
         const expectedActions = [
             { type: syncDownRecordingsTypes.processing },
             { type: syncDownRecordingsTypes.success, recordings: fakeResult },
@@ -81,13 +88,11 @@ describe('Recordings actions', () => {
         nock('https://beta.noteable.me').intercept('/api/v1/recordings?offset=0', 'GET').reply(200, fakeRecordings);
         nock('https://beta.noteable.me').intercept('/api/v1/recordings?offset=20', 'GET').reply(200, []);
 
-        return store.dispatch(syncDownRecordings()).then(() => {
-          const result = store.getActions();
-          assert.deepEqual(result, expectedActions, JSON.stringify(result) === JSON.stringify(expectedActions));
-        });
+        await store.dispatch(syncDownRecordings());
+        assert.deepEqual(store.getActions(), expectedActions);
       });
 
-      it('Sync down forbidden', () => {
+      it('Sync down forbidden', async () => {
         const expectedActions = [
             { type: syncDownRecordingsTypes.processing },
             { type: syncDownRecordingsTypes.error, error: '403' },
@@ -96,10 +101,8 @@ describe('Recordings actions', () => {
 
         nock('https://beta.noteable.me').intercept('/api/v1/recordings?offset=0', 'GET').reply(403, {});
 
-        return store.dispatch(syncDownRecordings()).then(() => {
-          const result = store.getActions();
-          assert.deepEqual(result, expectedActions, JSON.stringify(result) === JSON.stringify(expectedActions));
-        });
+        await store.dispatch(syncDownRecordings());
+        assert.deepEqual(store.getActions(), expectedActions);
       });
     });
 
@@ -118,40 +121,51 @@ describe('Recordings actions', () => {
 
         return store.dispatch(syncDownRecordings()).then(() => {
           const result = store.getActions();
-          assert.deepEqual(result, expectedActions, JSON.stringify(result) === JSON.stringify(expectedActions));
+          assert.deepEqual(result, expectedActions);
         });
       });
     });
   });
 
   describe('Fetch recordings', () => {
-    it('with no sort', () => {
+    beforeEach(() => {
+      fakeResult = {
+        ...fakeResult,
+        order: fakeResult.order.sort((a, b) => b - a),
+      };
+
+      realm.write(() => {
+        const recordings = realm.objects('Recording');
+        realm.delete(recordings);
+        fakeResult.order.forEach((key) => {
+          realm.create('Recording', fakeResult.networked[key]);
+        });
+      });
+    });
+
+    it('with no sort', async () => {
       const expectedActions = [
           { type: fetchRecordingsTypes.processing },
           { type: fetchRecordingsTypes.success, recordings: fakeResult },
       ];
       const store = mockStore();
 
-      return store.dispatch(fetchRecordings()).then(() => {
-        const result = store.getActions();
-        assert.deepEqual(result, expectedActions, JSON.stringify(result));
-      });
+      await store.dispatch(fetchRecordings());
+      assert.deepEqual(store.getActions(), expectedActions);
     });
 
-    it('sorted by date', () => {
+    it('sorted by date', async () => {
       const expectedActions = [
               { type: fetchRecordingsTypes.processing },
               { type: fetchRecordingsTypes.success, recordings: fakeResult },
       ];
       const store = mockStore();
 
-      return store.dispatch(fetchRecordings('date')).then(() => {
-        const result = store.getActions();
-        assert.deepEqual(result, expectedActions, JSON.stringify(result));
-      });
+      await store.dispatch(fetchRecordings('date'));
+      assert.deepEqual(store.getActions(), expectedActions);
     });
 
-    it('sorted by size', () => {
+    it('sorted by size', async () => {
       const expectedActions = [
         { type: fetchRecordingsTypes.processing },
         {
@@ -161,13 +175,11 @@ describe('Recordings actions', () => {
       ];
       const store = mockStore();
 
-      return store.dispatch(fetchRecordings('size')).then(() => {
-        const result = store.getActions();
-        assert.deepEqual(result, expectedActions);
-      });
+      await store.dispatch(fetchRecordings('size'));
+      assert.deepEqual(store.getActions(), expectedActions);
     });
 
-    it('filtered by search [assumes names are char unique]', () => {
+    it('filtered by search [assumes names are char unique]', async () => {
       const expectedActions = [
         { type: fetchRecordingsTypes.processing },
         {
@@ -183,15 +195,13 @@ describe('Recordings actions', () => {
       ];
       const store = mockStore();
 
-      return store.dispatch(fetchRecordings(null, fakeResult.networked[fakeResult.order[0]].name)).then(() => {
-        const result = store.getActions();
-        assert.deepEqual(result, expectedActions);
-      });
+      await store.dispatch(fetchRecordings(null, fakeResult.networked[fakeResult.order[0]].name));
+      assert.deepEqual(store.getActions(), expectedActions);
     });
   });
 
   describe('Create recording', () => {
-    it('Adds a local recording', () => {
+    it('Adds a local recording', async () => {
       const expectedActions = [
         { type: saveRecordingsTypes.processing },
         {
@@ -208,10 +218,127 @@ describe('Recordings actions', () => {
       ];
       const store = mockStore({});
 
-      return store.dispatch(addRecording(fakeAddRecording)).then(() => {
-        const result = store.getActions();
-        assert.deepEqual(result, expectedActions);
+      await store.dispatch(addRecording(fakeAddRecording));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+
+    it('Fails to add an invalid recording', async () => {
+      const expectedActions = [
+        { type: saveRecordingsTypes.processing },
+        { type: saveRecordingsTypes.error, error: 'Recording.id must be of type: number' },
+      ];
+      const store = mockStore({});
+
+      await store.dispatch(addRecording({ ...fakeAddRecording, id: null }));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+  });
+
+  describe('Delete recording', () => {
+    beforeEach(() => {
+      fakeResult = {
+        ...fakeResult,
+        order: fakeResult.order.sort((a, b) => b - a),
+      };
+
+      realm.write(() => {
+        const recordings = realm.objects('Recording');
+        realm.delete(recordings);
+        fakeResult.order.forEach((key) => {
+          realm.create('Recording', fakeResult.networked[key]);
+        });
+        realm.create('Recording', fakeAddRecording);
       });
     });
+
+    const mockState = {
+      SystemReducer: {
+        network: {
+          connected: 'wifi',
+        },
+      },
+    };
+
+    it('Deletes a local recording', async () => {
+      const expectedActions = [
+        { type: deleteRecordingTypes.processing },
+        { type: deleteRecordingTypes.success, deletedId: fakeAddRecording.id },
+      ];
+      const store = mockStore({});
+
+      await store.dispatch(deleteRecording(fakeAddRecording));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+
+    it('Fails to delete a local recording', async () => {
+      const expectedActions = [
+        { type: deleteRecordingTypes.processing },
+        { type: deleteRecordingTypes.error, error: 'Failed delete' },
+      ];
+      const store = mockStore({});
+
+      await store.dispatch(deleteRecording({ id: 5, isSynced: false }));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+
+    it('Deletes a networked recording', async () => {
+      const expectedActions = [
+        { type: deleteRecordingTypes.processing },
+        { type: deleteRecordingTypes.success, deletedId: fakeResult.order[0] },
+      ];
+      const store = mockStore(mockState);
+      const recording = fakeResult.networked[fakeResult.order[0]];
+
+      nock('https://beta.noteable.me').intercept(`/api/v1/recordings/${recording.resourceId}`, 'DELETE').reply(204, {});
+
+      await store.dispatch(deleteRecording(recording));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+
+    it('Fails request to delete a networked recording', async () => {
+      const expectedActions = [
+        { type: deleteRecordingTypes.processing },
+        { type: deleteRecordingTypes.error, error: 'Failed delete' },
+      ];
+      const store = mockStore(mockState);
+      const recording = fakeResult.networked[fakeResult.order[0]];
+
+      nock('https://beta.noteable.me').intercept(`/api/v1/recordings/${recording.resourceId}`, 'DELETE').reply(404, {});
+
+      await store.dispatch(deleteRecording(recording));
+      assert.deepEqual(store.getActions(), expectedActions);
+    });
+  });
+
+  describe('Update recording', () => {
+    beforeEach(() => {
+      fakeResult = {
+        ...fakeResult,
+        order: fakeResult.order.sort((a, b) => b - a),
+      };
+
+      realm.write(() => {
+        const recordings = realm.objects('Recording');
+        realm.delete(recordings);
+        fakeResult.order.forEach((key) => {
+          realm.create('Recording', fakeResult.networked[key]);
+        });
+        realm.create('Recording', fakeAddRecording);
+      });
+    });
+
+    const mockState = {
+      SystemReducer: {
+        network: {
+          connected: 'wifi',
+        },
+      },
+    };
+
+    it('updates a local recording', () => {});
+    it('fails to update a missing recording', () => {});
+    it('updates a networked recording', () => {});
+    it('fails to update a missing networked recording', () => {});
+    it('fails to update a networked recording without a connection', () => {});
   });
 });
