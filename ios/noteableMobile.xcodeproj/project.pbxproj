@@ -25,6 +25,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		1817403D1F74B6B300A5DB4C /* metronome.wav in Sources */ = {isa = PBXBuildFile; fileRef = 1829E4311F67A473001927FC /* metronome.wav */; };
+		1817403F1F74B75100A5DB4C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1817403E1F74B75100A5DB4C /* AVFoundation.framework */; };
+		181740411F74B76100A5DB4C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 181740401F74B76100A5DB4C /* AudioToolbox.framework */; };
 		1829E4321F67A473001927FC /* metronome.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1829E4311F67A473001927FC /* metronome.wav */; };
 		1869AAE71EDE8BFF00DA34CF /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1869AAE31EDE8BFF00DA34CF /* Bolts.framework */; };
 		1869AAE81EDE8BFF00DA34CF /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1869AAE41EDE8BFF00DA34CF /* FBSDKCoreKit.framework */; };
@@ -32,6 +35,7 @@
 		1869AAEA1EDE8BFF00DA34CF /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1869AAE61EDE8BFF00DA34CF /* FBSDKShareKit.framework */; };
 		1869AC101EDE942200DA34CF /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1869AC0E1EDE942200DA34CF /* Fabric.framework */; };
 		1869AC111EDE942200DA34CF /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1869AC0F1EDE942200DA34CF /* Crashlytics.framework */; };
+		189AAA7D1F738590008F8842 /* Metronome.m in Sources */ = {isa = PBXBuildFile; fileRef = 189AAA7C1F738590008F8842 /* Metronome.m */; };
 		2BC10E002BC2461A9608118E /* libRNBackgroundFetch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3971162E24A34BBC8FE0200F /* libRNBackgroundFetch.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -368,6 +372,8 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = noteableMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = noteableMobile/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
+		1817403E1F74B75100A5DB4C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		181740401F74B76100A5DB4C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		1829E4311F67A473001927FC /* metronome.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = metronome.wav; sourceTree = "<group>"; };
 		1869AAE31EDE8BFF00DA34CF /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = ../../../FacebookSDK/Bolts.framework; sourceTree = "<group>"; };
 		1869AAE41EDE8BFF00DA34CF /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = ../../../FacebookSDK/FBSDKCoreKit.framework; sourceTree = "<group>"; };
@@ -375,6 +381,8 @@
 		1869AAE61EDE8BFF00DA34CF /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = ../../../FacebookSDK/FBSDKShareKit.framework; sourceTree = "<group>"; };
 		1869AC0E1EDE942200DA34CF /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		1869AC0F1EDE942200DA34CF /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		189AAA7B1F73858F008F8842 /* Metronome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Metronome.h; path = noteableMobile/Metronome.h; sourceTree = "<group>"; };
+		189AAA7C1F738590008F8842 /* Metronome.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Metronome.m; path = noteableMobile/Metronome.m; sourceTree = "<group>"; };
 		1FF8E2500073429AA675F6BC /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		2010CE03B52E4F06BF6D1D8B /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* noteableMobile-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "noteableMobile-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -425,6 +433,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				181740411F74B76100A5DB4C /* AudioToolbox.framework in Frameworks */,
+				1817403F1F74B75100A5DB4C /* AVFoundation.framework in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				1869AC111EDE942200DA34CF /* Crashlytics.framework in Frameworks */,
@@ -570,6 +580,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				DB278E35941A485FB5C039AB /* RNBackgroundFetch+AppDelegate.m */,
+				1829E4311F67A473001927FC /* metronome.wav */,
+				189AAA7B1F73858F008F8842 /* Metronome.h */,
+				189AAA7C1F738590008F8842 /* Metronome.m */,
 			);
 			name = noteableMobile;
 			sourceTree = "<group>";
@@ -737,7 +750,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				1829E4311F67A473001927FC /* metronome.wav */,
 				1869AC0E1EDE942200DA34CF /* Fabric.framework */,
 				1869AC0F1EDE942200DA34CF /* Crashlytics.framework */,
 				13B07FAE1A68108700A75B9A /* noteableMobile */,
@@ -765,6 +777,8 @@
 		DB46050EDBC84409A71DC210 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				181740401F74B76100A5DB4C /* AudioToolbox.framework */,
+				1817403E1F74B75100A5DB4C /* AVFoundation.framework */,
 				71097A3B1F13CFDB0000D6ED /* libStreamingKit.a */,
 				1869AAE31EDE8BFF00DA34CF /* Bolts.framework */,
 				1869AAE41EDE8BFF00DA34CF /* FBSDKCoreKit.framework */,
@@ -1380,6 +1394,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1817403D1F74B6B300A5DB4C /* metronome.wav in Sources */,
+				189AAA7D1F738590008F8842 /* Metronome.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				C051A7AEF73D438C9A25AA22 /* RNBackgroundFetch+AppDelegate.m in Sources */,
