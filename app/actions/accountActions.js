@@ -38,13 +38,14 @@ export const registerUser = registration => (
           if (response.statusText == null) {
             throw new Error('Failed to register with a user with that email');
           }
+
           throw new Error(response.statusText);
         }
 
         return response.json();
       }, error => dispatch({ type: registerUserTypes.error, error }))
       .then((result) => {
-        dispatch({ type: registerUserTypes.success, registration, result });
+        dispatch({ type: registerUserTypes.success, result });
       }, error => dispatch({ type: registerUserTypes.error, error }));
   }
 );

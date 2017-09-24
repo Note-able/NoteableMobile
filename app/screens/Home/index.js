@@ -14,7 +14,7 @@ import BackgroundFetch from 'react-native-background-fetch';
 import {
   Footer,
   SystemMessage,
-} from '../../components/Shared';
+} from '../../components';
 import { appScreens } from '../../screens';
 import { colors } from '../../styles';
 

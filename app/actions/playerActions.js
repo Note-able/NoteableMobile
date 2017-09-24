@@ -4,7 +4,6 @@ import {
   DeviceEventEmitter,
 } from 'react-native';
 import { PlayerActionTypes } from './ActionTypes.js';
-import { logCustomToFabric } from '../util';
 
 const {
   startPlayerTypes,

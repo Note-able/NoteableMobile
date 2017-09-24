@@ -11,12 +11,12 @@ import {
 
 import {
   togglePlayer,
-} from '../../../actions/playerActions';
+} from '../../actions/playerActions';
 
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 import { mapIcon } from '../util.js';
 
 const mapDispatchToProps = dispatch => ({

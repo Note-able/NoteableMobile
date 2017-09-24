@@ -17,7 +17,7 @@ import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Schemas from '../../realmSchemas';
-import { RecordingModal, Recordings } from '../../components/Shared';
+import { RecordingModal, Recordings } from '../../components';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';

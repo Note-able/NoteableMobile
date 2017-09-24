@@ -4,7 +4,6 @@ import {
   Animated,
   Easing,
   Modal,
-  ScrollView,
   Text,
   TextInput,
   TouchableHighlight,
@@ -29,7 +28,7 @@ import {
 } from '../../actions/playerActions';
 
 import { colors, colorRGBA } from '../../styles';
-import { Recordings, RecordingModal } from '../../components/Shared';
+import { Recordings, RecordingModal } from '../../components';
 import { debounceFunc } from '../../util.js';
 import styles from './styles.js';
 

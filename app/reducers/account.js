@@ -13,8 +13,17 @@ const {
   registerUserTypes,
 } = AccountActionTypes;
 
-export default (state = { user: {} }, action) => {
-  const { type, error, user, profile } = action;
+const defaultState = {
+  user: {},
+  profile: null,
+  search: {
+    query: {},
+    results: {},
+  },
+};
+
+export default (state = defaultState, action) => {
+  const { type, error, user, result } = action;
   switch (type) {
     case loginFacebookTypes.success:
       logCustomToFabric('Facebook Login');
@@ -91,14 +100,8 @@ export default (state = { user: {} }, action) => {
       return {
         ...state,
         isProcessing: false,
-        registration: action.registration,
+        profile: result,
       };
-    case 'USER/SIGNIN':
-      return { ...state, user };
-    case 'USER/SIGNOUT':
-      return { ...state, user: {} };
-    case 'USER/CURRENT_PROFILE':
-      return { ...state, profile };
     default:
       return state;
   }

@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 
 export default class SystemMessage extends PureComponent {
   static propTypes = {

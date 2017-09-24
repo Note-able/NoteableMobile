@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import FBSDK from 'react-native-fbsdk';
 import { colors } from '../../../styles';
-import { InputField } from '../../Shared';
+import { InputField } from '../../';
 import { emailRegex } from '../../../constants';
 import { logErrorToCrashlytics } from '../../../util';
 

@@ -6,6 +6,8 @@ import ProfileInfo from '../../components/ProfileInfo/index.js';
 import { getUser } from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
+  user: state.AccountReducer.user,
+  profile: state.AccountReducer.profile,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -34,22 +36,28 @@ class Profile extends Component {
   }
 
   render() {
-    const { profile } = this.props;
-    if (!profile) { return null; }
-    const { coverImage, avatarUrl, firstName, lastName, bio } = profile;
+    const { user } = this.props;
+    console.log(user);
+    if (this.props.profile == null) {
+      return null;
+    }
+
+    const { coverImage, avatarUrl, firstName, lastName, bio } = user;
     const name = `${firstName} ${lastName}`;
     return (
-      <View style={styles.container}>
-        <ScrollView ref={(ref) => { this._scrollView = ref; }}>
-          <ProfileInfo
-            coverImage={coverImage || 'default'}
-            profileImage={avatarUrl || 'default'}
-            name={name}
-            bio={bio}
-            onLayout={this.setViewY}
-          />
-        </ScrollView>
-      </View>
+      <ScrollView
+        ref={(ref) => { this._scrollView = ref; }}
+        contentContainerStyle={styles.container}
+      >
+        <Text>Hello world</Text>
+        <ProfileInfo
+          coverImage={coverImage || 'default'}
+          profileImage={avatarUrl || 'default'}
+          name={name}
+          bio={bio}
+          onLayout={this.setViewY}
+        />
+      </ScrollView>
     );
   }
 }
@@ -60,6 +68,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     flex: 1,
+    height: '100%',
+    width: '100%',
   },
   navBar: {
     top: 0,

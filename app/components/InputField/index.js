@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 
 export default class InputField extends Component {
   static props = {

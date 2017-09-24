@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 

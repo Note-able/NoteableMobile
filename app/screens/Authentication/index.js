@@ -15,7 +15,7 @@ import { Login, Register } from '../../components/Authentication';
 
 import {
   SystemMessage,
-} from '../../components/Shared';
+} from '../../components';
 
 import {
   getUser,
@@ -51,7 +51,7 @@ class Authentication extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.users.registration == null && nextProps.users.registration != null) {
-      // this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
+      this.props.signInLocal(nextProps.users.registration.email, nextProps.users.registration.password);
     }
 
     if ((this.props.users.user == null && nextProps.users.user != null) || (this.props.users.user != null && nextProps.users.user == null)) {

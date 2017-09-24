@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import styles from './styles.js';
 import { Recording } from '../';
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 
 const OPTIONS_WIDTH = 175;
 const ITEM_HEIGHT = 48;
