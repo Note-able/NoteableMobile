@@ -11,8 +11,14 @@ const {
 } = PlayerActionTypes;
 
 export const startPlayer = recording => (
-  (dispatch) => {
+  (dispatch, getState) => {
     dispatch({ type: startPlayerTypes.processing });
+    const currentSound = getState().PlayerReducer.sound;
+    if (currentSound != null) {
+      currentSound.stop();
+      currentSound.release();
+    }
+
     if (recording.path !== '') {
       const reactNativeSound = new Sound(recording.path, '', (error) => {
         if (error) {
@@ -36,9 +42,9 @@ export const startPlayer = recording => (
       const sound = {
         play: callback => (new Promise((resolve, reject) => {
           ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
+          DeviceEventEmitter.removeAllListeners();
           DeviceEventEmitter.addListener(
             'AudioBridgeEvent', (evt) => {
-                // We just want meta update for song name
               if (evt.status === 'STOPPED') {
                 callback();
               } else if (evt.status === 'PLAYING') {
