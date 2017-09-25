@@ -223,7 +223,6 @@ export default class Audio extends PureComponent {
       const modal = !!recordingStarted;
       const reviewMode = !!recordingStarted;
       Metronome.stop();
-      console.log(`started? ${recordingStarted}`);
       this.setState({ recordingStarted: false, stoppedRecording: true, recording: false, reviewMode, modal });
     }
   }
@@ -449,11 +448,12 @@ export default class Audio extends PureComponent {
             loadingRecordings={this.props.loadingRecordings}
           />
         </View>
+        <View />
         <Modal
           animationType={'slide'}
           transparent
           visible={modal}
-          onRequestClose={() => { this.setState({ modal: true }); }}
+          onRequestClose={() => { this.setState({ modal: false }); }}
         >
           <RecordingModal
             initialValue={fileName}

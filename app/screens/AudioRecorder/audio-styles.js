@@ -208,7 +208,7 @@ export default StyleSheet.create({
   header: {
     backgroundColor: colors.shade0,
     flexDirection: 'row',
-    height: 40,
+    height: 50,
     justifyContent: 'space-between',
     padding: 11,
     paddingLeft: 20,
@@ -217,7 +217,6 @@ export default StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 5,
     shadowOffset: { height: 0 },
-    zIndex: 4,
   },
   headerText: {
     color: colors.white,
