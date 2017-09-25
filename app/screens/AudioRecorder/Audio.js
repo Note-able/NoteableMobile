@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 import {
   Text,
   View,
+  TextInput,
   TouchableHighlight,
+  TouchableOpacity,
+  Image,
   Animated,
   Dimensions,
   Modal,
@@ -16,16 +19,23 @@ import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Metronome } from '../../nativeModules';
 import Schemas from '../../realmSchemas';
-import { RecordingModal, Recordings } from '../../components';
+import { RecordingModal, Recordings, Select } from '../../components';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
 import { logErrorToCrashlytics } from '../../util';
+import timeSignatures from './time-signatures';
 
 const realm = Schemas.RecordingSchema;
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const SAMPLE_RATE = 22050;
+const metronomeStates = {
+  off: 'Off',
+  countIn: 'Count In',
+  always: 'Always on',
+};
 
 export default class Audio extends PureComponent {
   static propTypes = {
@@ -56,11 +66,19 @@ export default class Audio extends PureComponent {
     displayTime: DisplayTime(0),
     modal: false,
     isTiming: false,
+    metronomeMenuWidth: 0,
+    metronomeMenuHeight: 0,
+    metronomeMenuOpacity: 0,
+    metronomeState: metronomeStates.off,
+    metronomeBPM: '120',
+    countIn: '2',
+    timeSignature: { value: '4,4', display: '4/4' },
   };
 
   componentDidMount() {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
+    this.metronomeSound = new Sound('metronome.wav', Sound.MAIN_BUNDLE);
 
     AudioRecorder.onProgress = () => {};
     AudioRecorder.onFinished = () => {
@@ -187,19 +205,35 @@ export default class Audio extends PureComponent {
 
   async toggleRecording(isRecording) {
     if (!isRecording) {
+      const { metronomeState } = this.state;
       const datedFilePath = `${moment().format('HHmmss')}`;
       const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
       await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
-      try {
-        this.toggleTiming();
-        await AudioRecorder.startRecording();
-      } catch (err) {
-        logErrorToCrashlytics(err);
+      if (metronomeState !== metronomeStates.off) {
+        this.startMetronome();
+      } else {
+        await this.startRecording();
       }
     } else {
-      await AudioRecorder.stopRecording();
-      this.setState({ stoppedRecording: true, recording: false, reviewMode: true, modal: true });
+      const { recordingStarted } = this.state;
+      if (recordingStarted) {
+        await AudioRecorder.stopRecording();
+      }
+      const modal = !!recordingStarted;
+      const reviewMode = !!recordingStarted;
+      Metronome.stop();
+      this.setState({ recordingStarted: false, stoppedRecording: true, recording: false, reviewMode, modal });
+    }
+  }
+
+  async startRecording() {
+    try {
+      this.setState({ recordingStarted: true });
+      this.toggleTiming();
+      await AudioRecorder.startRecording();
+    } catch (err) {
+      logErrorToCrashlytics(err);
     }
   }
 
@@ -281,7 +315,84 @@ export default class Audio extends PureComponent {
     this.props.uploadRecording(recording, this.props.currentUser);
   }
 
+  toggleMetronomeSettings = () => {
+    const { showMetronomeMenu } = this.state;
+    const metronomeMenuWidth = showMetronomeMenu ? this.state.metronomeMenuWidth : new Animated.Value(0);
+    const metronomeMenuHeight = showMetronomeMenu ? this.state.metronomeMenuHeight : new Animated.Value(0);
+    this.setState({ metronomeMenuWidth, metronomeMenuHeight, showMetronomeMenu: !showMetronomeMenu }, () => {
+      this.metronomeTimingAnimation = Animated.parallel([
+        Animated.timing(
+          this.state.metronomeMenuWidth,
+          {
+            easing: Easing.linear,
+            toValue: showMetronomeMenu ? 0 : WINDOW_WIDTH,
+            duration: 150,
+          },
+        ),
+        Animated.timing(
+          this.state.metronomeMenuHeight,
+          {
+            easing: Easing.linear,
+            toValue: showMetronomeMenu ? 0 : 50,
+            duration: 150,
+          },
+        ),
+      ]);
+      this.metronomeTimingAnimation.start(() => this.setState({ metronomeMenuVisible: !showMetronomeMenu }));
+    });
+  }
+
+  handleChangeMetronomeState = () => {
+    this.setState((prevState) => {
+      const { metronomeState } = prevState;
+      switch (metronomeState) {
+        case metronomeStates.off:
+          return { metronomeState: metronomeStates.countIn };
+        case metronomeStates.countIn:
+          return { metronomeState: metronomeStates.always };
+        default:
+          return { metronomeState: metronomeStates.off };
+      }
+    });
+  }
+
+  handleChangeBPM = (text) => {
+    if (!text) {
+      this.setState({ metronomeBPM: text });
+    } else {
+      const BPM = parseInt(text, 10);
+      if (!isNaN(BPM) && BPM <= 400) {
+        this.setState({ metronomeBPM: BPM.toString() });
+      }
+    }
+  }
+
+  handleChangeCountIn = (text) => {
+    if (!text) {
+      this.setState({ countIn: text });
+    } else {
+      const countIn = parseInt(text, 10);
+      if (!isNaN(countIn) && countIn <= 16) {
+        this.setState({ countIn: countIn.toString() });
+      }
+    }
+  }
+
+  startMetronome = () => {
+    const { metronomeState, metronomeBPM, countIn, timeSignature } = this.state;
+    if (metronomeState === metronomeStates.off || metronomeBPM.length === 0 || countIn.length === 0) {
+      return;
+    }
+
+    const [beatCount, barCount] = timeSignature.value.split(',');
+    const BPM = parseInt(metronomeBPM, 10);
+    this.metronomeCount = 0;
+    Metronome.start(parseInt(countIn, 10) * beatCount, BPM, parseInt(beatCount, 10), metronomeState === metronomeStates.always, () => { this.startRecording(); });
+  }
+
   render() {
+    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature } = this.state;
+    const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
     return (
       <View style={styles.container}>
         <LinearGradient
@@ -291,14 +402,24 @@ export default class Audio extends PureComponent {
           colors={[colorRGBA.red, colorRGBA.lightRed, colors.shade0]}
           style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
         />
+        <TouchableOpacity onPress={this.toggleMetronomeSettings}>
+          <Image source={metronomeState === metronomeStates.off ? require('../../img/metronome.png') : require('../../img/metronome_green.png')} style={{ width: 30, height: 40, margin: 10 }} />
+        </TouchableOpacity>
+        <MetronomeMenu
+          {...metronomeMenuProps}
+          onMetronomeStateChange={this.handleChangeMetronomeState}
+          onBPMChange={this.handleChangeBPM}
+          onCountInChange={this.handleChangeCountIn}
+          onTimeSigantureChange={value => this.setState({ timeSignature: value })}
+        />
         <Text style={{ fontSize: 20, color: 'white', paddingTop: 28, backgroundColor: 'transparent' }}>Recording Time</Text>
-        <View style={[styles.detailsContainer, this.state.reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
+        <View style={[styles.detailsContainer, reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
           <View style={styles.progressTextContainer}>
-            <Text style={[styles.progressText, this.state.displayTime.length > 7 ? { width: 110 } : null]}>{this.state.displayTime}</Text>
+            <Text style={[styles.progressText, displayTime.length > 7 ? { width: 110 } : null]}>{displayTime}</Text>
           </View>
         </View>
         <View style={[styles.buttonContainer, { marginBottom: 75 }]}>
-          <TouchableHighlight onPress={() => { this.toggleRecording(this.state.recording); }}>
+          <TouchableHighlight onPress={() => { this.toggleRecording(recording); }}>
             { this.state.recording ?
               <View style={styles.stopButton} /> :
               <View style={styles.recordButton}>
@@ -327,25 +448,60 @@ export default class Audio extends PureComponent {
             loadingRecordings={this.props.loadingRecordings}
           />
         </View>
+        <View />
         <Modal
           animationType={'slide'}
           transparent
-          visible={this.state.modal}
-          onRequestClose={() => { this.setState({ modal: true }); }}
+          visible={modal}
+          onRequestClose={() => { this.setState({ modal: false }); }}
         >
           <RecordingModal
-            initialValue={this.state.fileName}
+            initialValue={fileName}
             cancel={() => {
               this.setState({ modal: false });
-              if (this.state.modal.id == null) {
+              if (modal.id == null) {
                 this.deleteRecording();
               }
             }}
-            cancelText={this.state.modal.id == null ? 'Delete' : 'Cancel'}
-            save={recordingInfo => (this.state.modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
+            cancelText={modal.id == null ? 'Delete' : 'Cancel'}
+            save={recordingInfo => (modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
           />
         </Modal>
       </View>
     );
   }
 }
+
+const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => {
+  return (
+    <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View style={[styles.metronomeMenuContainer, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
+        {showMetronomeMenu && (<View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
+          <TouchableHighlight onPress={onMetronomeStateChange} style={styles.metronomeMenuTouchableHighlight}>
+            <Text style={[styles.metronomeLabel, metronomeState !== metronomeStates.off ? styles.metronomeOnText : null, { width: 90 }]}>{ metronomeState }</Text>
+          </TouchableHighlight>
+          <Text style={styles.metronomeLabel}>BPM:</Text>
+          <TextInput
+            onChangeText={onBPMChange}
+            value={metronomeBPM}
+            style={styles.metronomeInput}
+            underlineColorAndroid="transparent"
+          />
+          <Text style={styles.metronomeLabel}>Count In:</Text>
+          <TextInput
+            onChangeText={onCountInChange}
+            value={countIn}
+            style={styles.metronomeInput}
+            underlineColorAndroid="transparent"
+          />
+          <Select
+            onValueChange={onTimeSigantureChange}
+            selectedValue={timeSignature}
+            options={timeSignatures}
+          />
+        </View>)}
+      </Animated.View>
+    </View>
+  );
+};
+

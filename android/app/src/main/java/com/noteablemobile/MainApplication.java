@@ -2,6 +2,9 @@ package com.noteablemobile;
 
 import android.app.Application;
 
+/* Our modules */
+import com.noteable.react.modules.metronome.MetronomePackage;
+
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
 import com.audioStreaming.ReactNativeAudioStreamingPackage;
@@ -46,7 +49,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNSoundPackage(),
             new LinearGradientPackage(),
             new RNFetchBlobPackage(),
-            new ReactNativeAudioPackage()
+            new ReactNativeAudioPackage(),
+            new MetronomePackage()
       );
     }
   };

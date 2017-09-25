@@ -7,10 +7,13 @@ const WINDOW_WIDTH = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   container: {
+    position: 'absolute',
     backgroundColor: colors.shade0,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
+    paddingTop: 30,
+    width: WINDOW_WIDTH,
     height: '100%',
   },
   timingBar: {
@@ -199,13 +202,13 @@ export default StyleSheet.create({
     flex: 1,
   },
   recordingsContainer: {
-    height: 250,
+    height: 200,
     width: '100%',
   },
   header: {
     backgroundColor: colors.shade0,
     flexDirection: 'row',
-    height: 40,
+    height: 50,
     justifyContent: 'space-between',
     padding: 11,
     paddingLeft: 20,
@@ -214,7 +217,6 @@ export default StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 5,
     shadowOffset: { height: 0 },
-    zIndex: 4,
   },
   headerText: {
     color: colors.white,
@@ -225,5 +227,29 @@ export default StyleSheet.create({
     fontSize: 14,
     paddingBottom: 2,
     paddingTop: 2,
+  },
+  metronomeMenuContainer: {
+    backgroundColor: 'rgba(100, 100, 100, 0.3)',
+    paddingHorizontal: 20,
+  },
+  metronomeMenu: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 50,
+  },
+  metronomeOnText: {
+    color: colors.green,
+  },
+  metronomeLabel: {
+    color: colors.white,
+    fontSize: 14,
+    padding: 10,
+  },
+  metronomeInput: {
+    marginLeft: -10,
+    width: 50,
+    fontSize: 16,
+    color: colors.white,
   },
 });
