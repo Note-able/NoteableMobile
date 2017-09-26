@@ -5,20 +5,31 @@ import {
 } from 'react-native';
 import { PlayerActionTypes } from './ActionTypes.js';
 
+
 const {
+  bufferCompleteType,
   startPlayerTypes,
   togglePlayerTypes,
 } = PlayerActionTypes;
 
 export const startPlayer = recording => (
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
+    const state = getState().PlayerReducer;
     dispatch({ type: startPlayerTypes.processing });
-    const currentSound = getState().PlayerReducer.sound;
-    if (currentSound != null) {
-      currentSound.stop();
-      currentSound.release();
+
+    // if we are playing the same recording
+    if (state.recording != null && state.recording.id === recording.id) {
+      state.sound.stop();
+      dispatch({ type: startPlayerTypes.success, sound: state.sound, recording });
     }
 
+    // remove existing resources
+    if (state.sound != null && state.sound.stop != null) {
+      state.sound.stop();
+      state.sound.release();
+    }
+
+    // for local recordings
     if (recording.path !== '') {
       const reactNativeSound = new Sound(recording.path, '', (error) => {
         if (error) {
@@ -29,6 +40,7 @@ export const startPlayer = recording => (
       });
       const sound = {
         play: callback => (new Promise((resolve) => {
+          dispatch({ type: bufferCompleteType });
           reactNativeSound.play(callback);
           resolve();
         })),
@@ -39,6 +51,7 @@ export const startPlayer = recording => (
         release: reactNativeSound.release,
       };
     } else {
+      // for streamed recordings.
       const sound = {
         play: callback => (new Promise((resolve, reject) => {
           ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
@@ -50,6 +63,7 @@ export const startPlayer = recording => (
               } else if (evt.status === 'PLAYING') {
                 sound.duration = evt.duration;
                 sound.currentTime = evt.progress;
+                dispatch({ type: bufferCompleteType });
                 resolve();
               } else if (evt.status === 'ERROR') {
                 if (sound.errorCount === 0) {

@@ -5,10 +5,11 @@ import {
 import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 
 const {
+  bufferCompleteType,
   startPlayerTypes,
 } = PlayerActionTypes;
 
-export default (state = { isPlaying: false, sound: null, recording: null }, action) => {
+export default (state = { isPlaying: false, sound: null, recording: null, buffering: false }, action) => {
   const { type, error } = action;
   switch (type) {
     case startPlayerTypes.success:
@@ -20,19 +21,24 @@ export default (state = { isPlaying: false, sound: null, recording: null }, acti
 
   switch (type) {
     case startPlayerTypes.success:
-      if (state.sound != null) {
-        state.sound.stop();
-        state.sound.release();
-      }
-
       return {
         ...state,
         sound: action.sound,
         recording: action.recording,
       };
+    case bufferCompleteType:
+      return {
+        ...state,
+        buffering: false,
+      };
     case startPlayerTypes.error:
       logErrorToCrashlytics({ customMessage: 'starting player error: ', error });
       return state;
+    case startPlayerTypes.processing:
+      return {
+        ...state,
+        buffering: true,
+      };
     default:
       return state;
   }

@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import {
   Animated,
+  AsyncStorage,
   Dimensions,
   Easing,
   Text,
@@ -10,7 +11,7 @@ import {
 } from 'react-native';
 
 import {
-  togglePlayer,
+  startPlayer,
 } from '../../actions/playerActions';
 
 import PropTypes from 'prop-types';
@@ -19,15 +20,21 @@ import styles from './styles.js';
 import { colors } from '../../styles';
 import { mapIcon } from '../util.js';
 
+const LAST_PLAYED = '@PLAYER:LAST_PLAYED';
+const windowWidth = Dimensions.get('window').width + 20;
+const welcomeString = 'Welcome to Noteable';
+
 const mapDispatchToProps = dispatch => ({
-  togglePlayer: play => dispatch(togglePlayer(play)),
+  startPlayer: recording => dispatch(startPlayer(recording)),
 });
 
 const mapStateToProps = state => ({
-  player: state.PlayerReducer,
+  sound: state.PlayerReducer.sound,
+  recording: state.PlayerReducer.recording,
+  buffering: state.PlayerReducer.buffering,
 });
 
-class Footer extends Component {
+class Footer extends PureComponent {
   state = {
     player: this.props.player,
     playerHeight: new Animated.Value(0),
@@ -35,98 +42,102 @@ class Footer extends Component {
     isPlaying: false,
     isPaused: 0,
     showPlayer: false,
+    recording: this.props.recording,
+    sound: this.props.sound,
+    buffering: false,
   };
 
+  componentDidMount = async () => {
+    const recording = await AsyncStorage.getItem(LAST_PLAYED);
+    this.setState({
+      recording: recording == null ? null : JSON.parse(recording),
+    });
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (this.props.navigationState.index === nextProps.navigationState.index && ((this.state.player.sound == null && nextProps.player.sound != null) || nextProps.player.recording != null)) {
-      if (this.state.player != null && this.state.isPlaying) {
-        this.resetPlayer();
-      }
+    const { id } = this.state.recording || {};
+    const stateId = id;
+    const nextId = (nextProps.recording || {}).id;
 
+    if ((stateId == null && nextId != null) || (nextId !== stateId) || (!this.state.buffering && nextProps.buffering)) {
+      // we have a new sound
       this.setState({
-        player: nextProps.player,
-        isPlaying: true,
-        showPlayer: true,
-      }, () => this.animatePlayer(40, true));
-    }
-  }
-
-  resetPlayer = () => {
-    this.setState({
-      timingBarWidth: new Animated.Value(0),
-      playerHeight: new Animated.Value(0),
-      isPlaying: false,
-      isPaused: 0,
-    });
-
-    this.state.player.sound.stop();
-    this.state.player.sound.release();
-
-    this.hideTimeout = setTimeout(() => {
-      this.setState({
-        showPlayer: false,
-      });
-
-      Animated.timing(
-        this.state.playerHeight, {
-          easing: Easing.linear,
-          toValue: 0,
-          duration: 50,
-        }).start();
-    }, 30000);
-  }
-
-  animatePlayer = (height, newSong) => {
-    if (this.hideTimeout == null) {
-      clearTimeout(this.hideTimeout);
-      this.hideTimeout = null;
-    }
-
-    this.setState({
-      showPlayer: true,
-      isPlaying: true,
-    });
-
-    Animated.timing(
-      this.state.playerHeight, {
-        easing: Easing.linear,
-        toValue: height,
-        duration: 50,
-      }).start();
-
-    if (this.state.isPaused === 0 || newSong) {
-      this.setState({
-        timingBarWidth: new Animated.Value(0),
-      }, () => {
-        this.state.player.sound.play(this.resetPlayer).then(() => {
-          this.timingAnimation = Animated.timing(
-            this.state.timingBarWidth, {
-              easing: Easing.linear,
-              toValue: Dimensions.get('window').width,
-              duration: (this.state.player.recording.duration || this.state.player.sound.duration) * 1000,
-            },
-          );
-          this.timingAnimation.start();
+        sound: nextProps.sound || this.state.sound,
+        recording: nextProps.recording || this.state.recording,
+        buffering: nextProps.buffering,
+      }, nextProps.recording != null ? () => this.onPlay() : null);
+    } else if (stateId != null && stateId === nextId) {
+      // we have the same sound
+      if (this.state.buffering !== nextProps.buffering) {
+        // we finished buffering
+        this.setState({
+          buffering: nextProps.buffering,
         });
-      });
-    } else {
-      this.state.player.sound.play(this.resetPlayer).then(() => {
-        this.timingAnimation = Animated.timing(
-          this.state.timingBarWidth, {
-            easing: Easing.linear,
-            toValue: Dimensions.get('window').width,
-            duration: ((this.state.player.recording.duration || this.state.player.sound.duration) * 1000) - (this.state.isPaused * 1000),
-          },
-        );
-        this.timingAnimation.start();
-      });
+
+        if (!nextProps.buffering) {
+          this.startAnimations();
+        } else {
+          // we are playing the same sound again
+          this.props.startPlayer(this.state.recording);
+        }
+      }
     }
   }
 
-  pause = () => {
-    this.state.player.sound.pause();
+  startAnimations = () => {
+    const duration = this.state.isPaused ? ((this.state.recording.duration || this.state.sound.duration) * 1000) - (this.state.isPaused * 1000) :
+      (this.state.recording.duration || this.state.sound.duration) * 1000;
+    this.setTimingBarAnimation(duration);
+
+    if (this.state.recording != null) {
+      AsyncStorage.setItem(LAST_PLAYED, JSON.stringify(this.state.recording));
+    }
+  }
+
+  setTimingBarAnimation = (duration) => {
+    this.timingAnimation = Animated.timing(
+      this.state.timingBarWidth, {
+        easing: Easing.linear,
+        toValue: windowWidth,
+        duration,
+      },
+    );
+    this.timingAnimation.start();
+  }
+
+  onPlay = async () => {
+    if (this.state.isPaused) {
+      this.state.sound.resume();
+    } else {
+      await this.clearPlayer();
+      this.setState({
+        isPlaying: true,
+        isPaused: 0,
+      });
+      this.state.sound.play(this.clearPlayer);
+    }
+  }
+
+  clearPlayer = async () => {
+    if (this.state.sound != null) {
+      this.state.sound.stop();
+    }
+
+    if (this.timingAnimation != null) {
+      this.timingAnimation.stop();
+    }
+
+    await this.setState({
+      timingBarWidth: new Animated.Value(0),
+      isPlaying: false,
+      isPaused: false,
+    });
+  }
+
+  onPause = () => {
+    this.state.sound.pause();
     this.timingAnimation.stop();
-    this.state.player.sound.getCurrentTime((seconds) => {
+    this.state.sound.getCurrentTime((seconds) => {
       this.setState({
         isPlaying: false,
         isPaused: seconds,
@@ -138,22 +149,22 @@ class Footer extends Component {
     return (
       <View style={styles.footerContainer}>
         {/* Player Component */}
-        {this.state.showPlayer ? <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} /> : null}
-        <Animated.View style={[styles.playerContainer, { height: this.state.playerHeight }]}>
-          {this.state.player.sound != null ?
+        {this.state.recording != null ?
+          <View style={[styles.playerContainer, { height: 40 }]}>
+            <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} />
             <View style={styles.player}>
-              <Text numberOfLines={1} style={styles.playerText}>{this.state.player.recording.name}</Text>
-              <Text numberOfLines={1} style={styles.playerDetails}>{this.state.player.recording.name}</Text>
+              <Text numberOfLines={1} style={styles.playerText}>{this.state.recording.name}</Text>
+              <Text numberOfLines={1} style={styles.playerDetails}>{this.state.recording.name}</Text>
               {this.state.isPlaying ?
-                <TouchableHighlight onPress={this.pause}>
+                <TouchableHighlight onPress={this.onPause}>
                   <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> :
-                <TouchableHighlight onPress={() => this.animatePlayer(40)}>
+                <TouchableHighlight onPress={this.onPlay}>
                   <Icon name="play-arrow" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> }
             </View>
-            : null}
-        </Animated.View>
+          </View>
+          : null}
         {/* Tabs Component */}
         <View style={styles.tabsContainer}>
           {this.props.navigationState.routes.map((route, index) => (

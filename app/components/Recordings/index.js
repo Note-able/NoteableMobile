@@ -131,6 +131,7 @@ export default class Recordings extends Component {
         onRefresh={this.props.syncDownRecordings}
         refreshing={false}
         removeClippedSubviews={false}
+        keyExtractor={(item, index) => index}
         renderItem={({ item }) => {
           const recording = this.state.recordings.local[item] || this.state.recordings.networked[item];
           return (
