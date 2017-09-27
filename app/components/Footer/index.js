@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Animated,
@@ -19,9 +19,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
 import { colors } from '../../styles';
 import { mapIcon } from '../util.js';
+import { ShortDisplayTime, DisplayTime } from '../../mappers/recordingMapper';
 
 const LAST_PLAYED = '@PLAYER:LAST_PLAYED';
-const windowWidth = Dimensions.get('window').width + 20;
+const windowWidth = Dimensions.get('window').width + 30;
 const welcomeString = 'Welcome to Noteable';
 
 const mapDispatchToProps = dispatch => ({
@@ -34,7 +35,7 @@ const mapStateToProps = state => ({
   buffering: state.PlayerReducer.buffering,
 });
 
-class Footer extends PureComponent {
+class Footer extends Component {
   state = {
     player: this.props.player,
     playerHeight: new Animated.Value(0),
@@ -45,6 +46,11 @@ class Footer extends PureComponent {
     recording: this.props.recording,
     sound: this.props.sound,
     buffering: false,
+    timing: {
+      isTiming: false,
+      displayTime: ShortDisplayTime(0),
+      currentTime: 0.0,
+    },
   };
 
   componentDidMount = async () => {
@@ -65,7 +71,7 @@ class Footer extends PureComponent {
         sound: nextProps.sound || this.state.sound,
         recording: nextProps.recording || this.state.recording,
         buffering: nextProps.buffering,
-      }, nextProps.recording != null ? () => this.onPlay() : null);
+      }, nextProps.recording != null ? () => this.play() : null);
     } else if (stateId != null && stateId === nextId) {
       // we have the same sound
       if (this.state.buffering !== nextProps.buffering) {
@@ -75,6 +81,7 @@ class Footer extends PureComponent {
         });
 
         if (!nextProps.buffering) {
+          this.startTiming();
           this.startAnimations();
         } else {
           // we are playing the same sound again
@@ -84,8 +91,75 @@ class Footer extends PureComponent {
     }
   }
 
+  stopTiming = () => {
+    this.pauseTiming();
+    this.setState({
+      timing: {
+        ...this.state.timing,
+        currentTime: 0,
+      },
+    });
+  }
+
+  pauseTiming = () => {
+    clearInterval(this.interval);
+    this.setState({
+      timing: {
+        ...this.state.timing,
+        isTiming: false,
+      },
+    });
+  }
+
+  startTiming = () => {
+    if (this.state.timing.isTiming) {
+      return;
+    }
+
+    this.setState({
+      timing: {
+        ...this.state.timing,
+        start: new Date() - 20,
+        isTiming: true,
+      },
+    });
+
+    this.interval = setInterval(() => {
+      const currentTime = (new Date() - this.state.timing.start);
+      this.setState({
+        timing: {
+          ...this.state.timing,
+          currentTime,
+          displayTime: DisplayTime(currentTime),
+          isTiming: true,
+        },
+      });
+    }, 50);
+  }
+
+  resumeTiming = () => {
+    this.setState({
+      timing: {
+        ...this.state.timing,
+        start: new Date() - 20 - this.state.timing.currentTime,
+      },
+    });
+
+    this.interval = setInterval(() => {
+      const currentTime = new Date() - this.state.timing.start;
+      this.setState({
+        timing: {
+          ...this.state.timing,
+          currentTime,
+          displayTime: DisplayTime(currentTime),
+          isTiming: true,
+        },
+      });
+    }, 50);
+  }
+
   startAnimations = () => {
-    const duration = this.state.isPaused ? ((this.state.recording.duration || this.state.sound.duration) * 1000) - (this.state.isPaused * 1000) :
+    const duration = this.state.isPaused ? ((this.state.recording.duration || this.state.sound.duration) * 1000) - this.state.timing.currentTime :
       (this.state.recording.duration || this.state.sound.duration) * 1000;
     this.setTimingBarAnimation(duration);
 
@@ -105,20 +179,25 @@ class Footer extends PureComponent {
     this.timingAnimation.start();
   }
 
-  onPlay = async () => {
-    if (this.state.isPaused) {
-      this.state.sound.resume();
-    } else {
-      await this.clearPlayer();
-      this.setState({
-        isPlaying: true,
-        isPaused: 0,
-      });
-      this.state.sound.play(this.clearPlayer);
-    }
+  play = async () => {
+    await this.clear();
+    this.setState({
+      isPlaying: true,
+      isPaused: 0,
+      buffering: true,
+      timingBarWidth: new Animated.Value(0),
+    });
+
+    this.state.sound.play(this.clear);
   }
 
-  clearPlayer = async () => {
+  resume = async () => {
+    this.resumeTiming();
+    this.state.sound.play(this.clear);
+    this.startAnimations();
+  }
+
+  clear = async () => {
     if (this.state.sound != null) {
       this.state.sound.stop();
     }
@@ -127,21 +206,21 @@ class Footer extends PureComponent {
       this.timingAnimation.stop();
     }
 
+    this.stopTiming();
+
     await this.setState({
-      timingBarWidth: new Animated.Value(0),
       isPlaying: false,
       isPaused: false,
     });
   }
 
-  onPause = () => {
+  pause = () => {
     this.state.sound.pause();
     this.timingAnimation.stop();
-    this.state.sound.getCurrentTime((seconds) => {
-      this.setState({
-        isPlaying: false,
-        isPaused: seconds,
-      });
+    this.pauseTiming();
+    this.setState({
+      isPlaying: false,
+      isPaused: true,
     });
   }
 
@@ -154,12 +233,12 @@ class Footer extends PureComponent {
             <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} />
             <View style={styles.player}>
               <Text numberOfLines={1} style={styles.playerText}>{this.state.recording.name}</Text>
-              <Text numberOfLines={1} style={styles.playerDetails}>{this.state.recording.name}</Text>
+              <Text numberOfLines={1} style={styles.playerDetails}>{`${this.state.timing.displayTime} ${this.state.timing.isTiming.toString()}`}</Text>
               {this.state.isPlaying ?
-                <TouchableHighlight onPress={this.onPause}>
+                <TouchableHighlight onPress={this.pause}>
                   <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> :
-                <TouchableHighlight onPress={this.onPlay}>
+                <TouchableHighlight onPress={this.state.isPaused ? () => this.resume() : () => this.props.startPlayer(this.state.recording)}>
                   <Icon name="play-arrow" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
                 </TouchableHighlight> }
             </View>

@@ -29,6 +29,30 @@ export const DisplayTime = (currentTime) => {
   return `${hour}:${minute}:${second}.${tenth}`;
 };
 
+export const ShortDisplayTime = (currentTime) => {
+  let hour = Math.floor((currentTime / 360000)) % 24;
+  let minute = Math.floor((currentTime / 60000)) % 60;
+  let second = Math.floor((currentTime / 1000)) % 60;
+
+  if (hour < 10) {
+    hour = `0${hour}`;
+  }
+
+  if (minute < 10) {
+    minute = `0${minute}`;
+  }
+
+  if (second < 10) {
+    second = `0${second}`;
+  }
+
+  if (hour === '00') {
+    return `${minute}:${second}`;
+  }
+
+  return `${hour}:${minute}:${second}`;
+};
+
 /**
  *
  * @param {object} source
