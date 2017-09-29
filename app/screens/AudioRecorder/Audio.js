@@ -12,6 +12,8 @@ import {
   Dimensions,
   Modal,
   Easing,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
@@ -76,6 +78,23 @@ export default class Audio extends PureComponent {
   };
 
   componentDidMount() {
+    if (Platform.OS === 'android') {
+      const audioGrantedPromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+      const writeStoragePromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+
+      Promise.all(audioGrantedPromise, writeStoragePromise).then(async ([audioGranted, writeStorageGranted]) => {
+        const request = [];
+        if (!audioGranted) {
+          request.push(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+        }
+        if (!writeStorageGranted) {
+          request.push(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+        }
+        if (request.length !== 0) {
+          const granted = await PermissionsAndroid.requestMultiple(request);
+        }
+      });
+    }
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
     this.metronomeSound = new Sound('metronome.wav', Sound.MAIN_BUNDLE);

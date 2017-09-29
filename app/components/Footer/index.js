@@ -233,7 +233,7 @@ class Footer extends Component {
             <Animated.View style={[styles.timingBar, { width: this.state.timingBarWidth }]} />
             <View style={styles.player}>
               <Text numberOfLines={1} style={styles.playerText}>{this.state.recording.name}</Text>
-              <Text numberOfLines={1} style={styles.playerDetails}>{`${this.state.timing.displayTime} ${this.state.timing.isTiming.toString()}`}</Text>
+              <Text numberOfLines={1} style={styles.playerDetails}>{`${this.state.timing.displayTime}`}</Text>
               {this.state.isPlaying ?
                 <TouchableHighlight onPress={this.pause}>
                   <Icon name="pause" size={24} style={{ width: 24, height: 24 }} color={colors.green} />
