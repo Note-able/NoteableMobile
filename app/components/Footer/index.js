@@ -85,8 +85,9 @@ class Footer extends Component {
           this.startTiming();
           this.startAnimations();
         }
-      } else if (this.state.sound.key !== nextProps.sound.key) {
-        // we are playing the same sound again but it has a different sound key because we've reloaded it
+      } else if (!this.state.sound || this.state.sound.key !== nextProps.sound.key) {
+        // this is the first time in the app and we're playing the same recording as last time the app was open
+        // OR we are playing the same sound again but it has a different sound key because we've reloaded it
         this.setState({ sound: nextProps.sound }, () => this.play());
       }
     }
