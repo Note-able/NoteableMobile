@@ -333,6 +333,13 @@
 			remoteGlobalIDString = 835318541D52293F005738CD;
 			remoteInfo = RNBackgroundFetch;
 		};
+		71B0C5691F7E02BA009FB463 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0949E3868DC54D94BA7A7931 /* BVLinearGradient.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 64AA15081EF7F30100718508;
+			remoteInfo = "BVLinearGradient-tvOS";
+		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */;
@@ -399,6 +406,7 @@
 		71097A3B1F13CFDB0000D6ED /* libStreamingKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libStreamingKit.a; path = "/Users/MichaelNakayama/Development/NoteableMobile/node_modules/react-native-audio-streaming/ios/Pods/../build/Debug-iphoneos/StreamingKit/libStreamingKit.a"; sourceTree = "<absolute>"; };
 		71097A3D1F13D00A0000D6ED /* ReactNativeAudioStreaming.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeAudioStreaming.xcodeproj; path = "../node_modules/react-native-audio-streaming/ios/ReactNativeAudioStreaming.xcodeproj"; sourceTree = "<group>"; };
 		71097A441F13D0320000D6ED /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = "../node_modules/react-native-audio-streaming/ios/Pods/Pods.xcodeproj"; sourceTree = "<group>"; };
+		71B0C5651F7E02BA009FB463 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFoundation.framework/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
 		73B0A37FFEA3492DB1B919D2 /* RNSound.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSound.xcodeproj; path = "../node_modules/react-native-sound/RNSound.xcodeproj"; sourceTree = "<group>"; };
 		777BE373286C4A07806BC879 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		78761EAD29784EE6AC2D90D6 /* libc++.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -654,6 +662,7 @@
 			isa = PBXGroup;
 			children = (
 				1869AAB71EDE8BE200DA34CF /* libBVLinearGradient.a */,
+				71B0C56A1F7E02BA009FB463 /* libBVLinearGradient.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -698,6 +707,22 @@
 				713B07471F4556180028D308 /* libRNBackgroundFetch.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		714A6F661F7E0BBB00D4C814 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				E1FB351044264ABBABD7259B /* libRNAudio.a */,
+				D635621512FC468A906F3D1C /* libRCTFBSDK.a */,
+				BE42017417824ED98C37F9A4 /* libRNFetchBlob.a */,
+				87E600856B704EC2BAFCB7FC /* libBVLinearGradient.a */,
+				6E8979E05495475982B5F74D /* libRNVectorIcons.a */,
+				3FC98C2333FB403DA5C95E8D /* libRealmReact.a */,
+				CD96DA5245CD46838D9C7022 /* libSMXCrashlytics.a */,
+				DF6082978286464D8C04672D /* libRNSound.a */,
+				3971162E24A34BBC8FE0200F /* libRNBackgroundFetch.a */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
@@ -758,6 +783,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				DB46050EDBC84409A71DC210 /* Frameworks */,
 				FD7DFE548DF540C8B9876146 /* Resources */,
+				714A6F661F7E0BBB00D4C814 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -777,6 +803,7 @@
 		DB46050EDBC84409A71DC210 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				71B0C5651F7E02BA009FB463 /* AVFAudio.framework */,
 				181740401F74B76100A5DB4C /* AudioToolbox.framework */,
 				1817403E1F74B75100A5DB4C /* AVFoundation.framework */,
 				71097A3B1F13CFDB0000D6ED /* libStreamingKit.a */,
@@ -1277,6 +1304,13 @@
 			remoteRef = 713B07461F4556180028D308 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		71B0C56A1F7E02BA009FB463 /* libBVLinearGradient.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libBVLinearGradient.a;
+			remoteRef = 71B0C5691F7E02BA009FB463 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1530,6 +1564,7 @@
 					"~/Documents/FacebookSDK/**",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+					"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks/AVFoundation.framework/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1576,6 +1611,7 @@
 					"~/Documents/FacebookSDK/**",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+					"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks/AVFoundation.framework/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

@@ -64,6 +64,9 @@ class Footer extends Component {
     const { id } = this.state.recording || {};
     const stateId = id;
     const nextId = (nextProps.recording || {}).id;
+    if (this.state.sound != null && this.state.sound.key !== nextProps.sound.key) {
+      nextProps.sound.play(this.clear);
+    }
 
     if ((stateId == null && nextId != null) || (nextId !== stateId) || (!this.state.buffering && nextProps.buffering)) {
       // we have a new sound
@@ -81,22 +84,24 @@ class Footer extends Component {
         });
 
         if (!nextProps.buffering) {
+          this.stopTiming();
           this.startTiming();
           this.startAnimations();
-        } else {
-          // we are playing the same sound again
-          this.props.startPlayer(this.state.recording);
         }
+      } else {
+        // we are playing the same sound again
+        this.play();
       }
     }
   }
 
   stopTiming = () => {
-    this.pauseTiming();
+    clearInterval(this.interval);
     this.setState({
       timing: {
         ...this.state.timing,
         currentTime: 0,
+        isTiming: false,
       },
     });
   }
@@ -159,8 +164,9 @@ class Footer extends Component {
   }
 
   startAnimations = () => {
-    const duration = this.state.isPaused ? ((this.state.recording.duration || this.state.sound.duration) * 1000) - this.state.timing.currentTime :
-      (this.state.recording.duration || this.state.sound.duration) * 1000;
+    const duration = this.state.isPaused ? ((this.state.sound.duration * 1000) - this.state.timing.currentTime) :
+        this.state.sound.duration * 1000;
+
     this.setTimingBarAnimation(duration);
 
     if (this.state.recording != null) {
@@ -181,18 +187,27 @@ class Footer extends Component {
 
   play = async () => {
     await this.clear();
-    this.setState({
+    await this.setState({
       isPlaying: true,
       isPaused: 0,
-      buffering: true,
+      buffering: this.state.recording.path === '',
       timingBarWidth: new Animated.Value(0),
     });
+
+    if (this.state.recording.path !== '') {
+      this.startTiming();
+      this.startAnimations();
+    }
 
     this.state.sound.play(this.clear);
   }
 
   resume = async () => {
     this.resumeTiming();
+    this.setState({
+      isPlaying: true,
+      isPaused: false,
+    });
     this.state.sound.play(this.clear);
     this.startAnimations();
   }
@@ -211,6 +226,11 @@ class Footer extends Component {
     await this.setState({
       isPlaying: false,
       isPaused: false,
+      timing: {
+        ...this.state.timing,
+        currentTime: 0,
+        isTiming: false,
+      },
     });
   }
 

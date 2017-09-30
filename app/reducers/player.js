@@ -37,7 +37,7 @@ export default (state = { isPlaying: false, sound: null, recording: null, buffer
     case startPlayerTypes.processing:
       return {
         ...state,
-        buffering: true,
+        buffering: action.buffering,
       };
     default:
       return state;
