@@ -14,6 +14,7 @@ const {
 
 export const startPlayer = recording => (
   async (dispatch, getState) => {
+    console.log('start palyer dispatched');
     const state = getState().PlayerReducer;
     if (state.sound != null && state.sound.stop != null) {
       state.sound.stop();

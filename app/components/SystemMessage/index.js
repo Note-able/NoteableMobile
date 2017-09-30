@@ -28,7 +28,6 @@ export default class SystemMessage extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('Showing: ', nextProps.message, this.state.oldMessage);
     if (nextProps.message !== this.state.oldMessage && nextProps.message !== '') {
       this.setState({ message: nextProps.message, kind: nextProps.kind, oldMessage: this.state.message });
       if (this.timeout == null) {

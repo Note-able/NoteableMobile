@@ -64,9 +64,6 @@ class Footer extends Component {
     const { id } = this.state.recording || {};
     const stateId = id;
     const nextId = (nextProps.recording || {}).id;
-    if (this.state.sound != null && this.state.sound.key !== nextProps.sound.key) {
-      nextProps.sound.play(this.clear);
-    }
 
     if ((stateId == null && nextId != null) || (nextId !== stateId) || (!this.state.buffering && nextProps.buffering)) {
       // we have a new sound
@@ -88,9 +85,9 @@ class Footer extends Component {
           this.startTiming();
           this.startAnimations();
         }
-      } else {
-        // we are playing the same sound again
-        this.play();
+      } else if (this.state.sound.key !== nextProps.sound.key) {
+        // we are playing the same sound again but it has a different sound key because we've reloaded it
+        this.setState({ sound: nextProps.sound }, () => this.play());
       }
     }
   }
