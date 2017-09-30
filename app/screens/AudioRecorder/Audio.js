@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -23,7 +23,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Metronome } from '../../nativeModules';
 import Schemas from '../../realmSchemas';
-import { RecordingModal, Recordings, Select } from '../../components';
+import { RecordingModal, Recordings, Select, SystemMessage } from '../../components';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
@@ -39,7 +39,7 @@ const metronomeStates = {
   always: 'Always on',
 };
 
-export default class Audio extends PureComponent {
+export default class Audio extends Component {
   static propTypes = {
     fetchRecordings: PropTypes.func.isRequired,
     downloadRecording: PropTypes.func.isRequired,
@@ -55,6 +55,7 @@ export default class Audio extends PureComponent {
   };
 
   state = {
+    permissions: null,
     currentTime: 0.0,
     recording: false,
     stoppedRecording: false,
@@ -82,18 +83,7 @@ export default class Audio extends PureComponent {
       const audioGrantedPromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
       const writeStoragePromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
 
-      Promise.all(audioGrantedPromise, writeStoragePromise).then(async ([audioGranted, writeStorageGranted]) => {
-        const request = [];
-        if (!audioGranted) {
-          request.push(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
-        }
-        if (!writeStorageGranted) {
-          request.push(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-        }
-        if (request.length !== 0) {
-          const granted = await PermissionsAndroid.requestMultiple(request);
-        }
-      });
+      Promise.all([audioGrantedPromise, writeStoragePromise]).then(this.requestPermissions);
     }
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
@@ -106,6 +96,20 @@ export default class Audio extends PureComponent {
 
       this.toggleTiming();
     };
+  }
+
+  requestPermissions = async ([audioGranted, writeStorageGranted]) => {
+    const request = [];
+    if (!audioGranted) {
+      request.push(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    }
+    if (!writeStorageGranted) {
+      request.push(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+    }
+    if (request.length !== 0) {
+      const permissions = await PermissionsAndroid.requestMultiple(request);
+      this.setState({ permissions });
+    }
   }
 
   componentWillUnmount() {
@@ -223,6 +227,11 @@ export default class Audio extends PureComponent {
   }
 
   async toggleRecording(isRecording) {
+    const { permissions } = this.state;
+    if (permissions && (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' || permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied')) {
+      this.requestPermissions([permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] !== 'denied', permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] !== 'denied']);
+      return;
+    }
     if (!isRecording) {
       const { metronomeState } = this.state;
       const datedFilePath = `${moment().format('HHmmss')}`;
@@ -412,6 +421,10 @@ export default class Audio extends PureComponent {
   render() {
     const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature } = this.state;
     const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
+
+    const { permissions } = this.state;
+    const showSystemMessage = permissions && (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' || permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied');
+
     return (
       <View style={styles.container}>
         <LinearGradient
@@ -421,6 +434,9 @@ export default class Audio extends PureComponent {
           colors={[colorRGBA.red, colorRGBA.lightRed, colors.shade0]}
           style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
         />
+        <View style={{ width: '100%', position: 'absolute', top: -20, display: showSystemMessage ? 'flex' : 'none' }}>
+          <SystemMessage message={'Noteable needs permissions to record.'} kind={'audioPermissions'} persistent />
+        </View>
         <TouchableOpacity onPress={this.toggleMetronomeSettings}>
           <Image source={metronomeState === metronomeStates.off ? require('../../img/metronome.png') : require('../../img/metronome_green.png')} style={{ width: 30, height: 40, margin: 10 }} />
         </TouchableOpacity>

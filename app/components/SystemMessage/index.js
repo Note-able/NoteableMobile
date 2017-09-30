@@ -13,6 +13,7 @@ export default class SystemMessage extends PureComponent {
   static propTypes = {
     message: PropTypes.string.isRequired,
     kind: PropTypes.string.isRequired,
+    persistent: PropTypes.bool,
   };
 
   state = {
@@ -59,7 +60,7 @@ export default class SystemMessage extends PureComponent {
       oldMessage: this.state.message,
     });
 
-    this.timeout = setTimeout(() => {
+    this.timeout = this.props.persistent ? null : setTimeout(() => {
       this.timeout = null;
       this.close();
     }, 5000);
@@ -87,7 +88,6 @@ export default class SystemMessage extends PureComponent {
   }
 
   render() {
-    console.log('rendered');
     return (
       <Animated.View style={[styles.messageContainer, { opacity: this.state.opacityAnimation, transform: [{ translateY: this.state.topAnimation }], backgroundColor: this.state.kind === 'error' ? colors.error : colors.success }]}>
         <TouchableOpacity style={{ width: '100%', height: '100%', justifyContent: 'center' }} onPress={() => this.close()}>
