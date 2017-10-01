@@ -22,6 +22,7 @@ export const PlayerActionTypes = {
   bufferCompleteType: 'BUFFER_COMPLETE',
   startPlayerTypes: createAsyncActionTypes('START_PLAYER'),
   togglePlayerType: 'TOGGLE_PLAYER',
+  finishedPlayingType: 'FINISHED_PLAYING',
 };
 
 export const AccountActionTypes = {

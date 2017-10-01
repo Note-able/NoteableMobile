@@ -10,26 +10,32 @@ const {
   bufferCompleteType,
   startPlayerTypes,
   togglePlayerTypes,
+  finishedPlayingType,
 } = PlayerActionTypes;
 
 export const startPlayer = recording => (
   async (dispatch, getState) => {
-    console.log('start palyer dispatched');
     const state = getState().PlayerReducer;
+    if (state.buffering) {
+      return;
+    }
+
+    dispatch({ type: startPlayerTypes.processing });
     if (state.sound != null && state.sound.stop != null) {
       state.sound.stop();
       state.sound.release();
     }
 
     if (recording.path !== '') {
-      dispatch({ type: startPlayerTypes.processing, buffering: false });
       const reactNativeSound = new Sound(recording.path, '', (error) => {
         if (error) {
           return dispatch({ type: startPlayerTypes.error, error });
         }
 
         const sound = {
-          play: callback => reactNativeSound.play(callback),
+          play: () => reactNativeSound.play(() => {
+            dispatch({ type: finishedPlayingType });
+          }),
           stop: () => reactNativeSound.stop(),
           resume: () => reactNativeSound.resume(),
           getCurrentTime: () => reactNativeSound.getCurrentTime(),
@@ -40,22 +46,27 @@ export const startPlayer = recording => (
           duration: reactNativeSound.getDuration(),
         };
 
+        sound.play();
         return dispatch({ type: startPlayerTypes.success, sound, recording });
       });
     } else {
       dispatch({ type: startPlayerTypes.processing, buffering: true });
       const sound = {
-        play: callback => (new Promise((resolve, reject) => {
+        play: () => (new Promise((resolve, reject) => {
           ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
           DeviceEventEmitter.removeAllListeners();
           DeviceEventEmitter.addListener(
             'AudioBridgeEvent', (evt) => {
               if (evt.status === 'STOPPED') {
-                callback();
+                dispatch({ type: finishedPlayingType });
               } else if (evt.status === 'PLAYING') {
                 sound.duration = evt.duration;
                 sound.currentTime = evt.progress;
-                dispatch({ type: bufferCompleteType });
+                if (!sound.hasStarted) {
+                  sound.hasStarted = true;
+                  dispatch({ type: startPlayerTypes.success, sound, recording });
+                  dispatch({ type: bufferCompleteType });
+                }
                 resolve();
               } else if (evt.status === 'ERROR') {
                 if (sound.errorCount === 0) {
@@ -74,9 +85,11 @@ export const startPlayer = recording => (
         getCurrentTime: callback => callback(sound.currentTime),
         errorCount: 0,
         key: 0,
+        duration: recording.duration,
+        hasStarted: false,
       };
 
-      return dispatch({ type: startPlayerTypes.success, sound, recording });
+      sound.play();
     }
   }
 );

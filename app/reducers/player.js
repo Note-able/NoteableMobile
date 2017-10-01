@@ -7,9 +7,10 @@ import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 const {
   bufferCompleteType,
   startPlayerTypes,
+  finishedPlayingType,
 } = PlayerActionTypes;
 
-export default (state = { isPlaying: false, sound: null, recording: null, buffering: false }, action) => {
+export default (state = { isPlaying: false, sound: null, recording: null, buffering: false, playerState: false }, action) => {
   const { type, error } = action;
   switch (type) {
     case startPlayerTypes.success:
@@ -23,8 +24,11 @@ export default (state = { isPlaying: false, sound: null, recording: null, buffer
     case startPlayerTypes.success:
       return {
         ...state,
+        isPlaying: true,
         sound: action.sound,
         recording: action.recording,
+        playerState: !state.playerState,
+        buffering: false,
       };
     case bufferCompleteType:
       return {
@@ -37,7 +41,12 @@ export default (state = { isPlaying: false, sound: null, recording: null, buffer
     case startPlayerTypes.processing:
       return {
         ...state,
-        buffering: action.buffering,
+        buffering: true,
+      };
+    case finishedPlayingType:
+      return {
+        ...state,
+        isPlaying: false,
       };
     default:
       return state;

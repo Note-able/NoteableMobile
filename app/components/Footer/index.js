@@ -19,10 +19,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
 import { colors } from '../../styles';
 import { mapIcon } from '../util.js';
-import { ShortDisplayTime, DisplayTime } from '../../mappers/recordingMapper';
+import { ShortDisplayTime } from '../../mappers/recordingMapper';
 
 const LAST_PLAYED = '@PLAYER:LAST_PLAYED';
-const windowWidth = Dimensions.get('window').width + 30;
+const windowWidth = Dimensions.get('window').width + 60;
 const welcomeString = 'Welcome to Noteable';
 
 const mapDispatchToProps = dispatch => ({
@@ -32,25 +32,35 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = state => ({
   sound: state.PlayerReducer.sound,
   recording: state.PlayerReducer.recording,
-  buffering: state.PlayerReducer.buffering,
+  playerState: state.PlayerReducer.playerState,
+  isPlaying: state.PlayerReducer.isPlaying,
 });
 
 class Footer extends Component {
+  static propTypes = {
+    startPlayer: PropTypes.func.isRequired,
+    sound: PropTypes.shape({
+      pause: PropTypes.func.isRequired,
+      play: PropTypes.func.isRequired,
+    }),
+    recording: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }),
+    isPlaying: PropTypes.bool,
+  };
+
   state = {
-    player: this.props.player,
-    playerHeight: new Animated.Value(0),
     timingBarWidth: new Animated.Value(0),
-    isPlaying: false,
-    isPaused: 0,
-    showPlayer: false,
+    isPlaying: this.props.isPlaying,
+    isPaused: false,
     recording: this.props.recording,
     sound: this.props.sound,
-    buffering: false,
     timing: {
       isTiming: false,
       displayTime: ShortDisplayTime(0),
       currentTime: 0.0,
     },
+    playerState: this.props.playerState,
   };
 
   componentDidMount = async () => {
@@ -60,36 +70,32 @@ class Footer extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { id } = this.state.recording || {};
-    const stateId = id;
-    const nextId = (nextProps.recording || {}).id;
+  componentWillReceiveProps = async (nextProps) => {
+    if (this.props.playerState !== nextProps.playerState) {
+      await this.setState({
+        playerState: !this.state.playerState,
+        sound: nextProps.sound,
+        duration: nextProps.sound.duration,
+        isPlaying: nextProps.isPlaying,
+        recording: nextProps.recording,
+        isPaused: false,
+        timingBarWidth: new Animated.Value(0),
+        timing: {
+          ...this.state.timing,
+          currentTime: 0,
+          isTiming: false,
+        },
+      });
 
-    if ((stateId == null && nextId != null) || (nextId !== stateId) || (!this.state.buffering && nextProps.buffering)) {
-      // we have a new sound
-      this.setState({
-        sound: nextProps.sound || this.state.sound,
-        recording: nextProps.recording || this.state.recording,
-        buffering: nextProps.buffering,
-      }, nextProps.recording != null ? () => this.play() : null);
-    } else if (stateId != null && stateId === nextId) {
-      // we have the same sound
-      if (this.state.buffering !== nextProps.buffering) {
-        // we finished buffering
-        this.setState({
-          buffering: nextProps.buffering,
-        });
+      this.startTiming();
+      this.startAnimations();
+    } else if (this.state.isPlaying && !nextProps.isPlaying) {
+      await this.setState({
+        isPlaying: nextProps.isPlaying,
+      });
 
-        if (!nextProps.buffering) {
-          this.stopTiming();
-          this.startTiming();
-          this.startAnimations();
-        }
-      } else if (!this.state.sound || this.state.sound.key !== nextProps.sound.key) {
-        // this is the first time in the app and we're playing the same recording as last time the app was open
-        // OR we are playing the same sound again but it has a different sound key because we've reloaded it
-        this.setState({ sound: nextProps.sound }, () => this.play());
-      }
+      this.stopTiming();
+      this.timingAnimation.stop();
     }
   }
 
@@ -119,6 +125,8 @@ class Footer extends Component {
       return;
     }
 
+    clearInterval(this.interval);
+
     this.setState({
       timing: {
         ...this.state.timing,
@@ -133,7 +141,7 @@ class Footer extends Component {
         timing: {
           ...this.state.timing,
           currentTime,
-          displayTime: DisplayTime(currentTime),
+          displayTime: ShortDisplayTime(currentTime),
           isTiming: true,
         },
       });
@@ -154,7 +162,7 @@ class Footer extends Component {
         timing: {
           ...this.state.timing,
           currentTime,
-          displayTime: DisplayTime(currentTime),
+          displayTime: ShortDisplayTime(currentTime),
           isTiming: true,
         },
       });
@@ -162,8 +170,8 @@ class Footer extends Component {
   }
 
   startAnimations = () => {
-    const duration = this.state.isPaused ? ((this.state.sound.duration * 1000) - this.state.timing.currentTime) :
-        this.state.sound.duration * 1000;
+    const duration = this.state.isPaused ? ((this.state.duration * 1000) - this.state.timing.currentTime) :
+        this.state.duration * 1000;
 
     this.setTimingBarAnimation(duration);
 
@@ -184,52 +192,32 @@ class Footer extends Component {
   }
 
   play = async () => {
-    await this.clear();
-    await this.setState({
-      isPlaying: true,
-      isPaused: 0,
-      buffering: this.state.recording.path === '',
-      timingBarWidth: new Animated.Value(0),
-    });
-
-    if (this.state.recording.path !== '') {
+    this.startAnimations();
+    if (this.state.isPaused) {
+      this.resumeTiming();
+    } else {
       this.startTiming();
-      this.startAnimations();
     }
-
     this.state.sound.play(this.clear);
   }
 
   resume = async () => {
     this.resumeTiming();
-    this.setState({
+    this.state.sound.play(this.clear);
+    this.startAnimations();
+    await this.setState({
       isPlaying: true,
       isPaused: false,
     });
-    this.state.sound.play(this.clear);
-    this.startAnimations();
   }
 
   clear = async () => {
-    if (this.state.sound != null) {
-      this.state.sound.stop();
-    }
-
-    if (this.timingAnimation != null) {
-      this.timingAnimation.stop();
-    }
-
-    this.stopTiming();
-
     await this.setState({
       isPlaying: false,
-      isPaused: false,
-      timing: {
-        ...this.state.timing,
-        currentTime: 0,
-        isTiming: false,
-      },
     });
+
+    this.stopTiming();
+    this.timingAnimation.stop();
   }
 
   pause = () => {
