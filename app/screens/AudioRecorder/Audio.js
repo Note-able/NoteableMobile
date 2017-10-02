@@ -23,7 +23,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Metronome } from '../../nativeModules';
 import Schemas from '../../realmSchemas';
-import { RecordingModal, Recordings, Select, SystemMessage } from '../../components';
+import { RecordingModal, MultiTrackMixer, Select, SystemMessage } from '../../components';
 import { DisplayTime } from '../../mappers/recordingMapper';
 import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
@@ -88,7 +88,6 @@ export default class Audio extends Component {
     }
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
-    this.metronomeSound = new Sound('metronome.wav', Sound.MAIN_BUNDLE);
 
     AudioRecorder.onProgress = () => {};
     AudioRecorder.onFinished = () => {
@@ -472,23 +471,9 @@ export default class Audio extends Component {
           </TouchableHighlight>
         </View>
         <View style={styles.recordingsContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Recent</Text>
-            <TouchableHighlight onPress={() => { this.props.navigation.navigate('Recordings'); }}>
-              <Text style={styles.navigateRecordings}>{'Recordings >'}</Text>
-            </TouchableHighlight>
-          </View>
-          <Recordings
-            deleteRecording={this.props.deleteRecording}
-            downloadRecording={this.props.downloadRecording}
-            recordings={this.state.recordings}
-            startPlayer={this.props.startPlayer}
-            editRecording={this.editRecording}
-            uploadRecording={this.uploadRecording}
-            syncDownRecordings={this.props.syncDownRecordings}
-            removeRecording={this.props.removeRecording}
-            currentUser={this.props.currentUser}
-            loadingRecordings={this.props.loadingRecordings}
+          <MultiTrackMixer
+            recordings={this.state.recordings || []}
+            removeRecording={(id) => console.log(`remove ${id}`)}
           />
         </View>
         <View />

@@ -4,6 +4,7 @@ import android.app.Application;
 
 /* Our modules */
 import com.noteable.react.modules.metronome.MetronomePackage;
+import com.noteable.react.modules.multitrack.MultiTrackPackage;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
@@ -50,7 +51,8 @@ public class MainApplication extends Application implements ReactApplication {
             new LinearGradientPackage(),
             new RNFetchBlobPackage(),
             new ReactNativeAudioPackage(),
-            new MetronomePackage()
+            new MetronomePackage(),
+            new MultiTrackPackage()
       );
     }
   };
