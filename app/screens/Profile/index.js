@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
 
 import ProfileInfo from '../../components/ProfileInfo/index.js';
-import { getUser } from '../../actions/accountActions';
+import {
+  getUser,
+  loadCurrentProfile,
+} from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
   user: state.AccountReducer.user,
@@ -12,14 +15,13 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCurrentUser: user => {
-    dispatch(getUser(user));
-  },
+  getCurrentUser: (user) => { dispatch(getUser(user)); },
+  loadCurrentProfile: () => dispatch(loadCurrentProfile()),
 });
 
 class Profile extends Component {
   static propTypes = {
-    getCurrentUser: PropTypes.func.isRequired,
+    loadCurrentProfile: PropTypes.func.isRequired,
     profile: PropTypes.shape({}),
     user: PropTypes.shape({}),
   };
@@ -27,33 +29,34 @@ class Profile extends Component {
   _views = {};
   _scrollView = {};
 
-  componentDidMount() {}
+  componentWillMount() {
+    if (this.props.profile == null) {
+      this.props.loadCurrentProfile();
+    }
+  }
 
   setViewY = (event, view) => {
     this._views[view] = { y: event.nativeEvent.layout.y };
   };
 
-  scrollToView = view => {
+  scrollToView = (view) => {
     this._scrollView.scrollTo({ y: this._views[view].y });
   };
 
   render() {
-    const { user } = this.props;
-    console.log(user);
     if (this.props.profile == null) {
       return null;
     }
 
-    const { coverImage, avatarUrl, firstName, lastName, bio } = user;
+    const { coverImage, avatarUrl, firstName, lastName, bio } = this.props.profile;
     const name = `${firstName} ${lastName}`;
     return (
       <ScrollView
-        ref={ref => {
+        ref={(ref) => {
           this._scrollView = ref;
         }}
         contentContainerStyle={styles.container}
       >
-        <Text>Hello world</Text>
         <ProfileInfo
           coverImage={coverImage || 'default'}
           profileImage={avatarUrl || 'default'}

@@ -25,7 +25,7 @@ import { networkConnectivityChange, runBackgroundRequests } from '../../actions/
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
-  initialRouteName: 'Record',
+  initialRouteName: 'Profile',
   tabBarOptions: {
     activeTintColor: 'blue',
     labelStyle: {
@@ -89,7 +89,9 @@ class Home extends Component {
   };
 
   componentDidMount() {
-    this.props.accountActions.getCurrentUser();
+    if (this.props.users.user == null) {
+      this.props.accountActions.getCurrentUser();
+    }
     NetInfo.addEventListener('change', this.handleConnectivityChange);
     NetInfo.fetch().done(reach => {
       this.setState({ isConnected: reach !== 'none' });

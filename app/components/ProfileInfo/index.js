@@ -26,7 +26,7 @@ ProfileInfo.propTypes = {
   coverImage: PropTypes.string.isRequired,
   profileImage: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  bio: PropTypes.string.isRequired,
+  bio: PropTypes.string,
   onLayout: PropTypes.func.isRequired,
 };
 
@@ -82,6 +82,7 @@ const styles = {
   name: {
     marginLeft: 20,
     color: 'white',
+    backgroundColor: 'transparent',
     fontSize: 30,
     elevation: 10,
   },

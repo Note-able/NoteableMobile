@@ -83,10 +83,10 @@ export default class Audio extends Component {
   componentDidMount() {
     if (Platform.OS === 'android') {
       const audioGrantedPromise = PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       );
       const writeStoragePromise = PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       );
 
       Promise.all([audioGrantedPromise, writeStoragePromise]).then(this.requestPermissions);
@@ -94,7 +94,7 @@ export default class Audio extends Component {
     this._recordingLocation = AudioUtils.DocumentDirectoryPath;
     this.props.fetchRecordings();
 
-    AudioRecorder.onProgress = () => {};
+    AudioRecorder.onProgress = () => { };
     AudioRecorder.onFinished = () => {
       RNFetchBlob.fs.stat(this.state.audioPath).then(stats => this.setState({ fileStats: stats }));
 
@@ -177,8 +177,8 @@ export default class Audio extends Component {
   }
 
   getAudio = () =>
-    new Promise(resolve => {
-      const audio = new Sound(this.state.audioPath, '', error => {
+    new Promise((resolve) => {
+      const audio = new Sound(this.state.audioPath, '', (error) => {
         if (error) {
           logErrorToCrashlytics(`${error.message}`);
         }
@@ -187,7 +187,7 @@ export default class Audio extends Component {
     });
 
   pausePlay = () => {
-    this.getAudio().then(audio => {
+    this.getAudio().then((audio) => {
       this.timingAnimation.stop();
       audio.pause();
       this.setState({ isPlaying: false, isPaused: true });
@@ -195,7 +195,7 @@ export default class Audio extends Component {
   };
 
   startPlay = () => {
-    this.getAudio().then(audio => {
+    this.getAudio().then((audio) => {
       const timingBarWidth = this.state.isPaused
         ? this.state.timingBarWidth
         : new Animated.Value(0);
@@ -206,7 +206,7 @@ export default class Audio extends Component {
   };
 
   playAndAnimate(audio) {
-    audio.getCurrentTime(time => {
+    audio.getCurrentTime((time) => {
       const duration = (audio.getDuration() - time) * 1000;
       this.timingAnimation = Animated.timing(this.state.timingBarWidth, {
         easing: Easing.linear,
@@ -218,7 +218,7 @@ export default class Audio extends Component {
     });
   }
 
-  playSound = audio => {
+  playSound = (audio) => {
     audio.play(() => {
       this.setState({
         isPaused: false,
@@ -294,8 +294,8 @@ export default class Audio extends Component {
     }
   }
 
-  saveAudio = recording => {
-    const audio = new Sound(this.state.audioPath, '', error => {
+  saveAudio = (recording) => {
+    const audio = new Sound(this.state.audioPath, '', (error) => {
       if (error || audio.getDuration === -1) {
         logErrorToCrashlytics(`${error.message}`);
         return;
@@ -344,7 +344,7 @@ export default class Audio extends Component {
     });
   };
 
-  editRecording = recording => {
+  editRecording = (recording) => {
     this.setState({
       modal: {
         id: recording.id,
@@ -355,7 +355,7 @@ export default class Audio extends Component {
     });
   };
 
-  updateRecording = recordingInfo => {
+  updateRecording = (recordingInfo) => {
     this.props.updateRecording({
       ...this.state.recording,
       name: recordingInfo.fileName,
@@ -369,7 +369,7 @@ export default class Audio extends Component {
     });
   };
 
-  uploadRecording = recording => {
+  uploadRecording = (recording) => {
     this.props.uploadRecording(recording, this.props.currentUser);
   };
 
@@ -397,14 +397,14 @@ export default class Audio extends Component {
           }),
         ]);
         this.metronomeTimingAnimation.start(() =>
-          this.setState({ metronomeMenuVisible: !showMetronomeMenu })
+          this.setState({ metronomeMenuVisible: !showMetronomeMenu }),
         );
-      }
+      },
     );
   };
 
   handleChangeMetronomeState = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const { metronomeState } = prevState;
       switch (metronomeState) {
         case metronomeStates.off:
@@ -417,7 +417,7 @@ export default class Audio extends Component {
     });
   };
 
-  handleChangeBPM = text => {
+  handleChangeBPM = (text) => {
     if (!text) {
       this.setState({ metronomeBPM: text });
     } else {
@@ -428,7 +428,7 @@ export default class Audio extends Component {
     }
   };
 
-  handleChangeCountIn = text => {
+  handleChangeCountIn = (text) => {
     if (!text) {
       this.setState({ countIn: text });
     } else {
@@ -459,7 +459,7 @@ export default class Audio extends Component {
       metronomeState === metronomeStates.always,
       () => {
         this.startRecording();
-      }
+      },
     );
   };
 
@@ -571,14 +571,14 @@ export default class Audio extends Component {
               <View style={styles.stopButton} />
             ) : (
               <View style={styles.recordButton}>
-                <Icon
-                  name="mic"
-                  size={40}
-                  style={{ width: 40, height: 40, margin: 10 }}
-                  color={'white'}
-                />
-              </View>
-            )}
+                  <Icon
+                    name="mic"
+                    size={40}
+                    style={{ width: 40, height: 40, margin: 10 }}
+                    color={'white'}
+                  />
+                </View>
+              )}
           </TouchableHighlight>
         </View>
         <View style={styles.recordingsContainer}>
@@ -634,49 +634,49 @@ const MetronomeMenu = ({
   onTimeSigantureChange,
 }) => (
   <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
-    <Animated.View
-      style={[
-        styles.metronomeMenuContainer,
-        { width: metronomeMenuWidth, height: metronomeMenuHeight },
-      ]}
-    >
-      {showMetronomeMenu && (
-        <View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
-          <TouchableHighlight
-            onPress={onMetronomeStateChange}
-            style={styles.metronomeMenuTouchableHighlight}
-          >
-            <Text
-              style={[
-                styles.metronomeLabel,
-                metronomeState !== metronomeStates.off ? styles.metronomeOnText : null,
-                { width: 90 },
-              ]}
+      <Animated.View
+        style={[
+          styles.metronomeMenuContainer,
+          { width: metronomeMenuWidth, height: metronomeMenuHeight },
+        ]}
+      >
+        {showMetronomeMenu && (
+          <View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
+            <TouchableHighlight
+              onPress={onMetronomeStateChange}
+              style={styles.metronomeMenuTouchableHighlight}
             >
-              {metronomeState}
-            </Text>
-          </TouchableHighlight>
-          <Text style={styles.metronomeLabel}>BPM:</Text>
-          <TextInput
-            onChangeText={onBPMChange}
-            value={metronomeBPM}
-            style={styles.metronomeInput}
-            underlineColorAndroid="transparent"
-          />
-          <Text style={styles.metronomeLabel}>Count In:</Text>
-          <TextInput
-            onChangeText={onCountInChange}
-            value={countIn}
-            style={styles.metronomeInput}
-            underlineColorAndroid="transparent"
-          />
-          <Select
-            onValueChange={onTimeSigantureChange}
-            selectedValue={timeSignature}
-            options={timeSignatures}
-          />
-        </View>
-      )}
-    </Animated.View>
-  </View>
-);
+              <Text
+                style={[
+                  styles.metronomeLabel,
+                  metronomeState !== metronomeStates.off ? styles.metronomeOnText : null,
+                  { width: 90 },
+                ]}
+              >
+                {metronomeState}
+              </Text>
+            </TouchableHighlight>
+            <Text style={styles.metronomeLabel}>BPM:</Text>
+            <TextInput
+              onChangeText={onBPMChange}
+              value={metronomeBPM}
+              style={styles.metronomeInput}
+              underlineColorAndroid="transparent"
+            />
+            <Text style={styles.metronomeLabel}>Count In:</Text>
+            <TextInput
+              onChangeText={onCountInChange}
+              value={countIn}
+              style={styles.metronomeInput}
+              underlineColorAndroid="transparent"
+            />
+            <Select
+              onValueChange={onTimeSigantureChange}
+              selectedValue={timeSignature}
+              options={timeSignatures}
+            />
+          </View>
+        )}
+      </Animated.View>
+    </View >
+  );

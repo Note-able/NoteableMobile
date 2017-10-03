@@ -7,7 +7,7 @@ export const appScreens = {
   Settings: { screen: Settings },
   Recordings: { screen: Music },
   Record: { screen: AudioRecorder },
-  // Profile: { screen: Profile },
+  Profile: { screen: Profile },
   // Nearby: { screen: Nearby },
   // Events: { screen: Events },
 };

@@ -6,6 +6,7 @@ const {
   fetchSignInTypes,
   getCurrentUserTypes,
   getUserPreferencesTypes,
+  loadCurrentProfileTypes,
   loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
@@ -44,6 +45,9 @@ export default (state = defaultState, action) => {
     case registerUserTypes.error:
       logErrorToCrashlytics({ customMessage: 'Register Error', error });
       break;
+    case loadCurrentProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Load Profile', error });
+      break;
     default:
       break;
   }
@@ -72,6 +76,7 @@ export default (state = defaultState, action) => {
         user: JSON.parse(action.currentUser),
         isProcessing: false,
       };
+    case loadCurrentProfileTypes.error:
     case logoutTypes.error:
     case registerUserTypes.error:
     case getCurrentUserTypes.error:
@@ -99,6 +104,12 @@ export default (state = defaultState, action) => {
         ...state,
         isProcessing: false,
         profile: result,
+      };
+    case loadCurrentProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        profile: action.profile,
       };
     default:
       return state;
