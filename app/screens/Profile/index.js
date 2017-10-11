@@ -7,6 +7,7 @@ import ProfileInfo from '../../components/ProfileInfo/index.js';
 import {
   getUser,
   loadCurrentProfile,
+  saveProfile,
 } from '../../actions/accountActions';
 
 const mapStateToProps = state => ({
@@ -17,6 +18,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getCurrentUser: (user) => { dispatch(getUser(user)); },
   loadCurrentProfile: () => dispatch(loadCurrentProfile()),
+  saveProfile: profile => dispatch(saveProfile(profile)),
 });
 
 class Profile extends Component {
@@ -49,7 +51,6 @@ class Profile extends Component {
     }
 
     const { coverImage, avatarUrl, firstName, lastName, bio } = this.props.profile;
-    const name = `${firstName} ${lastName}`;
     return (
       <ScrollView
         ref={(ref) => {
@@ -60,9 +61,10 @@ class Profile extends Component {
         <ProfileInfo
           coverImage={coverImage || 'default'}
           profileImage={avatarUrl || 'default'}
-          name={name}
+          firstName={firstName[0].toUpperCase() + firstName.substring(1)}
+          lastName={lastName[0].toUpperCase() + lastName.substring(1)}
           bio={bio}
-          onLayout={this.setViewY}
+          saveProfile={this.props.saveProfile}
         />
       </ScrollView>
     );

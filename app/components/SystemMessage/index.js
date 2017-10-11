@@ -56,9 +56,9 @@ export default class SystemMessage extends PureComponent {
     this.timeout = this.props.persistent
       ? null
       : setTimeout(() => {
-          this.timeout = null;
-          this.close();
-        }, 5000);
+        this.timeout = null;
+        this.close();
+      }, 5000);
   };
 
   close = () => {
@@ -80,20 +80,8 @@ export default class SystemMessage extends PureComponent {
 
   render() {
     return (
-      <Animated.View
-        style={[
-          styles.messageContainer,
-          {
-            opacity: this.state.opacityAnimation,
-            transform: [{ translateY: this.state.topAnimation }],
-            backgroundColor: this.state.kind === 'error' ? colors.error : colors.success,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          style={{ width: '100%', height: '100%', justifyContent: 'center' }}
-          onPress={() => this.close()}
-        >
+      <Animated.View style={[styles.messageContainer, { opacity: this.state.opacityAnimation, transform: [{ translateY: this.state.topAnimation }], backgroundColor: this.state.kind === 'error' ? colors.error : colors.success, zIndex: 100 }]}>
+        <TouchableOpacity style={{ width: '100%', height: '100%', justifyContent: 'center' }} onPress={() => this.close()}>
           <Text style={styles.message}>{this.state.message}</Text>
         </TouchableOpacity>
       </Animated.View>

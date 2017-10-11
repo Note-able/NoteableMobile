@@ -13,6 +13,7 @@ const {
   loginFacebookTypes,
   registerUserTypes,
   setUserPreferencesTypes,
+  saveProfileTypes,
 } = AccountActionTypes;
 
 const USER = '@ACCOUNTS:CURRENT_USER';
@@ -33,7 +34,8 @@ export const getCurrentUser = () => (
 export const loadCurrentProfile = () => (
   async (dispatch, getState) => {
     dispatch({ type: loadCurrentProfileTypes.processing });
-    let user = getState().AccountReducer.user;
+    const { SystemReducer, AccountReducer } = getState();
+    let user = AccountReducer.user;
     if (user.id == null) {
       user = await AsyncStorage.getItem(USER);
       user = JSON.parse(user);
@@ -41,7 +43,7 @@ export const loadCurrentProfile = () => (
 
     try {
       const profile = await AsyncStorage.getItem(profileKey);
-      if (profile != null) {
+      if (profile != null && SystemReducer.network.connected === 'none') {
         return dispatch({ type: loadCurrentProfileTypes.success, profile: JSON.parse(profile) });
       }
 
@@ -165,6 +167,39 @@ export const getAlreadySignedInUser = () => async dispatch => {
     dispatch({ type: fetchSignInTypes.success, user: JSON.parse(user) });
   }
 };
+
+export const saveProfile = profile => (
+  async (dispatch, getState) => {
+    console.log('save... ', profile);
+    const { AccountReducer } = getState();
+    if (profile.lastName === AccountReducer.profile.lastName && profile.firstName === AccountReducer.profile.firstName && profile.bio === AccountReducer.profile.bio) {
+      return;
+    }
+
+    dispatch({ type: saveProfileTypes.processing });
+    console.log(profile);
+
+    try {
+      const response = await fetchUtil.postWithBody({
+        url: `https://beta.noteable.me/api/v1/users/${AccountReducer.user.id}/profile`,
+        auth: AccountReducer.user.jwt,
+        body: {
+          ...AccountReducer.profile,
+          ...profile,
+        },
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('abc', response);
+      dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile } });
+    } catch (error) {
+      console.log(error);
+      // dispatch({ type: saveProfileTypes.error, error: error.message });
+    }
+  }
+);
 
 const fetchCurrentProfile = (user, next) => {
   fetchUtil

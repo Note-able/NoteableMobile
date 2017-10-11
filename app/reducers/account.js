@@ -10,6 +10,7 @@ const {
   loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
+  saveProfileTypes,
 } = AccountActionTypes;
 
 const defaultState = {
@@ -48,6 +49,9 @@ export default (state = defaultState, action) => {
     case loadCurrentProfileTypes.error:
       logErrorToCrashlytics({ customMessage: 'Load Profile', error });
       break;
+    case saveProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Save Profile', error });
+      break;
     default:
       break;
   }
@@ -58,6 +62,7 @@ export default (state = defaultState, action) => {
     case registerUserTypes.processing:
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
+    case saveProfileTypes.processing:
       return { ...state, isProcessing: true };
     case getUserPreferencesTypes.success:
       return {
@@ -76,6 +81,7 @@ export default (state = defaultState, action) => {
         user: JSON.parse(action.currentUser),
         isProcessing: false,
       };
+    case saveProfileTypes.error:
     case loadCurrentProfileTypes.error:
     case logoutTypes.error:
     case registerUserTypes.error:
@@ -105,6 +111,7 @@ export default (state = defaultState, action) => {
         isProcessing: false,
         profile: result,
       };
+    case saveProfileTypes.success:
     case loadCurrentProfileTypes.success:
       return {
         ...state,

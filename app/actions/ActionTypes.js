@@ -33,6 +33,7 @@ export const AccountActionTypes = {
   logoutTypes: createAsyncActionTypes('LOGOUT_USER'),
   registerUserTypes: createAsyncActionTypes('REGISTER_USER'),
   setUserPreferencesTypes: createAsyncActionTypes('SET_USER_PREFERENCES'),
+  saveProfileTypes: createAsyncActionTypes('SAVE_PROFILE'),
 };
 
 export const SystemMessageActionTypes = {

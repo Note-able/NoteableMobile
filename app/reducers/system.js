@@ -6,7 +6,13 @@ import {
   SystemActionTypes,
 } from '../actions/ActionTypes';
 
-const { fetchSignInTypes, loginFacebookTypes, logoutTypes, registerUserTypes } = AccountActionTypes;
+const {
+  fetchSignInTypes,
+  loginFacebookTypes,
+  logoutTypes,
+  registerUserTypes,
+  saveProfileTypes,
+} = AccountActionTypes;
 
 const {
   downloadRecordingTypes,
@@ -28,7 +34,7 @@ const { startPlayerTypes } = PlayerActionTypes;
 
 export default (
   state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } },
-  action
+  action,
 ) => {
   const { type } = action;
   switch (type) {
@@ -148,7 +154,23 @@ export default (
       return {
         ...state,
         authMessage: {
-          message: 'Success',
+          message: 'Success.',
+          kind: 'success',
+        },
+      };
+    case saveProfileTypes.processing:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Updating profile.',
+          kind: 'success',
+        },
+      };
+    case saveProfileTypes.success:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Successful update.',
           kind: 'success',
         },
       };
