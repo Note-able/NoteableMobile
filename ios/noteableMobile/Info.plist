@@ -85,6 +85,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To add your profile photo</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To record user content</string>
 	<key>UIAppFonts</key>

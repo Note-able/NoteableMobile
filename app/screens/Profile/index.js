@@ -65,6 +65,7 @@ class Profile extends Component {
           lastName={lastName[0].toUpperCase() + lastName.substring(1)}
           bio={bio}
           saveProfile={this.props.saveProfile}
+          canEdit={this.props.profile.id === this.props.user.id}
         />
       </ScrollView>
     );

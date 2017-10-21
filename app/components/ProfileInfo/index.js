@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import {
   Dimensions,
   Image,
+  ImagePickerIOS,
+  Platform,
   TouchableOpacity,
   Text,
   TextInput,
@@ -19,20 +21,21 @@ export default class ProfileInfo extends Component {
     lastName: PropTypes.string.isRequired,
     bio: PropTypes.string,
     saveProfile: PropTypes.func.isRequired,
+    canEdit: PropTypes.bool,
   };
 
   state = {
-    isEditMode: true,
+    isEditMode: false,
     editName: `${this.props.firstName} ${this.props.lastName}`,
     editBio: this.props.bio,
+    editImage: this.props.profileImage,
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { coverImage, profileImage, firstName, lastName, bio } = this.props;
-    const { isEditMode, editName, editBio } = this.state;
+    const stateKeys = Object.keys(this.state);
+    const propsKeys = Object.keys(this.props).filter(key => typeof this.props[key] !== 'function');
 
-    return (nextState.isEditMode !== isEditMode || nextState.editName !== editName || nextState.editBio !== editBio ||
-      coverImage !== nextProps.coverImage || profileImage !== nextProps.profileImage || firstName !== nextProps.firstName || lastName !== nextProps.lastName || bio !== nextProps.bio);
+    return stateKeys.filter(key => this.state[key] !== nextState[key]) || propsKeys.filter(key => this.props[key] !== nextProps[key]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -60,7 +63,19 @@ export default class ProfileInfo extends Component {
       firstName: this.state.editName.split(' ')[0],
       lastName: hasLastName ? this.state.editName.split(' ')[1] : '',
       bio: this.state.editBio,
+      profileImage: this.state.editImage,
     });
+  }
+
+  pickImage = () => {
+    if (Platform.OS === 'ios') {
+      this.setState({ isChoosingImage: true });
+      ImagePickerIOS.openSelectDialog(
+        {},
+        imageUri => this.setState({ editImage: imageUri }),
+        error => this.setState({ error }),
+      );
+    }
   }
 
   renderEditMode() {
@@ -83,9 +98,12 @@ export default class ProfileInfo extends Component {
         <View style={styles.profileHeader}>
           <View style={styles.profileImageView}>
             <Image
-              source={{ uri: profileImage }}
+              source={{ uri: this.state.editImage || profileImage }}
               style={styles.profileImage}
             />
+            <TouchableOpacity onPress={this.pickImage} style={[styles.profileImage, { backgroundColor: 'rgba(0, 0, 0, 0.4)', width: 75, height: 75, position: 'absolute', justifyContent: 'center', alignItems: 'center' }]}>
+              <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
+            </TouchableOpacity>
           </View>
           <View style={styles.edit.name}>
             <TextInput numberOfLines={1} onChangeText={text => this.setState({ editName: text })} style={{ marginRight: 4, fontSize: 24, width: windowWidth - 155, color: 'white', height: 32 }} value={this.state.editName} />
@@ -96,6 +114,7 @@ export default class ProfileInfo extends Component {
           <View style={styles.edit.description}>
             <TextInput
               autoGrow
+              onChangeText={text => this.setState({ editBio: text })}
               style={{ minHeight: 30, width: '100%', backgroundColor: 'white', fontSize: 16, lineHeight: 28 }}
               value={this.state.editBio}
               multiline
@@ -109,7 +128,7 @@ export default class ProfileInfo extends Component {
   }
 
   render() {
-    if (this.state.isEditMode) {
+    if (this.state.isEditMode && this.props.canEdit) {
       return this.renderEditMode();
     }
 
@@ -132,9 +151,11 @@ export default class ProfileInfo extends Component {
             />
           </View>
           <Text ellipsizeMode="tail" numberOfLines={1} style={styles.name}>{name}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => this.setState({ isEditMode: true })}>
-            <Icon name="create" size={24} style={{ width: 24, height: 24 }} color={colors.shade140} />
-          </TouchableOpacity>
+          {this.props.canEdit &&
+            <TouchableOpacity style={styles.button} onPress={() => this.setState({ isEditMode: true })}>
+              <Icon name="create" size={24} style={{ width: 24, height: 24 }} color={colors.shade140} />
+            </TouchableOpacity>
+          }
         </View>
         <View style={styles.bio}>
           <Text style={styles.header}>About</Text>
@@ -149,7 +170,7 @@ const windowWidth = Dimensions.get('window').width;
 
 const styles = {
   bio: {
-    margin: 20,
+    marginHorizontal: 20,
   },
   profileImageView: {
     width: 75,
@@ -187,6 +208,7 @@ const styles = {
   },
   description: {
     fontSize: 16,
+    marginHorizontal: 10,
   },
   header: {
     fontSize: 24,
@@ -203,12 +225,11 @@ const styles = {
   },
   name: {
     marginTop: -24,
-    marginLeft: 20,
     color: 'white',
     backgroundColor: 'transparent',
     fontSize: 24,
     elevation: 10,
-    maxWidth: windowWidth - 175,
+    width: windowWidth - 175,
   },
   button: {
     backgroundColor: 'transparent',

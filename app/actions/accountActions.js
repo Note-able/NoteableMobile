@@ -1,3 +1,4 @@
+import RNFetchBlob from 'react-native-fetch-blob';
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, getPreferences } from '../util';
@@ -170,14 +171,42 @@ export const getAlreadySignedInUser = () => async dispatch => {
 
 export const saveProfile = profile => (
   async (dispatch, getState) => {
-    console.log('save... ', profile);
     const { AccountReducer } = getState();
-    if (profile.lastName === AccountReducer.profile.lastName && profile.firstName === AccountReducer.profile.firstName && profile.bio === AccountReducer.profile.bio) {
-      return;
+
+    if (profile.lastName === AccountReducer.profile.lastName &&
+      profile.firstName === AccountReducer.profile.firstName &&
+      profile.bio === AccountReducer.profile.bio &&
+      profile.profileImage === AccountReducer.profile.avatarUrl
+    ) {
+      return null;
     }
 
     dispatch({ type: saveProfileTypes.processing });
-    console.log(profile);
+
+    let avatarUrl = AccountReducer.profile.avatarUrl;
+    if (profile.profileImage !== AccountReducer.profile.avatarUrl) {
+      try {
+        const response = await RNFetchBlob.fetch(
+          'POST',
+          'https://beta.noteable.me/api/v1/users/edit/picture/new',
+          {
+            Authorization: AccountReducer.user.jwt,
+            'Content-Type': 'multipart/form-data',
+          }, [{
+            name: 'file',
+            data: RNFetchBlob.wrap(profile.profileImage),
+            filename: 'avatar-png.jpg',
+          }]);
+
+        if (response.respInfo.status < 200 || response.respInfo.status > 300) {
+          return dispatch({ type: saveProfileTypes.error, error: response.respInfo.status });
+        }
+
+        avatarUrl = response.json().cloudStoragePublicUrl;
+      } catch (error) {
+        return dispatch({ type: saveProfileTypes.error, error: error.message });
+      }
+    }
 
     try {
       const response = await fetchUtil.postWithBody({
@@ -186,17 +215,17 @@ export const saveProfile = profile => (
         body: {
           ...AccountReducer.profile,
           ...profile,
+          avatarUrl,
         },
         headers: {
           accept: 'application/json',
           'Content-Type': 'application/json',
         },
       });
-      console.log('abc', response);
-      dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile } });
+      return dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile, avatarUrl } });
     } catch (error) {
       console.log(error);
-      // dispatch({ type: saveProfileTypes.error, error: error.message });
+      return dispatch({ type: saveProfileTypes.error, error: error.message });
     }
   }
 );
@@ -213,6 +242,14 @@ const fetchCurrentProfile = (user, next) => {
     })
     .catch(error => console.warn(error));
 };
+
+const uploadPhoto = (imageUri, auth) => RNFetchBlob.fetch(
+    'POST',
+    'https://beta.noteable.me/api/v1/users/edit/picture/new',
+  {
+    Authorization: auth,
+    'Content-Type': 'multipart/form-data',
+  }, [{ name: 'file', data: RNFetchBlob.wrap(imageUri.replace('assets-library://', '')) }]);
 
 /** **************** */
 /** User Preferences */
