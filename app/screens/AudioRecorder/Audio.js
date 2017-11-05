@@ -232,6 +232,14 @@ export default class Audio extends Component {
       this.requestPermissions([permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] !== 'denied', permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] !== 'denied']);
       return;
     }
+
+    if (!this.props.microphonePermission) {
+      const perm = await AudioRecorder.requestAuthorization();
+      if (!perm) {
+        return;
+      }
+    }
+
     if (!isRecording) {
       const { metronomeState } = this.state;
       const datedFilePath = `${moment().format('HHmmss')}`;
