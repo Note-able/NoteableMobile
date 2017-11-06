@@ -52,6 +52,7 @@ export default class Audio extends Component {
     updateRecording: PropTypes.func.isRequired,
     uploadRecording: PropTypes.func.isRequired,
     currentUser: PropTypes.shape({}),
+    alert: PropTypes.func.isRequired,
   };
 
   state = {
@@ -233,11 +234,10 @@ export default class Audio extends Component {
       return;
     }
 
-    if (!this.props.microphonePermission) {
-      const perm = await AudioRecorder.requestAuthorization();
-      if (!perm) {
-        return;
-      }
+    const perm = await AudioRecorder.requestAuthorization();
+    if (!perm) {
+      this.props.alert('Please allow microphone access first.', 'error');
+      return;
     }
 
     if (!isRecording) {
@@ -515,10 +515,9 @@ export default class Audio extends Component {
   }
 }
 
-const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => {
-  return (
-    <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.View style={[styles.metronomeMenuContainer, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
+const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => (
+  <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
+    <Animated.View style={[styles.metronomeMenuContainer, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
         {showMetronomeMenu && (<View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
           <TouchableHighlight onPress={onMetronomeStateChange} style={styles.metronomeMenuTouchableHighlight}>
             <Text style={[styles.metronomeLabel, metronomeState !== metronomeStates.off ? styles.metronomeOnText : null, { width: 90 }]}>{ metronomeState }</Text>
@@ -544,7 +543,6 @@ const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuW
           />
         </View>)}
       </Animated.View>
-    </View>
+  </View>
   );
-};
 

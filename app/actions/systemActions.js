@@ -3,6 +3,7 @@ import { logCustomToFabric, logErrorToCrashlytics } from '../util';
 import { SystemActionTypes } from './ActionTypes.js';
 
 const {
+  alertType,
   networkChangeType,
 } = SystemActionTypes;
 
@@ -29,5 +30,11 @@ export const runBackgroundRequests = () => (
     }, (error) => {
       logErrorToCrashlytics(error);
     });
+  }
+);
+
+export const alert = (message, type) => (
+  (dispatch) => {
+    dispatch({ type: alertType, message, kind: type });
   }
 );

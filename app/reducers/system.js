@@ -24,6 +24,7 @@ const {
 } = SystemMessageActionTypes;
 
 const {
+  alertType,
   queueNetworkRequestType,
   networkPreferencesFailureType,
   networkChangeType,
@@ -32,6 +33,14 @@ const {
 export default (state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } }, action) => {
   const { type } = action;
   switch (type) {
+    case alertType:
+      return {
+        ...state,
+        systemMessage: {
+          message: action.message,
+          kind: action.kind,
+        },
+      };
     case logoutTypes.success:
       return {
         ...state,

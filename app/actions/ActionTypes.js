@@ -40,6 +40,7 @@ export const SystemMessageActionTypes = {
 };
 
 export const SystemActionTypes = {
+  alertType: 'ALERT',
   networkChangeType: 'NETWORK_CHANGE',
   networkPreferencesFailureType: {
     cellular: 'NETWORK_PREFERENCES_CELLULAR',

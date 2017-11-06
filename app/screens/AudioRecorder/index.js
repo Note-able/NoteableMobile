@@ -25,6 +25,10 @@ import {
   getCurrentUser,
 } from '../../actions/accountActions';
 
+import {
+  alert,
+} from '../../actions/systemActions';
+
 const mapStateToProps = state => ({
   recordings: state.RecordingsReducer,
   users: state.AccountReducer,
@@ -43,6 +47,7 @@ const mapDispatchToProps = dispatch => ({
   startPlayer: recording => dispatch(startPlayer(recording)),
   getCurrentUser: () => dispatch(getCurrentUser()),
   uploadRecording: (recording, user) => dispatch(uploadRecording(recording, user)),
+  alert: (message, type) => dispatch(alert(message, type)),
 });
 
 class AudioRecorder extends Component {
@@ -90,6 +95,7 @@ class AudioRecorder extends Component {
           syncDownRecordings={this.props.syncDownRecordings}
           removeRecording={this.props.removeRecording}
           currentUser={this.props.users.user}
+          alert={this.props.alert}
         />
       </View>
     );

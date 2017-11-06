@@ -58,6 +58,7 @@ export const startPlayer = recording => (
           DeviceEventEmitter.addListener(
             'AudioBridgeEvent', (evt) => {
               if (evt.status === 'STOPPED') {
+                dispatch({ type: bufferCompleteType });
                 dispatch({ type: finishedPlayingType });
               } else if (evt.status === 'PLAYING') {
                 sound.duration = evt.duration;
