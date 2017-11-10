@@ -3,8 +3,8 @@ import { ReactNativeAudioStreaming } from 'react-native-audio-streaming';
 import {
   DeviceEventEmitter,
 } from 'react-native';
+import { AudioUtils } from 'react-native-audio';
 import { PlayerActionTypes } from './ActionTypes.js';
-
 
 const {
   bufferCompleteType,
@@ -27,8 +27,12 @@ export const startPlayer = recording => (
     }
 
     if (recording.path !== '') {
-      const reactNativeSound = new Sound(recording.path, '', (error) => {
+      const splits = recording.path.split('/');
+      const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
+
+      const reactNativeSound = new Sound(realPath, '', (error) => {
         if (error) {
+          dispatch({ type: bufferCompleteType });
           return dispatch({ type: startPlayerTypes.error, error });
         }
 
@@ -47,6 +51,8 @@ export const startPlayer = recording => (
         };
 
         sound.play();
+
+        dispatch({ type: bufferCompleteType });
         return dispatch({ type: startPlayerTypes.success, sound, recording });
       });
     } else {

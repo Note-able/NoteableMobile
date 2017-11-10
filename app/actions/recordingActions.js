@@ -7,7 +7,9 @@ import { fetchUtil, logErrorToCrashlytics, getPreferences } from '../util';
 import { RecordingActionTypes, SystemActionTypes } from './ActionTypes';
 import { MapRecordingFromAPI, MapRecordingFromDB, MapRecordingsToAssocArray, MapRecordingToAPI } from '../mappers/recordingMapper';
 import { preferenceKeys } from '../constants';
+import settings from '../settings.json';
 
+const { apiBaseUrl } = settings;
 const {
   deleteRecordingTypes,
   downloadRecordingTypes,
@@ -73,7 +75,7 @@ export const removeRecording = recording => (
   }
 );
 
-const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `https://beta.noteable.me/api/v1/recordings?offset=${offset}`, auth: token })
+const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `${apiBaseUrl}/recordings?offset=${offset}`, auth: token })
 .then(response => response.json(), (error) => { throw error; })
   .then((result) => {
     iteration += 1;
@@ -188,7 +190,7 @@ export const deleteRecording = recording => (
           return;
         }
 
-        fetchUtil.delete({ url: `https://beta.noteable.me/api/v1/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
+        fetchUtil.delete({ url: `${apiBaseUrl}/recordings/${recording.resourceId}`, auth: JSON.parse(user).jwt })
           .then((response) => {
             if (response.status === 204) {
               removeLocalRecording(recording, resolve, reject);
@@ -293,7 +295,7 @@ export const uploadRecording = (rec, user) => (
               let response;
               try {
                 response = await fetchUtil.postWithBody({
-                  url: 'https://beta.noteable.me/api/v1/recordings',
+                  url: `${apiBaseUrl}/recordings`,
                   body: form,
                   headers: {
                     Accept: 'application/json',

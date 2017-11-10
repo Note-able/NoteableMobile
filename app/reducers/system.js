@@ -1,5 +1,6 @@
 import {
   AccountActionTypes,
+  PlayerActionTypes,
   RecordingActionTypes,
   SystemMessageActionTypes,
   SystemActionTypes,
@@ -30,9 +31,21 @@ const {
   networkChangeType,
 } = SystemActionTypes;
 
+const {
+  startPlayerTypes,
+} = PlayerActionTypes;
+
 export default (state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } }, action) => {
   const { type } = action;
   switch (type) {
+    case startPlayerTypes.error:
+      return {
+        ...state,
+        systemMessage: {
+          message: 'Failed to play recording.',
+          kind: 'error',
+        },
+      };
     case alertType:
       return {
         ...state,

@@ -1,7 +1,9 @@
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, getPreferences } from '../util';
+import settings from '../settings.json';
 
+const { apiBaseUrl, authBaseUrl } = settings;
 const {
   getCurrentUserTypes,
   getUserPreferencesTypes,
@@ -32,7 +34,7 @@ export const registerUser = registration => (
 
     dispatch({ type: registerUserTypes.processing });
 
-    return fetchUtil.postWithBody({ url: 'https://beta.noteable.me/api/v1/register', body: { firstName, lastName, email, password } })
+    return fetchUtil.postWithBody({ url: `${apiBaseUrl}/register`, body: { firstName, lastName, email, password } })
       .then((response) => {
         if (response.status < 200 || response.status >= 300) {
           if (response.statusText == null) {
@@ -57,14 +59,14 @@ export const loginFacebook = authToken => (
     } else {
       dispatch({ type: loginFacebookTypes.processing });
 
-      fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/facebook/jwt', body: { token: authToken } })
-      .then(response => response.json())
-      .then((result) => {
-        const { token, user } = result;
-        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
-        dispatch({ type: loginFacebookTypes.success, user });
-      })
-      .catch((error) => { dispatch({ type: loginFacebookTypes.error, error }); });
+      fetchUtil.postWithBody({ url: `${authBaseUrl}/auth/facebook/jwt`, body: { token: authToken } })
+        .then(response => response.json())
+        .then((result) => {
+          const { token, user } = result;
+          AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+          dispatch({ type: loginFacebookTypes.success, user });
+        })
+        .catch((error) => { dispatch({ type: loginFacebookTypes.error, error }); });
     }
   }
 );
@@ -73,7 +75,7 @@ export const signInLocal = (email, password) => (
   (dispatch) => {
     dispatch({ type: fetchSignInTypes.processing });
 
-    return fetchUtil.postWithBody({ url: 'https://beta.noteable.me/auth/local/jwt', body: { username: email, password } })
+    return fetchUtil.postWithBody({ url: `${authBaseUrl}/auth/local/jwt`, body: { username: email, password } })
       .then((response) => {
         if (response.status < 200 || response.status >= 300) {
           throw new Error('Could not sign user in');
@@ -121,7 +123,7 @@ export const getAlreadySignedInUser = () => (
 
 const fetchCurrentProfile = (user, next) => {
   fetchUtil.get({
-    url: 'https://beta.noteable.me/user/me',
+    url: `${authBaseUrl}/user/me`,
     auth: user.jwt,
   })
   .then(response => response.json())
