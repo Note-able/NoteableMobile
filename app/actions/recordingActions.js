@@ -75,7 +75,7 @@ export const removeRecording = recording => (
   }
 );
 
-const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `${apiBaseUrl}/recordings?offset=${offset}`, auth: token })
+const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) => fetchUtil.get({ url: `${apiBaseUrl}/recordings?offset=${offset}&limit=${20}`, auth: token })
 .then(response => response.json(), (error) => { throw error; })
   .then((result) => {
     iteration += 1;
