@@ -33,22 +33,22 @@ export const getCurrentUser = () => (
 );
 
 export const loadCurrentProfile = () => (
-  async (dispatch, getState) => {
+  async (dispatch) => {
     dispatch({ type: loadCurrentProfileTypes.processing });
-    const { SystemReducer, AccountReducer } = getState();
-    let user = AccountReducer.user;
-    if (user.id == null) {
-      user = await AsyncStorage.getItem(USER);
-      user = JSON.parse(user);
+    let user = await AsyncStorage.getItem(USER);
+    user = JSON.parse(user);
+
+    if (user == null) {
+      return dispatch({ type: loadCurrentProfileTypes.success });
     }
 
     try {
       const profile = await AsyncStorage.getItem(profileKey);
-      if (profile != null && SystemReducer.network.connected === 'none') {
+      if (profile != null) {
         return dispatch({ type: loadCurrentProfileTypes.success, profile: JSON.parse(profile) });
       }
 
-      return fetchUtil.get({ url: `https://beta.noteable.me/api/v1/users/${user.id}`, auth: user.jwt })
+      return fetchUtil.get({ url: `${apiBaseUrl}/users/${user.id}`, auth: user.jwt })
         .then((response) => {
           if (response.status < 200 || response.status >= 300) {
             if (response.statusText == null) {
@@ -64,7 +64,10 @@ export const loadCurrentProfile = () => (
           AsyncStorage.setItem(profileKey, JSON.stringify(result));
           return result;
         })
-        .then(result => dispatch({ type: loadCurrentProfileTypes.success, profile: result }));
+        .then((result) => {
+          dispatch({ type: loadCurrentProfileTypes.success, profile: result });
+        })
+        .catch((error) => { throw error; });
     } catch (error) {
       return dispatch({ type: loadCurrentProfileTypes.error, error: error.message });
     }
@@ -85,19 +88,43 @@ export const registerUser = registration => dispatch => {
           throw new Error('Failed to register with a user with that email');
         }
 
-        throw new Error(response.statusText);
-      }
+        return response.json();
+      }, error => dispatch({ type: registerUserTypes.error, error }))
+    .then(() => {
+      dispatch({ type: registerUserTypes.success, result: registration });
+    }, error => dispatch({ type: registerUserTypes.error, error }));
+}
+);
 
-      return response.json();
+export const loginFacebook = authToken => (
+  (dispatch) => {
+    if (authToken == null) {
+      dispatch({ type: loginFacebookTypes.error, error: 'Access token missing.' });
+    } else {
+      dispatch({ type: loginFacebookTypes.processing });
+
+      fetchUtil.postWithBody({ url: `${authBaseUrl}/auth/facebook/jwt`, body: { token: authToken } })
+        .then(response => response.json())
+        .then(async (result) => {
+          const { token, user } = result;
+          await AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+          dispatch({ type: loginFacebookTypes.success, user });
+        })
+        .catch((error) => { dispatch({ type: loginFacebookTypes.error, error }); });
+    }
+  }
+);
+
+return response.json();
     },
-    error => dispatch({ type: registerUserTypes.error, error })
+error => dispatch({ type: registerUserTypes.error, error })
     )
     .then(
-    result => {
-      dispatch({ type: registerUserTypes.success, result });
-    },
-    error => dispatch({ type: registerUserTypes.error, error })
-    );
+  result => {
+    dispatch({ type: registerUserTypes.success, result });
+  },
+  error => dispatch({ type: registerUserTypes.error, error })
+);
 };
 
 export const loginFacebook = authToken => dispatch => {
@@ -188,7 +215,7 @@ export const saveProfile = profile => (
       try {
         const response = await RNFetchBlob.fetch(
           'POST',
-          'https://beta.noteable.me/api/v1/users/edit/picture/new',
+          `${apiBaseUrl}/users/edit/picture/new`,
           {
             Authorization: AccountReducer.user.jwt,
             'Content-Type': 'multipart/form-data',
@@ -210,7 +237,7 @@ export const saveProfile = profile => (
 
     try {
       const response = await fetchUtil.postWithBody({
-        url: `https://beta.noteable.me/api/v1/users/${AccountReducer.user.id}/profile`,
+        url: `${apiBaseUrl}/users/${AccountReducer.user.id}/profile`,
         auth: AccountReducer.user.jwt,
         body: {
           ...AccountReducer.profile,
@@ -222,9 +249,13 @@ export const saveProfile = profile => (
           'Content-Type': 'application/json',
         },
       });
+
+      if (response.status < 200 || response.status > 300) {
+        throw new Error('Update failed');
+      }
+
       return dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile, avatarUrl } });
     } catch (error) {
-      console.log(error);
       return dispatch({ type: saveProfileTypes.error, error: error.message });
     }
   }
@@ -244,8 +275,8 @@ const fetchCurrentProfile = (user, next) => {
 };
 
 const uploadPhoto = (imageUri, auth) => RNFetchBlob.fetch(
-    'POST',
-    'https://beta.noteable.me/api/v1/users/edit/picture/new',
+  'POST',
+  `${apiBaseUrl}/users/edit/picture/new`,
   {
     Authorization: auth,
     'Content-Type': 'multipart/form-data',

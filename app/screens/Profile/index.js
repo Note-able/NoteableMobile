@@ -37,6 +37,22 @@ class Profile extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps) {
+    if ((this.props.profile == null && nextProps.profile == null) || (this.props.user == null && nextProps.user == null)) {
+      return false;
+    }
+
+    if ((this.props.profile == null && nextProps.profile != null) || (this.props.user == null && nextProps.user != null)) {
+      return true;
+    }
+
+    return Object.keys(this.props.profile).map((profileKey) => {
+      const first = this.props.profile[profileKey] || '';
+      const second = nextProps[profileKey] || '';
+      return first === second;
+    }).filter(x => x).length !== 0 || this.props.user.id !== nextProps.user.id;
+  }
+
   setViewY = (event, view) => {
     this._views[view] = { y: event.nativeEvent.layout.y };
   };
@@ -46,7 +62,7 @@ class Profile extends Component {
   };
 
   render() {
-    if (this.props.profile == null) {
+    if (this.props.profile == null || this.props.user == null) {
       return null;
     }
 

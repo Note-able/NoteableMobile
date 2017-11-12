@@ -15,21 +15,24 @@ export const fetchUtil = {
     };
 
     if (getState == null) {
-      return fetch(url, fetchParams).then(response => {
-        if (response.status < 200 || response.status >= 300) {
-          throw new Error(response.status);
+      return fetch(url, fetchParams)
+        .then((response) => {
+          if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.status);
+          }
+
+          return response;
+        });
+    }
+
+    return asyncFetchWithPreferences(url, fetchParams, getState)
+      .then((response) => {
+        if (repsonse.status < 200 || response.status >= 300) {
+          throw new Error(response.statusText);
         }
 
         return response;
       });
-    }
-
-    return asyncFetchWithPreferences(url, fetchParams, getState).then(response => {
-      if (repsonse.status < 200 || response.status >= 300) {
-        throw new Error(response.statusText);
-      }
-      return response;
-    });
   },
   postWithBody: ({ url, auth, body, headers }, getState) => {
     const header = headers || {
@@ -68,7 +71,7 @@ export const fetchUtil = {
   },
 };
 
-export const logErrorToCrashlytics = error => {
+export const logErrorToCrashlytics = (error) => {
   if (global.isSimulator) {
     return;
   }
@@ -122,7 +125,7 @@ const asyncFetchWithPreferences = async (url, fetchParams, getState) => {
     preferences[preferenceKeys.celluarDataKey] !== 'true'
   ) {
     throw new Error('cellular');
-  } else if (SystemReducer.network.connected === '' || SystemReducer.network.connected === 'none') {
+  } else if (System.network.connected === '' || System.network.connected === 'none') {
     throw new Error('network');
   } else {
     return fetch(url, fetchParams);

@@ -34,9 +34,9 @@ const USER = '@ACCOUNTS:CURRENT_USER';
 const INITIALIZE_PLAYER = 'INITIALIZE_PLAYER';
 const TOGGLE_PLAY_FLAG = 'TOGGLE_PLAY_FLAG';
 
-const validate = recordings => {
+const validate = (recordings) => {
   const directory = AudioUtils.DocumentDirectoryPath;
-  return recordings.map(record => {
+  return recordings.map((record) => {
     if (record.isSynced || record.path.indexOf(directory) !== -1) {
       return record;
     }
@@ -60,7 +60,7 @@ const removeLocalRecording = (recording, resolve, reject) => {
   });
 };
 
-export const removeRecording = recording => dispatch => {
+export const removeRecording = recording => (dispatch) => {
   RNFetchBlob.fs.unlink(recording.path);
   realm.write(() => {
     try {
@@ -79,25 +79,25 @@ const fetchRecordingsFromAPI = (dispatch, recordings, iteration, token, offset) 
   fetchUtil
     .get({ url: `${apiBaseUrl}/recordings?offset=${offset}&limit=${20}`, auth: token })
     .then(
-      response => response.json(),
-      error => {
-        throw error;
-      }
+    response => response.json(),
+    (error) => {
+      throw error;
+    },
     )
     .then(
-      result => {
-        iteration += 1;
-        recordings = recordings.concat(result);
+    (result) => {
+      iteration += 1;
+      recordings = recordings.concat(result);
 
-        if (result == null || result.length === 0 || iteration === 10) {
-          return recordings;
-        }
-
-        return fetchRecordingsFromAPI(dispatch, recordings, iteration, token, offset + 20);
-      },
-      error => {
-        throw error;
+      if (result == null || result.length === 0 || iteration === 10) {
+        return recordings;
       }
+
+      return fetchRecordingsFromAPI(dispatch, recordings, iteration, token, offset + 20);
+    },
+    (error) => {
+      throw error;
+    },
     );
 
 export const getRecordingTitle = () => {
@@ -120,10 +120,10 @@ export const syncDownRecordings = () => async (dispatch, getState) => {
 
   dispatch({ type: syncDownRecordingsTypes.processing });
   return fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
-    .then(recordings => {
+    .then((recordings) => {
       realm.write(() => {
         try {
-          recordings.forEach(x => {
+          recordings.forEach((x) => {
             const rec = MapRecordingFromAPI(x);
             const current = realm
               .objects('Recording')
@@ -150,7 +150,7 @@ export const syncDownRecordings = () => async (dispatch, getState) => {
     .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error: error.message }));
 };
 
-export const fetchRecordings = (filter, search) => dispatch => {
+export const fetchRecordings = (filter, search) => (dispatch) => {
   dispatch({ type: fetchRecordingsTypes.processing });
 
   return new Promise((resolve, reject) => {
@@ -164,7 +164,7 @@ export const fetchRecordings = (filter, search) => dispatch => {
       } else if (search != null) {
         const result = [
           ...validate(
-            recordings.filtered(`name CONTAINS "${search}" OR tags CONTAINS "${search}"`)
+            recordings.filtered(`name CONTAINS "${search}" OR tags CONTAINS "${search}"`),
           ),
         ];
         return resolve(result);
@@ -175,14 +175,14 @@ export const fetchRecordings = (filter, search) => dispatch => {
       return reject(e);
     }
   })
-    .then(result => {
+    .then((result) => {
       const recordings = MapRecordingsToAssocArray(result, MapRecordingFromDB);
       dispatch({ type: fetchRecordingsTypes.success, recordings });
     })
     .catch(error => dispatch({ type: fetchRecordingsTypes.error, error: error.message }));
 };
 
-export const addRecording = recording => dispatch => {
+export const addRecording = recording => (dispatch) => {
   dispatch({ type: saveRecordingsTypes.processing });
   return new Promise((resolve, reject) => {
     try {
@@ -198,7 +198,7 @@ export const addRecording = recording => dispatch => {
       dispatch({
         type: saveRecordingsTypes.success,
         recordings: MapRecordingsToAssocArray(recordings, MapRecordingFromDB),
-      })
+      }),
     )
     .catch(error => dispatch({ type: saveRecordingsTypes.error, error: error.message }));
 };
@@ -222,7 +222,7 @@ export const deleteRecording = recording => (dispatch, getState) =>
             url: `${apiBaseUrl}/recordings/${recording.resourceId}`,
             auth: JSON.parse(user).jwt,
           })
-          .then(response => {
+          .then((response) => {
             if (response.status === 204) {
               removeLocalRecording(recording, resolve, reject);
             } else {
@@ -239,7 +239,7 @@ export const deleteRecording = recording => (dispatch, getState) =>
   })
     .then(id => dispatch({ type: deleteRecordingTypes.success, deletedId: id }))
     .catch(error =>
-      dispatch({ type: deleteRecordingTypes.error, error: error.message || 'Failed delete' })
+      dispatch({ type: deleteRecordingTypes.error, error: error.message || 'Failed delete' }),
     );
 
 export const updateRecording = recording => (dispatch, getState) => {
@@ -257,7 +257,7 @@ export const updateRecording = recording => (dispatch, getState) => {
       return reject(e);
     }
   })
-    .then(record => {
+    .then((record) => {
       const { SystemReducer } = getState();
       if (SystemReducer.network.connected === 'none') {
         dispatch({
@@ -313,22 +313,22 @@ export const uploadRecording = (rec, user) => (dispatch, getState) => {
         let data = '';
         RNFetchBlob.fs
           .readStream(
-            recording.path,
-            // encoding, should be one of `base64`, `utf8`, `ascii`
-            'base64',
-            // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
-            // when reading file in BASE64 encoding, buffer size must be multiples of 3.
-            4095
+          recording.path,
+          // encoding, should be one of `base64`, `utf8`, `ascii`
+          'base64',
+          // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
+          // when reading file in BASE64 encoding, buffer size must be multiples of 3.
+          4095,
           )
-          .then(ifstream => {
+          .then((ifstream) => {
             ifstream.open();
-            ifstream.onData(chunk => {
+            ifstream.onData((chunk) => {
               // when encoding is `ascii`, chunk will be an array contains numbers
               // otherwise it will be a string
               data += chunk;
             });
 
-            ifstream.onError(err => {
+            ifstream.onError((err) => {
               logErrorToCrashlytics(err);
             });
 
@@ -346,10 +346,10 @@ export const uploadRecording = (rec, user) => (dispatch, getState) => {
                       Authorization: user.jwt,
                     },
                   },
-                  getState
+                  getState,
                 );
 
-                response.json().then(song => {
+                response.json().then((song) => {
                   realm.write(() => {
                     realm.create(
                       'Recording',
@@ -358,7 +358,7 @@ export const uploadRecording = (rec, user) => (dispatch, getState) => {
                         isSynced: true,
                         resourceId: parseInt(song.id, 10),
                       },
-                      true
+                      true,
                     );
                     resolve({ ...recording, isSynced: true, resourceId: song.id, id: rec.id });
                   });
@@ -373,7 +373,7 @@ export const uploadRecording = (rec, user) => (dispatch, getState) => {
       }
     })
       .then(update =>
-        dispatch({ type: uploadRecordingTypes.success, recording: update, deletedId: rec.id })
+        dispatch({ type: uploadRecordingTypes.success, recording: update, deletedId: rec.id }),
       )
       .catch(error => dispatch({ type: uploadRecordingTypes.error, error }));
   }
@@ -400,7 +400,7 @@ export const downloadRecording = recording => async (dispatch, getState) => {
     path: fileName,
   })
     .fetch('GET', recording.audioUrl)
-    .then(response => {
+    .then((response) => {
       realm.write(() => {
         realm.create('Recording', { id: recording.id, path: response.data }, true);
         dispatch({
@@ -412,12 +412,12 @@ export const downloadRecording = recording => async (dispatch, getState) => {
     .catch(error => dispatch({ type: downloadRecordingTypes.error, error }));
 };
 
-export const logout = () => dispatch => {
+export const logout = () => (dispatch) => {
   const recordings = [...realm.objects('Recording')];
 
-  recordings.forEach(record => {
+  recordings.forEach((record) => {
     if (record.audioUrl != null && record.audioUrl !== '') {
-      removeLocalRecording({ ...record }, () => {});
+      removeLocalRecording({ ...record }, () => { });
     }
   });
 

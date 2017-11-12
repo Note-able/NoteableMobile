@@ -63,7 +63,7 @@ export default (state = defaultState, action) => {
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
     case saveProfileTypes.processing:
-      return { ...state, isProcessing: true };
+      return { ...state, done: false, isProcessing: true };
     case getUserPreferencesTypes.success:
       return {
         ...state,
@@ -96,6 +96,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         isProcessing: false,
+        done: true,
         user,
       };
     case fetchSignInTypes.error:
@@ -109,7 +110,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         isProcessing: false,
-        profile: result,
+        registration: result,
       };
     case saveProfileTypes.success:
     case loadCurrentProfileTypes.success:

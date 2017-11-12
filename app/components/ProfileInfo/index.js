@@ -28,7 +28,7 @@ export default class ProfileInfo extends Component {
     isEditMode: false,
     editName: `${this.props.firstName} ${this.props.lastName}`,
     editBio: this.props.bio,
-    editImage: this.props.profileImage,
+    editImage: null,
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -63,50 +63,57 @@ export default class ProfileInfo extends Component {
       firstName: this.state.editName.split(' ')[0],
       lastName: hasLastName ? this.state.editName.split(' ')[1] : '',
       bio: this.state.editBio,
-      profileImage: this.state.editImage,
+      profileImage: this.state.editImage || this.props.profileImage,
+      coverImage: this.state.editCoverImage || this.props.coverImage,
     });
   }
 
-  pickImage = () => {
+  pickImage = (property) => {
     if (Platform.OS === 'ios') {
       this.setState({ isChoosingImage: true });
-      ImagePickerIOS.openSelectDialog(
-        {},
-        imageUri => this.setState({ editImage: imageUri }),
-        error => this.setState({ error }),
-      );
+      if (ImagePickerIOS) {
+        ImagePickerIOS.openSelectDialog(
+          {},
+          imageUri => this.setState({ [property]: imageUri }),
+          error => this.setState({ error }),
+        );
+      }
     }
   }
 
   renderEditMode() {
-    const { coverImage, profileImage } = this.props;
     return (
-      <View>
-        <TouchableOpacity style={styles.edit.close} onPress={() => this.setState({ isEditMode: false })}>
-          <Icon name="close" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.edit.save} onPress={this.saveProfile}>
-          <Text style={{ color: 'white', fontSize: 16 }}>Save</Text>
-        </TouchableOpacity>
-        <View style={styles.coverImageView}>
-          <Image
-            source={{ uri: coverImage }}
-            style={styles.coverImage}
-          />
-          <View style={styles.coverImageScreen} />
+      <View style={styles.edit.screen}>
+        <View style={styles.edit.buttons}>
+          <TouchableOpacity style={[styles.edit.save, styles.edit.cancel]} onPress={() => this.setState({ isEditMode: false })}>
+            <Text style={{ color: colors.red, fontSize: 16 }}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.edit.save} onPress={this.saveProfile}>
+            <Text style={{ color: colors.white, fontSize: 16 }}>Save</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.coverImageView, { backgroundColor: 'transparent' }]}>
+          <TouchableOpacity onPress={() => this.pickImage('editCoverImage')} style={styles.edit.coverImageButton}>
+            <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
+          </TouchableOpacity>
+          {this.state.editCoverImage ?
+            <Image
+              source={{ uri: this.state.editCoverImage }}
+              style={styles.coverImage}
+            /> :
+            <View
+              style={[styles.coverImage, { backgroundColor: 'transparent' }]}
+            /> }
         </View>
         <View style={styles.profileHeader}>
-          <View style={styles.profileImageView}>
-            <Image
-              source={{ uri: this.state.editImage || profileImage }}
-              style={styles.profileImage}
-            />
-            <TouchableOpacity onPress={this.pickImage} style={[styles.profileImage, { backgroundColor: 'rgba(0, 0, 0, 0.4)', width: 75, height: 75, position: 'absolute', justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[styles.profileImageView, { backgroundColor: 'transparent' }]}>
+            {this.state.editImage && <Image source={{ uri: this.state.editImage }} style={styles.profileImage} />}
+            <TouchableOpacity onPress={() => this.pickImage('editImage')} style={[styles.profileImage, styles.edit.profileImage]}>
               <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
             </TouchableOpacity>
           </View>
           <View style={styles.edit.name}>
-            <TextInput numberOfLines={1} onChangeText={text => this.setState({ editName: text })} style={{ marginRight: 4, fontSize: 24, width: windowWidth - 155, color: 'white', height: 32 }} value={this.state.editName} />
+            <TextInput numberOfLines={1} onChangeText={text => this.setState({ editName: text })} style={styles.edit.nameInput} value={this.state.editName} />
           </View>
         </View>
         <View style={styles.bio}>
@@ -128,14 +135,11 @@ export default class ProfileInfo extends Component {
   }
 
   render() {
-    if (this.state.isEditMode && this.props.canEdit) {
-      return this.renderEditMode();
-    }
-
     const { coverImage, profileImage, firstName, lastName, bio } = this.props;
     const name = `${firstName} ${lastName}`;
     return (
-      <View>
+      <View style={{ height: '100%' }}>
+        {this.state.isEditMode && this.props.canEdit && this.renderEditMode()}
         <View style={styles.coverImageView}>
           <Image
             source={{ uri: coverImage }}
@@ -157,10 +161,10 @@ export default class ProfileInfo extends Component {
             </TouchableOpacity>
           }
         </View>
-        <View style={styles.bio}>
+        {!this.state.isEditMode && <View style={styles.bio}>
           <Text style={styles.header}>About</Text>
           <Text style={styles.description}>{bio}</Text>
-        </View>
+        </View>}
       </View>
     );
   }
@@ -238,6 +242,38 @@ const styles = {
     width: 50,
   },
   edit: {
+    nameInput: {
+      marginRight: 4,
+      fontSize: 24,
+      width: windowWidth - 155,
+      color: 'white',
+      height: 32,
+    },
+    profileImage: {
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      width: 75,
+      height: 75,
+      position: 'absolute',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    screen: {
+      height: '100%',
+      width: '100%',
+      position: 'absolute',
+      top: 0,
+      zIndex: 10,
+    },
+    coverImageButton: {
+      width: 75,
+      height: 75,
+      zIndex: 10,
+      position: 'absolute',
+      top: 20,
+      right: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     description: {
       backgroundColor: 'white',
       shadowColor: 'rgba(0, 0, 0, 0.4)',
@@ -253,16 +289,6 @@ const styles = {
       paddingBottom: 4,
       overflow: 'hidden',
     },
-    close: {
-      left: 20,
-      position: 'absolute',
-      backgroundColor: 'transparent',
-      top: 40,
-      elevation: 100,
-      zIndex: 10,
-      height: 50,
-      width: 50,
-    },
     name: {
       marginTop: -24,
       borderBottomWidth: 1,
@@ -274,13 +300,29 @@ const styles = {
     },
     save: {
       borderRadius: 4,
-      position: 'absolute',
-      top: 40,
-      right: 20,
       zIndex: 10,
       backgroundColor: colors.green,
       height: 36,
-      width: 60,
+      width: 80,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    cancel: {
+      marginBottom: 24,
+      backgroundColor: 'white',
+      borderColor: colors.red,
+      borderWidth: 1,
+    },
+    buttons: {
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      padding: 20,
+      shadowColor: 'black',
+      shadowOpacity: 1,
+      shadowRadius: 75,
+      shadowOffset: { width: 25, height: 25 },
+      backgroundColor: 'transparent',
       justifyContent: 'center',
       alignItems: 'center',
     },

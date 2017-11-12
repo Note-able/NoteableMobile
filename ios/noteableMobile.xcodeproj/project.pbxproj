@@ -528,7 +528,6 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				711C994D1F907B9E00ED6203 /* libRCTCameraRoll.a in Frameworks */,
 				10C04751C6534C619B442730 /* libRNAudio.a in Frameworks */,
 				1869AAEA1EDE8BFF00DA34CF /* FBSDKShareKit.framework in Frameworks */,
 				6BF922F90910460B81D30EC0 /* libRCTFBSDK.a in Frameworks */,
@@ -546,6 +545,7 @@
 				561FB0BDF05B4C18B5A8CFD3 /* libRealmReact.a in Frameworks */,
 				AB8C6A007108480D9C911C80 /* libc++.tbd in Frameworks */,
 				0A6CF8DDFA5144498ABB62F9 /* libz.tbd in Frameworks */,
+				711C994D1F907B9E00ED6203 /* libRCTCameraRoll.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
