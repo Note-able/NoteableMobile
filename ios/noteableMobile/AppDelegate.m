@@ -24,12 +24,17 @@
     didFinishLaunchingWithOptions:launchOptions];
   [Fabric with:@[[Crashlytics class]]];
   NSURL *jsCodeLocation;
+  
+  BOOL isSimulator = NO;
+#if TARGET_IPHONE_SIMULATOR
+  isSimulator = YES;
+#endif
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"noteableMobile"
-                                               initialProperties:nil
+                                               initialProperties:@{@"isSimulator": @(isSimulator)}
                                                    launchOptions:launchOptions];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
 

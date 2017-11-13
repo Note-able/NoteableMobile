@@ -20,6 +20,7 @@ const AppNavigator = StackNavigator(appScreens, {
 export default class NoteableMobile extends Component {
   componentDidMount() {
     store.dispatch(getAlreadySignedInUser());
+    global.isSimulator = this.props.isSimulator;
     Answers.logCustom('Opened App');
   }
 

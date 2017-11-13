@@ -71,6 +71,9 @@ export const fetchUtil = {
 };
 
 export const logErrorToCrashlytics = (error) => {
+  if (global.isSimulator) {
+    return;
+  }
   let loggableError = error;
   if (typeof error === 'object') {
     loggableError = JSON.stringify(error);
@@ -84,7 +87,9 @@ export const logErrorToCrashlytics = (error) => {
 };
 
 export const logCustomToFabric = (eventType, properties) => {
-  Answers.logCustom(eventType, properties);
+  if (!global.isSimulator) {
+    Answers.logCustom(eventType, properties);
+  }
 };
 
 export const debounceFunc = (name, func, delay) => {
