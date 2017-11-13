@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   ImagePickerIOS,
@@ -10,43 +11,91 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../styles';
+import {
+  getUser,
+  loadCurrentProfile,
+  saveProfile,
+} from '../../actions/accountActions';
 
-export default class ProfileInfo extends Component {
+const mapStateToProps = state => ({
+  user: state.AccountReducer.user,
+  profile: state.AccountReducer.profile,
+  isProcessing: state.AccountReducer.isProcessing,
+});
+
+const mapDispatchToProps = dispatch => ({
+  getCurrentUser: (user) => { dispatch(getUser(user)); },
+  loadCurrentProfile: () => dispatch(loadCurrentProfile()),
+  saveProfile: profile => dispatch(saveProfile(profile)),
+});
+
+class ProfileInfo extends Component {
   static propTypes = {
-    coverImage: PropTypes.string,
-    profileImage: PropTypes.string,
-    firstName: PropTypes.string.isRequired,
-    lastName: PropTypes.string.isRequired,
-    bio: PropTypes.string,
+    profile: PropTypes.shape({
+      coverImage: PropTypes.string,
+      avatarUrl: PropTypes.string,
+      firstName: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+      bio: PropTypes.string,
+      canEdit: PropTypes.bool,
+    }),
     saveProfile: PropTypes.func.isRequired,
-    canEdit: PropTypes.bool,
   };
 
   state = {
-    isEditMode: false,
-    editName: `${this.props.firstName} ${this.props.lastName}`,
-    editBio: this.props.bio,
-    editImage: null,
+    isEditMode: true,
+  }
+
+  componentDidMount() {
+    if (this.props.profile != null) {
+      this.setEditProfile(this.props);
+    } else {
+      this.props.loadCurrentProfile();
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     const stateKeys = Object.keys(this.state);
     const propsKeys = Object.keys(this.props).filter(key => typeof this.props[key] !== 'function');
 
-    return stateKeys.filter(key => this.state[key] !== nextState[key]) || propsKeys.filter(key => this.props[key] !== nextProps[key]);
+    return stateKeys.filter(key => this.state[key] !== nextState[key]).length !== 0 || propsKeys.filter(key => this.props[key] !== nextProps[key]).length !== 0;
   }
 
   componentWillReceiveProps(nextProps) {
-    const { coverImage, profileImage, firstName, lastName, bio } = this.props;
+    const { coverImage, avatarUrl, firstName, lastName, bio } = this.props;
 
-    if (this.state.submitting && (coverImage !== nextProps.coverImage || profileImage !== nextProps.profileImage || firstName !== nextProps.firstName || lastName !== nextProps.lastName || bio !== nextProps.bio)) {
+    if (this.props.isProcessing && this.props.profile == null) {
+      this.setState({
+        isLoading: true,
+      });
+    } else {
+      this.setState({
+        isLoading: false,
+      });
+    }
+
+    if (this.props.profile == null && nextProps.profile != null) {
+      this.setEditProfile(nextProps);
+    }
+
+    if (this.state.submitting && (coverImage !== nextProps.coverImage || avatarUrl !== nextProps.avatarUrl || firstName !== nextProps.firstName || lastName !== nextProps.lastName || bio !== nextProps.bio)) {
       this.setState({
         isEditMode: false,
         submitting: false,
       });
     }
+  }
+
+  setEditProfile = (props) => {
+    this.setState({
+      editName: `${props.profile.firstName} ${props.profile.lastName}`,
+      editBio: props.profile.bio,
+      editImage: null,
+      isLoading: false,
+    });
   }
 
   saveProfile = () => {
@@ -59,12 +108,12 @@ export default class ProfileInfo extends Component {
     });
 
     const hasLastName = this.state.editName.split(' ').length !== 1;
-    this.props.saveProfile({
+    this.props.profile.saveProfile({
       firstName: this.state.editName.split(' ')[0],
       lastName: hasLastName ? this.state.editName.split(' ')[1] : '',
       bio: this.state.editBio,
-      profileImage: this.state.editImage || this.props.profileImage,
-      coverImage: this.state.editCoverImage || this.props.coverImage,
+      profileImage: this.state.editImage || this.props.profile.avatarUrl,
+      coverImage: this.state.editCoverImage || this.props.profile.coverImage,
     });
   }
 
@@ -135,11 +184,41 @@ export default class ProfileInfo extends Component {
   }
 
   render() {
-    const { coverImage, profileImage, firstName, lastName, bio } = this.props;
+    const globalNav = this.props.screenProps.screenProps.stackNavigation.navigate;
+    if (this.state.isLoading) {
+      return (
+        <View style={{ backgroundColor: colors.shade10, height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: colors.shade90, fontSize: 20, marginBottom: 20 }}>Loading</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    }
+
+    if (this.props.profile == null) {
+      return (
+        <View style={{ width: '100%', height: '100%', backgroundColor: colors.shade10, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 20, color: colors.shade90 }}>Sign in to see your profile!</Text>
+          <TouchableOpacity style={{ width: 100 }} onPress={() => globalNav('Authentication')}>
+            <View style={styles.authButton}>
+              <Text>Login</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    const { coverImage, avatarUrl, bio } = this.props.profile;
+    let { firstName, lastName } = this.props.profile;
+
+    firstName = firstName[0].toUpperCase() + firstName.substring(1);
+    lastName = lastName[0].toUpperCase() + lastName.substring(1);
+
+    const canEdit = this.props.profile.id === this.props.user.id;
     const name = `${firstName} ${lastName}`;
+
     return (
-      <View style={{ height: '100%' }}>
-        {this.state.isEditMode && this.props.canEdit && this.renderEditMode()}
+      <View style={{ height: '100%', backgroundColor: 'white' }}>
+        {this.state.isEditMode && canEdit && this.renderEditMode()}
         <View style={styles.coverImageView}>
           <Image
             source={{ uri: coverImage }}
@@ -150,12 +229,12 @@ export default class ProfileInfo extends Component {
         <View style={styles.profileHeader}>
           <View style={styles.profileImageView}>
             <Image
-              source={{ uri: profileImage }}
+              source={{ uri: avatarUrl }}
               style={styles.profileImage}
             />
           </View>
           <Text ellipsizeMode="tail" numberOfLines={1} style={styles.name}>{name}</Text>
-          {this.props.canEdit &&
+          {canEdit &&
             <TouchableOpacity style={styles.button} onPress={() => this.setState({ isEditMode: true })}>
               <Icon name="create" size={24} style={{ width: 24, height: 24 }} color={colors.shade140} />
             </TouchableOpacity>
@@ -169,6 +248,8 @@ export default class ProfileInfo extends Component {
     );
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileInfo);
 
 const windowWidth = Dimensions.get('window').width;
 

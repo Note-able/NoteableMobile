@@ -1,24 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
+import React from 'react';
+import { StackNavigator } from 'react-navigation';
+import { profileScreens } from '../../components/People/index.js';
 
-import ProfileInfo from '../../components/ProfileInfo/index.js';
-import {
-  getUser,
-  loadCurrentProfile,
-  saveProfile,
-} from '../../actions/accountActions';
-
-const mapStateToProps = state => ({
-  user: state.AccountReducer.user,
-  profile: state.AccountReducer.profile,
-});
-
-const mapDispatchToProps = dispatch => ({
-  getCurrentUser: (user) => { dispatch(getUser(user)); },
-  loadCurrentProfile: () => dispatch(loadCurrentProfile()),
-  saveProfile: profile => dispatch(saveProfile(profile)),
+const AppNavigator = StackNavigator(profileScreens, {
+  initialRouteName: 'Me',
+  navigationOptions: { header: null },
 });
 
 class Profile extends Component {

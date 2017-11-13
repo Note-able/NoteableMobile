@@ -63,6 +63,7 @@ export default (state = defaultState, action) => {
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
     case saveProfileTypes.processing:
+    case loadCurrentProfileTypes.processing:
       return { ...state, done: false, isProcessing: true };
     case getUserPreferencesTypes.success:
       return {
