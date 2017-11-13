@@ -118,11 +118,23 @@ class Settings extends Component {
     });
   };
 
+  addLocation = () => {
+    navigator.geolocation.getCurrentPosition((result) => {
+      console.log(result.coords.latitude, result.coords.longitude);
+    });
+  }
+
   renderProfileRows = () => (
     <View>
       <View style={styles.row}>
         <Text style={styles.rowLabel}>Email</Text>
         <TextInput style={styles.editTextRow} editable={false} value={this.state.email} />
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>Location</Text>
+        {this.state.location ?
+          <TextInput style={styles.editTextRow} editable={false} value={this.state.location || ''} placeholder="Add your location" placeholderTextColor={colors.shade90} /> :
+          <TouchableOpacity style={styles.editButtonRow} onPress={this.addLocation}><Text style={{ color: colors.shade10 }}>Add your location</Text></TouchableOpacity>}
       </View>
     </View>
   )
@@ -210,6 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     marginHorizontal: -2,
+    marginTop: 8,
   },
   rowLabel: {
     height: 36,
@@ -230,5 +243,15 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     color: colors.shade140,
     paddingHorizontal: 12,
+  },
+  editButtonRow: {
+    height: 36,
+    maxWidth: 300,
+    width: '80%',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
   },
 });
