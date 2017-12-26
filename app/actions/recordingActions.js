@@ -332,7 +332,7 @@ export const downloadRecording = recording => (
     if (SystemReducer.network.connected === 'cellular' && userPreferences[preferenceKeys.celluarDataKey] !== 'true') {
       dispatch({ type: networkPreferencesFailureType.celllar });
       return;
-    } else if (System.network.connected === 'none') {
+    } else if (SystemReducer.network.connected === 'none') {
       dispatch({ type: queueNetworkRequestType, request: downloadRecordingTypes.queue });
       return;
     }

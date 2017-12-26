@@ -118,10 +118,10 @@ export const getPreferences = async () => {
 
 const asyncFetchWithPreferences = async (url, fetchParams, getState) => {
   const preferences = await getPreferences();
-  const { System } = getState();
-  if (System.network.connected === 'cellular' && preferences[preferenceKeys.celluarDataKey] !== 'true') {
+  const { SystemReducer } = getState();
+  if (SystemReducer.network.connected === 'cellular' && preferences[preferenceKeys.celluarDataKey] !== 'true') {
     throw new Error('cellular');
-  } else if (System.network.connected === '' || System.network.connected === 'none') {
+  } else if (SystemReducer.network.connected === '' || SystemReducer.network.connected === 'none') {
     throw new Error('network');
   } else {
     return fetch(url, fetchParams);
