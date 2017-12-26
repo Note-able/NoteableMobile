@@ -8,7 +8,6 @@ import com.noteable.react.modules.multitrack.MultiTrackPackage;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
-import com.audioStreaming.ReactNativeAudioStreamingPackage;
 import com.smixx.fabric.FabricPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import io.fabric.sdk.android.Fabric;
@@ -42,7 +41,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativeAudioStreamingPackage(),
             new FabricPackage(),
             new FBSDKPackage(mCallbackManager),
             new RealmReactPackage(),

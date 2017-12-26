@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -59,7 +58,6 @@
 		61D3A2621FF0C5A0006ED4A1 /* MultiTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A5D6C81FCA88F0003F0B86 /* MultiTrack.swift */; };
 		6BF922F90910460B81D30EC0 /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D635621512FC468A906F3D1C /* libRCTFBSDK.a */; };
 		71097A4F1F1524350000D6ED /* libStreamingKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71097A4C1F13D0320000D6ED /* libStreamingKit.a */; };
-		71097A511F1524500000D6ED /* libReactNativeAudioStreaming.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71097A431F13D00A0000D6ED /* libReactNativeAudioStreaming.a */; };
 		78408045CF414AA4B9CD25E0 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0695AE55CBAB4178B86BB936 /* Octicons.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8DEE2EAEAC504681B36543C0 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 78761EAD29784EE6AC2D90D6 /* libc++.tbd */; };
@@ -300,13 +298,6 @@
 			remoteGlobalIDString = 2D2A28201D9B03D100D4039D;
 			remoteInfo = "RCTAnimation-tvOS";
 		};
-		71097A421F13D00A0000D6ED /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 71097A3D1F13D00A0000D6ED /* ReactNativeAudioStreaming.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = ReactNativeAudioStreaming;
-		};
 		71097A491F13D0320000D6ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 71097A441F13D0320000D6ED /* Pods.xcodeproj */;
@@ -402,7 +393,6 @@
 		61A5D6CA1FCA88F0003F0B86 /* MultiTrackBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MultiTrackBridge.m; path = noteableMobile/MultiTrackBridge.m; sourceTree = "<group>"; };
 		6E8979E05495475982B5F74D /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		71097A3B1F13CFDB0000D6ED /* libStreamingKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libStreamingKit.a; path = "/Users/MichaelNakayama/Development/NoteableMobile/node_modules/react-native-audio-streaming/ios/Pods/../build/Debug-iphoneos/StreamingKit/libStreamingKit.a"; sourceTree = "<absolute>"; };
-		71097A3D1F13D00A0000D6ED /* ReactNativeAudioStreaming.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeAudioStreaming.xcodeproj; path = "../node_modules/react-native-audio-streaming/ios/ReactNativeAudioStreaming.xcodeproj"; sourceTree = "<group>"; };
 		71097A441F13D0320000D6ED /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = "../node_modules/react-native-audio-streaming/ios/Pods/Pods.xcodeproj"; sourceTree = "<group>"; };
 		71B0C5651F7E02BA009FB463 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFoundation.framework/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
 		73B0A37FFEA3492DB1B919D2 /* RNSound.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSound.xcodeproj; path = "../node_modules/react-native-sound/RNSound.xcodeproj"; sourceTree = "<group>"; };
@@ -467,7 +457,6 @@
 				8DEE2EAEAC504681B36543C0 /* libc++.tbd in Frameworks */,
 				0F20EEC13F3B40749134FA91 /* libz.tbd in Frameworks */,
 				EE15F11725CF4B7EB5DD5B64 /* libSMXCrashlytics.a in Frameworks */,
-				71097A511F1524500000D6ED /* libReactNativeAudioStreaming.a in Frameworks */,
 				71097A4F1F1524350000D6ED /* libStreamingKit.a in Frameworks */,
 				9CD1EE20C5224679AF699FC7 /* libRNSound.a in Frameworks */,
 				2BC10E002BC2461A9608118E /* libRNBackgroundFetch.a in Frameworks */,
@@ -676,14 +665,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		71097A3E1F13D00A0000D6ED /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				71097A431F13D00A0000D6ED /* libReactNativeAudioStreaming.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		71097A451F13D0320000D6ED /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -738,7 +719,6 @@
 			isa = PBXGroup;
 			children = (
 				71097A441F13D0320000D6ED /* Pods.xcodeproj */,
-				71097A3D1F13D00A0000D6ED /* ReactNativeAudioStreaming.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -927,7 +907,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 87FK6URL28;
-						LastSwiftMigration = 0910;
+						LastSwiftMigration = 910;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -1015,10 +995,6 @@
 				{
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-				},
-				{
-					ProductGroup = 71097A3E1F13D00A0000D6ED /* Products */;
-					ProjectRef = 71097A3D1F13D00A0000D6ED /* ReactNativeAudioStreaming.xcodeproj */;
 				},
 				{
 					ProductGroup = 1845CB761EDFA7430026783E /* Products */;
@@ -1270,13 +1246,6 @@
 			remoteRef = 5E9157341DD0AC6500FF2AA8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		71097A431F13D00A0000D6ED /* libReactNativeAudioStreaming.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libReactNativeAudioStreaming.a;
-			remoteRef = 71097A421F13D00A0000D6ED /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		71097A4A1F13D0320000D6ED /* libPods-ReactNativeAudioStreaming.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1486,7 +1455,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1495,8 +1463,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1525,7 +1491,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1534,8 +1499,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1574,7 +1537,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1624,7 +1586,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1670,7 +1631,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1678,8 +1638,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1717,7 +1675,6 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"$(SRCROOT)/../node_modules/react-native-fabric/ios/SMXCrashlytics",
-					"$(SRCROOT)/../node_modules/react-native-audio-streaming/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sound/RNSound",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
@@ -1725,8 +1682,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1756,8 +1711,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.noteableMobile-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1783,8 +1736,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.noteableMobile-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
