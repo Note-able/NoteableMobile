@@ -52,6 +52,13 @@ class MultiTrack : NSObject {
     self.audioPlayerFiles.removeValue(forKey: id)
   }
   
+  @objc(Stop)
+  func Stop() {
+    if self.audioEngine.isRunning {
+      self.audioEngine.stop()
+    }
+  }
+  
   @objc(Start)
   func Start() {
     if trackFileNames.count == 0 {
