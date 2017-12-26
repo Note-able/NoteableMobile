@@ -8,10 +8,10 @@ import com.noteable.react.modules.multitrack.MultiTrackPackage;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
+import io.realm.react.RealmReactPackage;
 import com.smixx.fabric.FabricPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import io.fabric.sdk.android.Fabric;
-import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -41,9 +41,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RealmReactPackage(),
             new FabricPackage(),
             new FBSDKPackage(mCallbackManager),
-            new RealmReactPackage(),
             new VectorIconsPackage(),
             new RNSoundPackage(),
             new LinearGradientPackage(),
