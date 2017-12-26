@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Animated, Easing, View, Text, TouchableHighlight, ScrollView, Modal } from 'react-native';
+import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
 
 import Recording from '../Recording';
@@ -39,7 +40,9 @@ export default class MultiTrackMixer extends Component {
   }
 
   addTrack = (recording) => {
-    MultiTrack.AddTrack(`${recording.id}`, recording.path);
+    const splits = recording.path.split('/');
+    const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
+    MultiTrack.AddTrack(`${recording.id}`, realPath);
     this.setState({ selectedRecordings: [...this.state.selectedRecordings, recording], modalVisible: false });
   }
 

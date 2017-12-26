@@ -241,8 +241,7 @@ export default class Audio extends Component {
 
     if (!isRecording) {
       const { metronomeState } = this.state;
-      const datedFilePath = `${moment().format('HHmmss')}`;
-      const audioPath = `${this._recordingLocation}/${datedFilePath}.aac`;
+      const audioPath = `${this._recordingLocation}/${moment().format('HHmmss')}.aac`;
       await this.prepareRecordingPath(audioPath);
       this.setState({ recording: true, stoppedRecording: false, audioPath });
       if (metronomeState !== metronomeStates.off) {

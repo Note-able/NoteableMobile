@@ -370,6 +370,13 @@
 			remoteGlobalIDString = ADD01A681E09402E00F6D226;
 			remoteInfo = "RCTBlob-tvOS";
 		};
+		61F4F2331FF2C81300182199 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0949E3868DC54D94BA7A7931 /* BVLinearGradient.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 64AA15081EF7F30100718508;
+			remoteInfo = "BVLinearGradient-tvOS";
+		};
 		71097A491F13D0320000D6ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 71097A441F13D0320000D6ED /* Pods.xcodeproj */;
@@ -733,6 +740,7 @@
 			isa = PBXGroup;
 			children = (
 				1869AAB71EDE8BE200DA34CF /* libBVLinearGradient.a */,
+				61F4F2341FF2C81300182199 /* libBVLinearGradient.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1419,6 +1427,13 @@
 			fileType = archive.ar;
 			path = "libRCTBlob-tvOS.a";
 			remoteRef = 619D033D1FF1E64100CD74CC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		61F4F2341FF2C81300182199 /* libBVLinearGradient.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libBVLinearGradient.a;
+			remoteRef = 61F4F2331FF2C81300182199 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		71097A4A1F13D0320000D6ED /* libPods-ReactNativeAudioStreaming.a */ = {
