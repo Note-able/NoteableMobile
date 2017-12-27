@@ -233,10 +233,12 @@ export default class Audio extends Component {
       return;
     }
 
-    const perm = await AudioRecorder.requestAuthorization();
-    if (!perm) {
-      this.props.alert('Please allow microphone access first.', 'error');
-      return;
+    if (AudioRecorder.requestAuthorization) {
+      const perm = await AudioRecorder.requestAuthorization();
+      if (!perm) {
+        this.props.alert('Please allow microphone access first.', 'error');
+        return;
+      }
     }
 
     if (!isRecording) {
