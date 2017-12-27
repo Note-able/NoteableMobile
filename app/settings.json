@@ -1,4 +1,4 @@
 {
-  "apiBaseUrl": "https://noteable.me/api/v1",
-  "authBaseUrl": "https://noteable.me"
+  "apiBaseUrl": "https://beta.noteable.me/api/v1",
+  "authBaseUrl": "https://beta.noteable.me"
 }

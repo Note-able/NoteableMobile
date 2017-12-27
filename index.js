@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StatusBar, View } from 'react-native';
+import { StatusBar, View, AppRegistry } from 'react-native';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -38,3 +38,5 @@ export default class NoteableMobile extends Component {
     );
   }
 }
+
+AppRegistry.registerComponent('noteableMobile', () => NoteableMobile);

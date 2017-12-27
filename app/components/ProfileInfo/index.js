@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Text, View, Image, Dimensions } from 'react-native';
 
 export default function ProfileInfo({ coverImage, profileImage, name, bio, onLayout }) {

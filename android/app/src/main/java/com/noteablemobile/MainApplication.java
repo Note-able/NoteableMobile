@@ -4,14 +4,14 @@ import android.app.Application;
 
 /* Our modules */
 import com.noteable.react.modules.metronome.MetronomePackage;
+import com.noteable.react.modules.multitrack.MultiTrackPackage;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.react.ReactApplication;
-import com.audioStreaming.ReactNativeAudioStreamingPackage;
+import io.realm.react.RealmReactPackage;
 import com.smixx.fabric.FabricPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import io.fabric.sdk.android.Fabric;
-import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -23,7 +23,6 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
-import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.facebook.appevents.AppEventsLogger;
 
 import java.util.Arrays;
@@ -41,17 +40,22 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativeAudioStreamingPackage(),
+            new RealmReactPackage(),
             new FabricPackage(),
             new FBSDKPackage(mCallbackManager),
-            new RealmReactPackage(),
             new VectorIconsPackage(),
             new RNSoundPackage(),
             new LinearGradientPackage(),
             new RNFetchBlobPackage(),
             new ReactNativeAudioPackage(),
-            new MetronomePackage()
+            new MetronomePackage(),
+            new MultiTrackPackage()
       );
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index";
     }
   };
 

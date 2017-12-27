@@ -1,5 +1,4 @@
 import Sound from 'react-native-sound';
-import { ReactNativeAudioStreaming } from 'react-native-audio-streaming';
 import {
   DeviceEventEmitter,
 } from 'react-native';
@@ -26,78 +25,34 @@ export const startPlayer = recording => (
       state.sound.release();
     }
 
-    if (recording.path !== '') {
-      const splits = recording.path.split('/');
-      const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
+    const splits = recording.path.split('/');
+    const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
 
-      const reactNativeSound = new Sound(realPath, '', (error) => {
-        if (error) {
-          dispatch({ type: bufferCompleteType });
-          return dispatch({ type: startPlayerTypes.error, error });
-        }
-
-        const sound = {
-          play: () => reactNativeSound.play(() => {
-            dispatch({ type: finishedPlayingType });
-          }),
-          stop: () => reactNativeSound.stop(),
-          resume: () => reactNativeSound.resume(),
-          getCurrentTime: () => reactNativeSound.getCurrentTime(),
-          pause: () => reactNativeSound.pause(),
-          release: () => reactNativeSound.release(),
-          errorCount: 0,
-          key: reactNativeSound._key,
-          duration: reactNativeSound.getDuration(),
-        };
-
-        sound.play();
-
+    const reactNativeSound = new Sound(recording.path !== '' ? realPath : recording.audioUrl, '', (error) => {
+      if (error) {
         dispatch({ type: bufferCompleteType });
-        return dispatch({ type: startPlayerTypes.success, sound, recording });
-      });
-    } else {
-      dispatch({ type: startPlayerTypes.processing, buffering: true });
+        return dispatch({ type: startPlayerTypes.error, error });
+      }
+
       const sound = {
-        play: () => (new Promise((resolve, reject) => {
-          ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
-          DeviceEventEmitter.removeAllListeners();
-          DeviceEventEmitter.addListener(
-            'AudioBridgeEvent', (evt) => {
-              if (evt.status === 'STOPPED') {
-                dispatch({ type: bufferCompleteType });
-                dispatch({ type: finishedPlayingType });
-              } else if (evt.status === 'PLAYING') {
-                sound.duration = evt.duration;
-                sound.currentTime = evt.progress;
-                if (!sound.hasStarted) {
-                  sound.hasStarted = true;
-                  dispatch({ type: startPlayerTypes.success, sound, recording });
-                  dispatch({ type: bufferCompleteType });
-                }
-                resolve();
-              } else if (evt.status === 'ERROR') {
-                if (sound.errorCount === 0) {
-                  ReactNativeAudioStreaming.play(recording.audioUrl, { showIniOSMediaCenter: true, showInAndroidNotifications: true });
-                } else {
-                  reject();
-                }
-              }
-            },
-          );
-        })),
-        stop: ReactNativeAudioStreaming.stop,
-        resume: ReactNativeAudioStreaming.resume,
-        pause: ReactNativeAudioStreaming.pause,
-        release: ReactNativeAudioStreaming.stop,
-        getCurrentTime: callback => callback(sound.currentTime),
+        play: () => reactNativeSound.play(() => {
+          dispatch({ type: finishedPlayingType });
+        }),
+        stop: () => reactNativeSound.stop(),
+        resume: () => reactNativeSound.resume(),
+        getCurrentTime: () => reactNativeSound.getCurrentTime(),
+        pause: () => reactNativeSound.pause(),
+        release: () => reactNativeSound.release(),
         errorCount: 0,
-        key: 0,
-        duration: recording.duration,
-        hasStarted: false,
+        key: reactNativeSound._key,
+        duration: reactNativeSound.getDuration(),
       };
 
       sound.play();
-    }
+
+      dispatch({ type: bufferCompleteType });
+      return dispatch({ type: startPlayerTypes.success, sound, recording });
+    });
   }
 );
 
