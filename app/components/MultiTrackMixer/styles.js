@@ -62,6 +62,7 @@ export default StyleSheet.create({
     height: 40,
     borderColor: colors.white,
     borderWidth: 1,
+    borderBottomLeftRadius: 4,
   },
   modalAddButton: {
     flex: 1,

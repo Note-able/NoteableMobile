@@ -25,10 +25,8 @@
   int countLimit = [t.userInfo[@"countLimit"] intValue];
   bool alwaysOn = [t.userInfo[@"alwaysOn"] boolValue];
   if (metronomeCount == countLimit) {
-    NSValue *callbackValue = t.userInfo[@"callback"];
-    RCTResponseSenderBlock __strong callback;
-    [callbackValue getValue:&callback];
-    callback(@[]);
+    RCTResponseSenderBlock callback = t.userInfo[@"callback"];
+    callback(@[[NSNull null], @[]]);
     if (!alwaysOn) {
       [t invalidate];
     } else {
@@ -58,7 +56,7 @@ RCT_EXPORT_METHOD(
   withBPM:(double)bpm
   withBeats:(nonnull NSNumber *)beatsInBar
   isAlwaysOn:(BOOL) alwaysOn
-  withCallback:(nonnull RCTResponseSenderBlock *) callback)
+  withCallback:(RCTResponseSenderBlock) callback)
 {
   NSString *soundFilePath = [NSString stringWithFormat:@"%@/metronome.wav",[[NSBundle mainBundle] resourcePath]];
   NSURL *soundFileURL = [NSURL fileURLWithPath:soundFilePath];
@@ -71,7 +69,7 @@ RCT_EXPORT_METHOD(
   [timerInfo setObject:beatsInBar forKey:@"beatsInBar"];
   [timerInfo setObject:[NSNumber numberWithInt:0] forKey:@"metronomeCount"];
   [timerInfo setObject:[NSNumber numberWithBool:alwaysOn] forKey:@"alwaysOn"];
-  [timerInfo setObject:[NSValue valueWithPointer:callback] forKey:@"callback"];
+  [timerInfo setObject:callback forKey:@"callback"];
   timer = [NSTimer timerWithTimeInterval: 60.0 / bpm
             target: self
             selector:@selector(playMetronomeSound:)
