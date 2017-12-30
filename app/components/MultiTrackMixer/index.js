@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Easing, View, Text, TouchableHighlight, ScrollView, Modal } from 'react-native';
+import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { colors } from '../../styles';
 import Recording from '../Recording';
 import { MultiTrack } from '../../nativeModules';
 import styles from './styles';
@@ -31,11 +33,13 @@ export default class MultiTrackMixer extends Component {
       networked: PropTypes.object.isRequired,
       order: PropTypes.arrayOf(PropTypes.number),
     }),
-    removeRecording: PropTypes.func.isRequired,
+    toggleMixer: PropTypes.func.isRequired,
+    isMixerOn: PropTypes.bool,
   }
 
   state = {
     selectedRecordings: [],
+    tracksToAdd: [],
     modalVisible: false,
   }
 
@@ -46,12 +50,38 @@ export default class MultiTrackMixer extends Component {
     this.setState({ selectedRecordings: [...this.state.selectedRecordings, recording], modalVisible: false });
   }
 
+  selectTrack = (recording) => {
+    const { tracksToAdd } = this.state;
+    tracksToAdd.push(recording);
+    this.setState({ tracksToAdd });
+  }
+
+  unselectTrack = (recording) => {
+    const { tracksToAdd } = this.state;
+    tracksToAdd.splice(tracksToAdd.findIndex(r => r.id === recording.id), 1);
+    this.setState({ tracksToAdd });
+  }
+
+  addTracks = () => {
+    const { tracksToAdd } = this.state;
+    tracksToAdd.forEach((recording) => {
+      const splits = recording.path.split('/');
+      const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
+      MultiTrack.AddTrack(`${recording.id}`, realPath);
+    });
+    this.setState({ tracksToAdd: [], modalVisible: false, selectedRecordings: [...this.state.selectedRecordings, ...tracksToAdd] });
+  }
+
+  cancelAddTracks = () => {
+    this.setState({ tracksToAdd: [], modalVisible: false });
+  }
+
   removeTrack = (recording) => {
     MultiTrack.RemoveTrack(`${recording.id}`);
     const { selectedRecordings } = this.state;
     const index = selectedRecordings.findIndex(r => r.id === recording.id);
     selectedRecordings.splice(index, 1);
-    this.setState({ selectedRecordings });
+    this.setState(state => ({ selectedRecordings, showOptions: null, [state.showOptions]: null }));
   }
 
   createAnimations = (recordingId) => {
@@ -105,27 +135,41 @@ export default class MultiTrackMixer extends Component {
 
   showRecordingSelector = () => { this.setState({ modalVisible: true }); }
 
+  togglePlay = () => {
+    const { isPlaying } = this.state;
+    if (isPlaying) {
+      this.setState({ isPlaying: false }, () => { MultiTrack.Stop(); });
+    } else {
+      this.setState({ isPlaying: true }, () => { MultiTrack.Start(); });
+    }
+  }
+
   render() {
-    const { recordings } = this.props;
-    const { selectedRecordings, modalVisible } = this.state;
+    const { recordings, isMixerOn, toggleMixer } = this.props;
+    const { selectedRecordings, modalVisible, showOptions, isPlaying, tracksToAdd } = this.state;
 
     return (
       <View>
         <View style={styles.multiTrackHeader}>
-          <TouchableHighlight onPress={() => MultiTrack.Start()}>
-            <Text style={styles.multiTrackHeaderControl}>Play</Text>
-          </TouchableHighlight>
-          <TouchableHighlight onPress={this.showRecordingSelector}>
-            <Text style={styles.multiTrackHeaderControl}>Add</Text>
-          </TouchableHighlight>
+          <TouchableOpacity onPress={this.togglePlay}>
+            <Icon name={isPlaying ? 'stop' : 'play-arrow'} size={25} color={colors.green} />
+          </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={toggleMixer}>
+              <Icon name={isMixerOn ? 'layers' : 'layers-clear'} size={25} style={styles.headerIcon} color={isMixerOn ? colors.green : colors.white} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.showRecordingSelector}>
+              <Icon name="add" size={25} style={styles.headerIcon} color={colors.green} />
+            </TouchableOpacity>
+          </View>
         </View>
         <ScrollView contentContainerStyle={styles.recordingsContainer}>
           { selectedRecordings.map(recording => (
             <View key={recording.id}>
               <View style={[styles.rowOptions, { width: OPTIONS_WIDTH, position: 'absolute', right: 0 }]}>
-                <TouchableHighlight onPress={() => this.removeTrack(recording)}>
-                  <Text style={styles.removeRecording}>Remove</Text>
-                </TouchableHighlight>
+                <TouchableOpacity onPress={() => this.removeTrack(recording)}>
+                  <Icon name="close" size={20} color={colors.red} />
+                </TouchableOpacity>
               </View>
               <Animated.View
                 style={[
@@ -140,8 +184,8 @@ export default class MultiTrackMixer extends Component {
               >
                 <Recording
                   name={recording.name}
-                  isPlaying={this.state.activeRecording === recording.id}
                   openMoreMenu={() => this.showOptions(recording.id)}
+                  isOpen={showOptions === recording.id}
                   secondaryDetails={recording.durationDisplay}
                   primaryDetails={moment(recording.dateCreated).format('MM/DD/YYYY')}
                 />
@@ -150,17 +194,30 @@ export default class MultiTrackMixer extends Component {
           )) }
         </ScrollView>
         <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => { this.setState({ modalVisible: false }); }}>
-          <View style={{backgroundColor: 'black', marginTop: 100}}>
+          <View style={styles.modal}>
             <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
-              {recordings.order.map((recordingId) => {
+              {recordings.order.filter(x => selectedRecordings.findIndex(r => r.id === x) === -1).map((recordingId) => {
                 const recording = recordings.local[recordingId] || recordings.networked[recordingId];
+                const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
                 return (
-                  <TouchableHighlight style={{ width: '100%' }} key={recording.id} onPress={() => this.addTrack(recording)}>
-                    <Text style={{ height: 50, width: 400, color: 'white' }}>{recording.name}</Text>
-                  </TouchableHighlight>
+                  <TouchableOpacity style={{ width: '100%' }} key={recording.id} onPress={() => { if (selected) { this.unselectTrack(recording); } else { this.selectTrack(recording); }}}>
+                    <View style={styles.modalRecordingContainer}>
+                      <Icon name={selected ? 'check-box' : 'check-box-outline-blank'} size={20} color={colors.white} />
+                      <Text style={{ marginLeft: 20, color: colors.white, flex: 2 }} numberOfLines={1}>{recording.name}</Text>
+                      <Text style={{ marginLeft: 20, color: colors.medium, flex: 1 }}>{moment.utc(recording.duration * 1000).format('mm:ss')}</Text>
+                    </View>
+                  </TouchableOpacity>
                 );
               })}
             </ScrollView>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity onPress={this.cancelAddTracks} style={styles.modalCancelButton}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this.addTracks} style={styles.modalAddButton}>
+                <Text style={styles.modalButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>

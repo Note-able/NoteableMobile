@@ -29,6 +29,7 @@ import styles from './audio-styles.js';
 import { colors, colorRGBA } from '../../styles';
 import { logErrorToCrashlytics } from '../../util';
 import timeSignatures from './time-signatures';
+import { MultiTrack } from '../../nativeModules';
 
 const realm = Schemas.RecordingSchema;
 const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -256,6 +257,9 @@ export default class Audio extends Component {
       if (recordingStarted) {
         await AudioRecorder.stopRecording();
       }
+      if (this.state.mixerOn) {
+        MultiTrack.Stop();
+      }
       const modal = !!recordingStarted;
       const reviewMode = !!recordingStarted;
       Metronome.stop();
@@ -267,6 +271,9 @@ export default class Audio extends Component {
     try {
       this.setState({ recordingStarted: true });
       this.toggleTiming();
+      if (this.state.mixerOn) {
+        MultiTrack.Start();
+      }
       await AudioRecorder.startRecording();
     } catch (err) {
       logErrorToCrashlytics(err);
@@ -427,7 +434,7 @@ export default class Audio extends Component {
   }
 
   render() {
-    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature } = this.state;
+    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature, mixerOn } = this.state;
     const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
 
     const { permissions } = this.state;
@@ -474,7 +481,8 @@ export default class Audio extends Component {
         <View style={styles.recordingsContainer}>
           <MultiTrackMixer
             recordings={this.state.recordings || []}
-            removeRecording={(id) => console.log(`remove ${id}`)}
+            toggleMixer={() => { this.setState(state => ({ mixerOn: !state.mixerOn })); }}
+            isMixerOn={mixerOn}
           />
         </View>
         <View />
