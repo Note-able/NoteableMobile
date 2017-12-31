@@ -76,97 +76,106 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void Start() throws IOException {
+  public void Start() {
     Log.v("RCT_DBG" ,"Starting real time mix");
     // use sample rate of first file for audio track
-    int trackSampleRate = 0;
-    ArrayList<String> fileNames = new ArrayList<String>(this.mediaFiles.values());
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          int trackSampleRate = 0;
+          ArrayList<String> fileNames = new ArrayList<String>(MultiTrackModule.this.mediaFiles.values());
 
-    this.mediaWorkers = Collections.synchronizedList(new ArrayList<Thread>());
-    this.trackBuffers = Collections.synchronizedMap(new HashMap<Integer, ByteBuffer>());
-    this.trackInputStreams = new ArrayList<PipedInputStream>();
-    this.trackOutputStreams = new ArrayList<PipedOutputStream>();
+          MultiTrackModule.this.mediaWorkers = Collections.synchronizedList(new ArrayList<Thread>());
+          MultiTrackModule.this.trackBuffers = Collections.synchronizedMap(new HashMap<Integer, ByteBuffer>());
+          MultiTrackModule.this.trackInputStreams = new ArrayList<PipedInputStream>();
+          MultiTrackModule.this.trackOutputStreams = new ArrayList<PipedOutputStream>();
 
-    this.barrier = new CyclicBarrier(this.mediaFiles.size());
-    ArrayList<MediaCodec> mediaCodecs = new ArrayList<MediaCodec>();
-    for (int i = 0; i < this.mediaFiles.size(); i++) {
-      String fileName = fileNames.get(i);
-      PipedInputStream in = new PipedInputStream();
-      PipedOutputStream out = new PipedOutputStream(in);
-      Thread mediaCodecThread = new Thread(new MediaCodecWorker(fileName, out, i));
-      this.trackInputStreams.add(in);
-      mediaWorkers.add(mediaCodecThread);
-      mediaCodecThread.start();
+          MultiTrackModule.this.barrier = new CyclicBarrier(MultiTrackModule.this.mediaFiles.size());
+          ArrayList<MediaCodec> mediaCodecs = new ArrayList<MediaCodec>();
+          for (int i = 0; i < MultiTrackModule.this.mediaFiles.size(); i++) {
+            String fileName = fileNames.get(i);
+            PipedInputStream in = new PipedInputStream();
+            PipedOutputStream out = new PipedOutputStream(in);
+            Thread mediaCodecThread = new Thread(new MediaCodecWorker(fileName, out, i));
+            MultiTrackModule.this.trackInputStreams.add(in);
+            mediaWorkers.add(mediaCodecThread);
+            mediaCodecThread.start();
 
-      if (i == 0) {
-        MediaExtractor extractor = new MediaExtractor();
-        extractor.setDataSource(fileName);
-        trackSampleRate = extractor.getTrackFormat(0).getInteger(MediaFormat.KEY_SAMPLE_RATE);
-        extractor.release();
-      }
-    }
-
-    int bufferSize = AudioTrack.getMinBufferSize(trackSampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-    this.player = new AudioTrack(AudioManager.STREAM_MUSIC, trackSampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
-
-    Log.v("RCT_DBG" ,"Writing audio track with sample rate " + trackSampleRate);
-    this.player.play();
-
-    boolean processing = true;
-    int trackBufferCount = this.trackBuffers.size();
-    short[] audioBuffer = new short[bufferSize];
-    int currentBufferIndex = 0;
-    while (processing) {
-      boolean dataAvailable = true;
-      while (dataAvailable) {
-        int total = 0;
-        short normalizeFactor = 0;
-        dataAvailable = false;
-
-        ArrayList<PipedInputStream> toRemove = new ArrayList<PipedInputStream>();
-        for (PipedInputStream in : this.trackInputStreams) {
-          byte[] shortBuffer = new byte[2];
-          int data = in.read(shortBuffer, 0, 2);
-          if (data != -1) {
-            if (data == 2)
-              total += this.convertBytesToShort(shortBuffer);
-            else
-              total += (shortBuffer[0] & 0xFF);
-
-            dataAvailable = true;
-            normalizeFactor++;
-          } else {
-            toRemove.add(in);
-            in.close();
+            if (i == 0) {
+              MediaExtractor extractor = new MediaExtractor();
+              extractor.setDataSource(fileName);
+              trackSampleRate = extractor.getTrackFormat(0).getInteger(MediaFormat.KEY_SAMPLE_RATE);
+              extractor.release();
+            }
           }
-        }
 
-        if (toRemove.size() > 0) {
-          for (int i = 0; i < toRemove.size(); i++) {
-            this.trackInputStreams.remove(toRemove.get(i));
+          int bufferSize = AudioTrack.getMinBufferSize(trackSampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+          MultiTrackModule.this.player = new AudioTrack(AudioManager.STREAM_MUSIC, trackSampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+
+          Log.v("RCT_DBG" ,"Writing audio track with sample rate " + trackSampleRate);
+          MultiTrackModule.this.player.play();
+
+          boolean processing = true;
+          int trackBufferCount = MultiTrackModule.this.trackBuffers.size();
+          short[] audioBuffer = new short[bufferSize];
+          int currentBufferIndex = 0;
+          while (processing) {
+            boolean dataAvailable = true;
+            while (dataAvailable) {
+              int total = 0;
+              short normalizeFactor = 0;
+              dataAvailable = false;
+
+              ArrayList<PipedInputStream> toRemove = new ArrayList<PipedInputStream>();
+              for (PipedInputStream in : MultiTrackModule.this.trackInputStreams) {
+                byte[] shortBuffer = new byte[2];
+                int data = in.read(shortBuffer, 0, 2);
+                if (data != -1) {
+                  if (data == 2)
+                    total += MultiTrackModule.this.convertBytesToShort(shortBuffer);
+                  else
+                    total += (shortBuffer[0] & 0xFF);
+
+                  dataAvailable = true;
+                  normalizeFactor++;
+                } else {
+                  toRemove.add(in);
+                  in.close();
+                }
+              }
+
+              if (toRemove.size() > 0) {
+                for (int i = 0; i < toRemove.size(); i++) {
+                  MultiTrackModule.this.trackInputStreams.remove(toRemove.get(i));
+                }
+                if (MultiTrackModule.this.trackInputStreams.size() == 0)
+                  processing = false;
+              }
+
+              if (normalizeFactor == 0);
+                normalizeFactor = 1;
+
+              int normalizedValue = (total / normalizeFactor);
+              if( normalizedValue > Short.MAX_VALUE )
+                normalizedValue = Short.MAX_VALUE;
+              if( normalizedValue < Short.MIN_VALUE )
+                normalizedValue = Short.MIN_VALUE;
+              audioBuffer[currentBufferIndex] = (short)normalizedValue;
+              currentBufferIndex++;
+              if (currentBufferIndex == bufferSize) {
+                int written = MultiTrackModule.this.player.write(audioBuffer, 0, bufferSize);
+                audioBuffer = new short[bufferSize];
+                currentBufferIndex = 0;
+              }
+            }
           }
-          if (this.trackInputStreams.size() == 0)
-            processing = false;
-        }
-
-        if (normalizeFactor == 0);
-          normalizeFactor = 1;
-
-        int normalizedValue = (total / normalizeFactor);
-        if( normalizedValue > Short.MAX_VALUE )
-          normalizedValue = Short.MAX_VALUE;
-        if( normalizedValue < Short.MIN_VALUE )
-          normalizedValue = Short.MIN_VALUE;
-        audioBuffer[currentBufferIndex] = (short)normalizedValue;
-        currentBufferIndex++;
-        if (currentBufferIndex == bufferSize) {
-          int written = this.player.write(audioBuffer, 0, bufferSize);
-          audioBuffer = new short[bufferSize];
-          currentBufferIndex = 0;
+          MultiTrackModule.this.player.flush();
+        } catch (IOException e) {
+          Log.d("RCT_DBG", e.getMessage());
         }
       }
-    }
-    this.player.flush();
+    }).start();
   }
 
   private short convertBytesToShort(byte[] bytes) {
@@ -182,7 +191,7 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
     MediaFormat m_trackFormat;
     MediaExtractor m_extractor;
     PipedOutputStream m_out;
-    final int m_index;
+    PipedInputStream m_in;
 
     MediaCodecWorker (String fileName, PipedOutputStream out, int index) throws IOException {
       MediaExtractor extractor = new MediaExtractor();
@@ -192,7 +201,14 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
       m_trackFormat = extractor.getTrackFormat(0);
       MediaCodecList mediaCodecList = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
       m_mediaCodec = MediaCodec.createByCodecName(mediaCodecList.findDecoderForFormat(m_trackFormat));
-      m_index = index;
+    }
+
+    MediaCodecWorker (String fileName, PipedInputStream in) throws IOException {
+      m_extractor = null;
+      m_in = in;
+      m_trackFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, 44100, 1);
+      MediaCodecList mediaCodecList = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+      m_mediaCodec = MediaCodec.createByCodecName(mediaCodecList.findEncoderForFormat(m_trackFormat));
     }
 
     public void run() {
