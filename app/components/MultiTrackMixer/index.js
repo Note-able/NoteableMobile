@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -40,14 +40,7 @@ export default class MultiTrackMixer extends Component {
   state = {
     selectedRecordings: [],
     tracksToAdd: [],
-    modalVisible: false,
-  }
-
-  addTrack = (recording) => {
-    const splits = recording.path.split('/');
-    const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
-    MultiTrack.AddTrack(`${recording.id}`, realPath);
-    this.setState({ selectedRecordings: [...this.state.selectedRecordings, recording], modalVisible: false });
+    modal: { visible: false },
   }
 
   selectTrack = (recording) => {
@@ -69,11 +62,11 @@ export default class MultiTrackMixer extends Component {
       const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
       MultiTrack.AddTrack(`${recording.id}`, realPath);
     });
-    this.setState({ tracksToAdd: [], modalVisible: false, selectedRecordings: [...this.state.selectedRecordings, ...tracksToAdd] });
+    this.setState({ tracksToAdd: [], modal: { visible: false }, selectedRecordings: [...this.state.selectedRecordings, ...tracksToAdd] });
   }
 
   cancelAddTracks = () => {
-    this.setState({ tracksToAdd: [], modalVisible: false });
+    this.setState({ tracksToAdd: [], modal: { visible: false } });
   }
 
   removeTrack = (recording) => {
@@ -133,7 +126,9 @@ export default class MultiTrackMixer extends Component {
     }
   }
 
-  showRecordingSelector = () => { this.setState({ modalVisible: true }); }
+  showRecordingSelector = () => this.setState({ modal: { visible: true, content: 'recordings' } });
+
+  showSaveDialog = () => this.setState({ modal: { visible: true, content: 'save' } });
 
   togglePlay = () => {
     const { isPlaying } = this.state;
@@ -144,9 +139,58 @@ export default class MultiTrackMixer extends Component {
     }
   }
 
+  saveMix = () => {
+    const { fileName } = this.state;
+    MultiTrack.WriteMixToFile(`${AudioUtils.DocumentDirectoryPath}/${fileName}`);
+  }
+
+  renderRecordingsModalContent = () => {
+    const { recordings } = this.props;
+    const { selectedRecordings, tracksToAdd } = this.state;
+    return (
+      <View style={styles.modal}>
+        <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
+          {recordings.order.filter(x => selectedRecordings.findIndex(r => r.id === x) === -1).map((recordingId) => {
+            const recording = recordings.local[recordingId] || recordings.networked[recordingId];
+            const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
+            return (
+              <TouchableOpacity style={{ width: '100%' }} key={recording.id} onPress={() => { if (selected) { this.unselectTrack(recording); } else { this.selectTrack(recording); } }}>
+                <View style={styles.modalRecordingContainer}>
+                  <Icon name={selected ? 'check-box' : 'check-box-outline-blank'} size={20} color={colors.white} />
+                  <Text style={{ marginLeft: 20, color: colors.white, flex: 2 }} numberOfLines={1}>{recording.name}</Text>
+                  <Text style={{ marginLeft: 20, color: colors.medium, flex: 1 }}>{moment.utc(recording.duration * 1000).format('mm:ss')}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+        <View style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => this.setState({ modal: { visible: false } })} style={styles.modalCancelButton}>
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.addTracks} style={styles.modalAddButton}>
+            <Text style={styles.modalButtonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
+      </View>);
+  }
+
+  renderSaveModalContent = () => (
+    <View style={styles.modal}>
+      <TextInput style={{ color: 'white' }} value={this.state.fileName} onChangeText={text => this.setState({ fileName: text })} />
+      <View style={styles.modalButtons}>
+        <TouchableOpacity onPress={this.cancelAddTracks} style={styles.modalCancelButton}>
+          <Text style={styles.modalButtonText}>Delete</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={this.saveMix} style={styles.modalAddButton}>
+          <Text style={styles.modalButtonText}>Save</Text>
+        </TouchableOpacity>
+      </View>
+    </View>);
+
   render() {
-    const { recordings, isMixerOn, toggleMixer } = this.props;
-    const { selectedRecordings, modalVisible, showOptions, isPlaying, tracksToAdd } = this.state;
+    const { isMixerOn, toggleMixer } = this.props;
+    const { selectedRecordings, modal, showOptions, isPlaying } = this.state;
 
     return (
       <View>
@@ -155,6 +199,9 @@ export default class MultiTrackMixer extends Component {
             <Icon name={isPlaying ? 'stop' : 'play-arrow'} size={25} color={colors.green} />
           </TouchableOpacity>
           <View style={styles.headerRight}>
+            <TouchableOpacity onPress={this.showSaveDialog}>
+              <Text>SAVE</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={toggleMixer}>
               <Icon name={isMixerOn ? 'layers' : 'layers-clear'} size={25} style={styles.headerIcon} color={isMixerOn ? colors.green : colors.white} />
             </TouchableOpacity>
@@ -193,32 +240,9 @@ export default class MultiTrackMixer extends Component {
             </View>
           )) }
         </ScrollView>
-        <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => { this.setState({ modalVisible: false }); }}>
-          <View style={styles.modal}>
-            <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
-              {recordings.order.filter(x => selectedRecordings.findIndex(r => r.id === x) === -1).map((recordingId) => {
-                const recording = recordings.local[recordingId] || recordings.networked[recordingId];
-                const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
-                return (
-                  <TouchableOpacity style={{ width: '100%' }} key={recording.id} onPress={() => { if (selected) { this.unselectTrack(recording); } else { this.selectTrack(recording); }}}>
-                    <View style={styles.modalRecordingContainer}>
-                      <Icon name={selected ? 'check-box' : 'check-box-outline-blank'} size={20} color={colors.white} />
-                      <Text style={{ marginLeft: 20, color: colors.white, flex: 2 }} numberOfLines={1}>{recording.name}</Text>
-                      <Text style={{ marginLeft: 20, color: colors.medium, flex: 1 }}>{moment.utc(recording.duration * 1000).format('mm:ss')}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity onPress={this.cancelAddTracks} style={styles.modalCancelButton}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.addTracks} style={styles.modalAddButton}>
-                <Text style={styles.modalButtonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        <Modal visible={modal.visible} transparent animationType="slide" onRequestClose={() => { this.setState({ modal: { visible: false } }); }}>
+          { modal.content === 'recordings' ? this.renderRecordingsModalContent() : null }
+          { modal.content === 'save' ? this.renderSaveModalContent() : null }
         </Modal>
       </View>
     );
