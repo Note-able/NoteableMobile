@@ -13,14 +13,13 @@ import android.media.MediaFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
-import android.media.MediaMuxer;
 
+import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 
 import java.io.IOException;
 import java.lang.Thread;
@@ -83,19 +82,19 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void Start() {
+  public void Start(final Promise promise) {
     Log.v("RCT_DBG" ,"Starting real time mix");
     // use sample rate of first file for audio track
     new Thread(new Runnable() {
       @Override
       public void run() {
-        MultiTrackModule.this.MixAudioCore(true);
+        MultiTrackModule.this.MixAudioCore(true, promise);
       }
     }).start();
   }
 
   @ReactMethod
-  public void WriteMixToFile(final String fileName) {
+  public void WriteMixToFile(final String fileName, final Promise promise) {
     Log.v("RCT_DBG" ,"Starting real time mix");
     // use sample rate of first file for audio track
     new Thread(new Runnable() {
@@ -110,7 +109,7 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
           file.createNewFile();
           MultiTrackModule.this.mixedFiledOutputStream = new FileOutputStream(file);
           MultiTrackModule.this.mixedFiledOutputPath = fileName + ".aac";
-          MultiTrackModule.this.MixAudioCore(false);
+          MultiTrackModule.this.MixAudioCore(false, promise);
         } catch (FileNotFoundException e) {
           Log.d("RCT_DBG", e.getMessage());
         } catch (IOException e) {
@@ -120,7 +119,7 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
     }).start();
   }
 
-  private void MixAudioCore(boolean playAudio) {
+  private void MixAudioCore(boolean playAudio, final Promise promise) {
     try {
       int trackSampleRate = 0;
       ArrayList<String> fileNames = new ArrayList<String>(MultiTrackModule.this.mediaFiles.values());
@@ -227,6 +226,7 @@ public class MultiTrackModule extends ReactContextBaseJavaModule {
       if (playAudio) {
         MultiTrackModule.this.player.flush();
       }
+      promise.resolve("Done");
     } catch (IOException e) {
       Log.d("RCT_DBG", e.getMessage());
     }
