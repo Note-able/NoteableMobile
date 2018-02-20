@@ -13,5 +13,7 @@ RCT_EXTERN_METHOD(AddTrack:(NSString *)id fileName:(NSString *)fileName)
 RCT_EXTERN_METHOD(RemoveTrack:(NSString *)id)
 RCT_EXTERN_METHOD(Start)
 RCT_EXTERN_METHOD(Stop)
+RCT_EXTERN_METHOD(WriteMixToFile:(NSString *)fileName)
+
 
 @end
