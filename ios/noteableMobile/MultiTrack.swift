@@ -8,6 +8,7 @@ class MultiTrack : NSObject {
   private var trackFileNames: [String: String]
   private var audioPlayerNodes: [String: AVAudioPlayerNode]
   private var audioPlayerFiles: [String: AVAudioFile]
+  private var audioPlayerFileCompletions: [String: Bool]
   private var audioEngine: AVAudioEngine = AVAudioEngine()
   private var mixer: AVAudioMixerNode = AVAudioMixerNode()
 
@@ -15,6 +16,7 @@ class MultiTrack : NSObject {
     trackFileNames = [String : String]()
     audioPlayerNodes = [String : AVAudioPlayerNode]()
     audioPlayerFiles = [String : AVAudioFile]()
+    audioPlayerFileCompletions = [String: Bool]()
   }
 
   @objc(AddTrack:fileName:)
@@ -39,6 +41,7 @@ class MultiTrack : NSObject {
     }
     self.audioPlayerNodes[id] = audioPlayer
     self.audioPlayerFiles[id] = file
+    self.audioPlayerFileCompletions[id] = false
   }
 
   @objc(RemoveTrack:)
@@ -56,8 +59,8 @@ class MultiTrack : NSObject {
     }
   }
   
-  @objc(Start)
-  func Start() {
+  @objc(Start:reject:)
+  func Start(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     if trackFileNames.count == 0 {
       return
     }
@@ -78,7 +81,15 @@ class MultiTrack : NSObject {
           audioPlayer.stop()
           audioPlayer.reset()
         }
-        audioPlayer.scheduleFile(file, at: nil, completionHandler: nil)
+        audioPlayer.scheduleFile(file, at: nil, completionHandler: {() -> Void in
+          self.audioPlayerFileCompletions[audioPlayerKVP.key] = true
+          if (!self.audioPlayerFileCompletions.values.contains(false)) {
+            for kvp in self.audioPlayerFileCompletions {
+              self.audioPlayerFileCompletions[kvp.key] = false
+            }
+            resolve(nil)
+          }
+        })
         if startFramePosition == nil {
           audioPlayer.play(at: nil)
           startFramePosition = (audioPlayer.lastRenderTime?.sampleTime)!
@@ -91,8 +102,8 @@ class MultiTrack : NSObject {
   }
   
   @available(iOS 11.0, *)
-  @objc(WriteMixToFile:)
-  func WriteMixToFile(fileName: String) {
+  @objc(WriteMixToFile:resolve:reject:)
+  func WriteMixToFile(fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .background).async {
       if self.audioEngine.isRunning {
         self.audioEngine.stop()
@@ -107,11 +118,7 @@ class MultiTrack : NSObject {
         }
         audioPlayer.scheduleFile(file, at: nil, completionHandler: nil)
       }
-      
-      /*self.mixer.installTap(onBus: 0, bufferSize: 2048, format: self.mixer.outputFormat(forBus: 0), block: { (buffer, _) in
-        try! file.write(from: buffer)
-        file.framePosition = file.length
-      })*/
+
       let format = self.audioPlayerFiles.values.first?.processingFormat
       do {
         let maxNumberOfFrames: AVAudioFrameCount = 4096
@@ -167,10 +174,10 @@ class MultiTrack : NSObject {
             break
             
           case .error:
-            fatalError("render failed")
+            reject("WriteMixToFile", "rendering to file encountered error case", nil)
           }
         } catch {
-          fatalError("render failed, \(error)")
+          reject("WriteMixToFile", "render failed", error)
         }
       }
       for audioPlayerKVP in self.audioPlayerNodes {
@@ -178,6 +185,7 @@ class MultiTrack : NSObject {
         audioPlayer.stop()
       }
       self.audioEngine.stop()
+      resolve(nil)
     }
   }
 }

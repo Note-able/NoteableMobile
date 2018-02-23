@@ -135,13 +135,15 @@ export default class MultiTrackMixer extends Component {
     if (isPlaying) {
       this.setState({ isPlaying: false }, () => { MultiTrack.Stop(); });
     } else {
-      this.setState({ isPlaying: true }, () => { MultiTrack.Start(); });
+      this.setState({ isPlaying: true }, () => { MultiTrack.Start().then(() => this.setState({ isPlaying: false })); });
     }
   }
 
   saveMix = () => {
     const { fileName } = this.state;
-    MultiTrack.WriteMixToFile(`${AudioUtils.DocumentDirectoryPath}/${fileName}`);
+    MultiTrack.WriteMixToFile(`${AudioUtils.DocumentDirectoryPath}/${fileName}`).then(() => {
+      // do something
+    });
   }
 
   renderRecordingsModalContent = () => {
