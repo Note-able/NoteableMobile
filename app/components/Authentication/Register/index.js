@@ -1,21 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FBSDK from 'react-native-fbsdk';
 import { colors } from '../../../styles';
 import { InputField } from '../../';
 import { emailRegex } from '../../../constants';
 import { logErrorToCrashlytics } from '../../../util';
 
-const {
-  AccessToken,
-  LoginManager,
-} = FBSDK;
+const { AccessToken, LoginManager } = FBSDK;
 
 export default class Register extends Component {
   static propTypes = {
@@ -35,18 +27,14 @@ export default class Register extends Component {
   };
 
   facebookLogin = () => {
-    LoginManager.logInWithReadPermissions().then(
-      (result) => {
-        if (!result.isCancelled) {
-          AccessToken.getCurrentAccessToken().then(
-            (data) => {
-              this.props.loginFacebook(data.accessToken.toString());
-            },
-          );
-        }
-      }, logErrorToCrashlytics,
-    );
-  }
+    LoginManager.logInWithReadPermissions().then(result => {
+      if (!result.isCancelled) {
+        AccessToken.getCurrentAccessToken().then(data => {
+          this.props.loginFacebook(data.accessToken.toString());
+        });
+      }
+    }, logErrorToCrashlytics);
+  };
 
   finishEmail = () => {
     this._password.focusInput();
@@ -55,7 +43,7 @@ export default class Register extends Component {
     } else {
       this.setState({ emailError: '' });
     }
-  }
+  };
 
   finishPassword = () => {
     if (this.state.password.trim().length < 7) {
@@ -65,7 +53,7 @@ export default class Register extends Component {
     } else {
       this.setState({ passwordError: '' });
     }
-  }
+  };
 
   finishFirstName = () => {
     this._lastName.focusInput();
@@ -74,7 +62,7 @@ export default class Register extends Component {
     } else {
       this.setState({ firstNameError: '' });
     }
-  }
+  };
 
   finishLastName = () => {
     if (this.state.lastName.trim().length === 0) {
@@ -82,10 +70,17 @@ export default class Register extends Component {
     } else {
       this.setState({ lastNameError: '' });
     }
-  }
+  };
 
   register = () => {
-    if (this.state.email === '' || this.state.password === '' || this.state.lastName === '' || this.state.firstName === '' || this.state.emailError || this.state.passwordError) {
+    if (
+      this.state.email === '' ||
+      this.state.password === '' ||
+      this.state.lastName === '' ||
+      this.state.firstName === '' ||
+      this.state.emailError ||
+      this.state.passwordError
+    ) {
       this.finishEmail();
       this.finishPassword();
       this.finishLastName();
@@ -93,13 +88,20 @@ export default class Register extends Component {
       return;
     }
 
-    this.props.submitRegister({ firstName: this.state.firstName, lastName: this.state.lastName, email: this.state.email, password: this.state.password });
-  }
+    this.props.submitRegister({
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      password: this.state.password,
+    });
+  };
 
   render() {
     return (
       <View style={{ marginTop: this.state.firstNameError ? 6 : 12, paddingTop: 12 }}>
-        {this.state.firstNameError !== '' && <Text style={styles.errorText}>{this.state.firstNameError}</Text>}
+        {this.state.firstNameError !== '' && (
+          <Text style={styles.errorText}>{this.state.firstNameError}</Text>
+        )}
         <InputField
           name="First Name"
           inputContainerStyles={[styles.input, { marginBottom: 12 }]}
@@ -113,9 +115,13 @@ export default class Register extends Component {
             value: this.state.firstName,
           }}
         />
-        {this.state.lastNameError !== '' && <Text style={styles.errorText}>{this.state.lastNameError}</Text>}
+        {this.state.lastNameError !== '' && (
+          <Text style={styles.errorText}>{this.state.lastNameError}</Text>
+        )}
         <InputField
-          ref={(ref) => { this._lastName = ref; }}
+          ref={ref => {
+            this._lastName = ref;
+          }}
           name="Name"
           inputContainerStyles={[styles.input, { marginBottom: 12 }]}
           inputProps={{
@@ -128,9 +134,13 @@ export default class Register extends Component {
             value: this.state.lastName,
           }}
         />
-        {this.state.emailError !== '' && <Text style={styles.errorText}>{this.state.emailError}</Text>}
+        {this.state.emailError !== '' && (
+          <Text style={styles.errorText}>{this.state.emailError}</Text>
+        )}
         <InputField
-          ref={(ref) => { this._email = ref; }}
+          ref={ref => {
+            this._email = ref;
+          }}
           name="Email"
           inputContainerStyles={[styles.input, { marginBottom: 12 }]}
           inputProps={{
@@ -144,9 +154,13 @@ export default class Register extends Component {
             value: this.state.email,
           }}
         />
-        {this.state.passwordError !== '' && <Text style={styles.errorText}>{this.state.passwordError}</Text>}
+        {this.state.passwordError !== '' && (
+          <Text style={styles.errorText}>{this.state.passwordError}</Text>
+        )}
         <InputField
-          ref={(ref) => { this._password = ref; }}
+          ref={ref => {
+            this._password = ref;
+          }}
           name="Password"
           inputContainerStyles={styles.input}
           inputProps={{

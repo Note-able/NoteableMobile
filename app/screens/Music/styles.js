@@ -1,8 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import {
-  colors,
-  shadowProps,
-} from '../../styles';
+import { colors, shadowProps } from '../../styles';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 

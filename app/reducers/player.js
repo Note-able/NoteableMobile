@@ -1,16 +1,13 @@
-import {
-  PlayerActionTypes,
-} from '../actions/ActionTypes';
+import { PlayerActionTypes } from '../actions/ActionTypes';
 
 import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 
-const {
-  bufferCompleteType,
-  startPlayerTypes,
-  finishedPlayingType,
-} = PlayerActionTypes;
+const { bufferCompleteType, startPlayerTypes, finishedPlayingType } = PlayerActionTypes;
 
-export default (state = { isPlaying: false, sound: null, recording: null, buffering: false, playerState: false }, action) => {
+export default (
+  state = { isPlaying: false, sound: null, recording: null, buffering: false, playerState: false },
+  action
+) => {
   const { type, error } = action;
   switch (type) {
     case startPlayerTypes.success:

@@ -12,7 +12,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCurrentUser: (user) => { dispatch(getUser(user)); },
+  getCurrentUser: user => {
+    dispatch(getUser(user));
+  },
 });
 
 class Profile extends Component {
@@ -20,21 +22,20 @@ class Profile extends Component {
     getCurrentUser: PropTypes.func.isRequired,
     profile: PropTypes.shape({}),
     user: PropTypes.shape({}),
-  }
+  };
 
   _views = {};
   _scrollView = {};
 
-  componentDidMount() {
-  }
+  componentDidMount() {}
 
   setViewY = (event, view) => {
     this._views[view] = { y: event.nativeEvent.layout.y };
-  }
+  };
 
-  scrollToView = (view) => {
+  scrollToView = view => {
     this._scrollView.scrollTo({ y: this._views[view].y });
-  }
+  };
 
   render() {
     const { user } = this.props;
@@ -47,7 +48,9 @@ class Profile extends Component {
     const name = `${firstName} ${lastName}`;
     return (
       <ScrollView
-        ref={(ref) => { this._scrollView = ref; }}
+        ref={ref => {
+          this._scrollView = ref;
+        }}
         contentContainerStyle={styles.container}
       >
         <Text>Hello world</Text>

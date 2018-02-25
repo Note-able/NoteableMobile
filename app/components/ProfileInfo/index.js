@@ -6,17 +6,11 @@ export default function ProfileInfo({ coverImage, profileImage, name, bio, onLay
   return (
     <View onLayout={event => onLayout(event, 'about')}>
       <View style={styles.coverImageView}>
-        <Image
-          source={{ uri: coverImage }}
-          style={styles.coverImage}
-        />
+        <Image source={{ uri: coverImage }} style={styles.coverImage} />
       </View>
       <View style={styles.profileHeader}>
         <View style={styles.profileImageView}>
-          <Image
-            source={{ uri: profileImage }}
-            style={styles.profileImage}
-          />
+          <Image source={{ uri: profileImage }} style={styles.profileImage} />
         </View>
         <Text style={styles.name}>{name}</Text>
       </View>

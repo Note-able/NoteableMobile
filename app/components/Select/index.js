@@ -10,21 +10,23 @@ export default class Select extends PureComponent {
       value: PropTypes.string.isRequired,
       display: PropTypes.string.isRequired,
     }),
-    options: PropTypes.arrayOf(PropTypes.shape({
-      value: PropTypes.string.isRequired,
-      display: PropTypes.string.isRequired,
-    })),
+    options: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string.isRequired,
+        display: PropTypes.string.isRequired,
+      })
+    ),
     onValueChange: PropTypes.func.isRequired,
-  }
+  };
 
   state = {
     visible: false,
-  }
+  };
 
-  handleValueChange = (value) => {
+  handleValueChange = value => {
     this.setState({ visible: false });
     this.props.onValueChange(value);
-  }
+  };
 
   render() {
     const { visible } = this.state;
@@ -35,11 +37,15 @@ export default class Select extends PureComponent {
         <View style={styles.selectContainer}>
           <Text style={styles.selectText}>{selectedValue.display}</Text>
           <Icon name="keyboard-arrow-down" size={20} color={'white'} />
-          <Modal visible={visible} transparent animationType="slide" >
+          <Modal visible={visible} transparent animationType="slide">
             <View style={styles.modal}>
               <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
                 {options.map(option => (
-                  <TouchableOpacity style={{ width: '100%' }} key={option.value} onPress={() => this.handleValueChange(option)}>
+                  <TouchableOpacity
+                    style={{ width: '100%' }}
+                    key={option.value}
+                    onPress={() => this.handleValueChange(option)}
+                  >
                     <Text style={styles.modalItem}>{option.display}</Text>
                   </TouchableOpacity>
                 ))}

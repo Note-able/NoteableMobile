@@ -1,10 +1,10 @@
 import moment from 'moment';
 
-export const DisplayTime = (currentTime) => {
-  let hour = Math.floor((currentTime / 360000)) % 24;
-  let minute = Math.floor((currentTime / 60000)) % 60;
-  let second = Math.floor((currentTime / 1000)) % 60;
-  let tenth = Math.floor((currentTime / 10)) % 100;
+export const DisplayTime = currentTime => {
+  let hour = Math.floor(currentTime / 360000) % 24;
+  let minute = Math.floor(currentTime / 60000) % 60;
+  let second = Math.floor(currentTime / 1000) % 60;
+  let tenth = Math.floor(currentTime / 10) % 100;
 
   if (hour < 10) {
     hour = `0${hour}`;
@@ -29,10 +29,10 @@ export const DisplayTime = (currentTime) => {
   return `${hour}:${minute}:${second}.${tenth}`;
 };
 
-export const ShortDisplayTime = (currentTime) => {
-  let hour = Math.floor((currentTime / 360000)) % 24;
-  let minute = Math.floor((currentTime / 60000)) % 60;
-  let second = Math.floor((currentTime / 1000)) % 60;
+export const ShortDisplayTime = currentTime => {
+  let hour = Math.floor(currentTime / 360000) % 24;
+  let minute = Math.floor(currentTime / 60000) % 60;
+  let second = Math.floor(currentTime / 1000) % 60;
 
   if (hour < 10) {
     hour = `0${hour}`;
@@ -119,7 +119,7 @@ export const MapRecordingsToAssocArray = (recordingsList, mapFunc) => {
     order: [],
   };
 
-  recordingsList.forEach((recording) => {
+  recordingsList.forEach(recording => {
     if (recording.resourceId === -1) {
       recordings.local[recording.id] = mapFunc ? mapFunc(recording) : recording;
     } else {

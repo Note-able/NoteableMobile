@@ -15,23 +15,21 @@ export const fetchUtil = {
     };
 
     if (getState == null) {
-      return fetch(url, fetchParams)
-        .then((response) => {
-          if (response.status < 200 || response.status >= 300) {
-            throw new Error(response.status);
-          }
-
-          return response;
-        });
-    }
-
-    return asyncFetchWithPreferences(url, fetchParams, getState)
-      .then((response) => {
-        if (repsonse.status < 200 || response.status >= 300) {
-          throw new Error(response.statusText);
+      return fetch(url, fetchParams).then(response => {
+        if (response.status < 200 || response.status >= 300) {
+          throw new Error(response.status);
         }
+
         return response;
       });
+    }
+
+    return asyncFetchWithPreferences(url, fetchParams, getState).then(response => {
+      if (repsonse.status < 200 || response.status >= 300) {
+        throw new Error(response.statusText);
+      }
+      return response;
+    });
   },
   postWithBody: ({ url, auth, body, headers }, getState) => {
     const header = headers || {
@@ -70,7 +68,7 @@ export const fetchUtil = {
   },
 };
 
-export const logErrorToCrashlytics = (error) => {
+export const logErrorToCrashlytics = error => {
   if (global.isSimulator) {
     return;
   }
@@ -119,7 +117,10 @@ export const getPreferences = async () => {
 const asyncFetchWithPreferences = async (url, fetchParams, getState) => {
   const preferences = await getPreferences();
   const { SystemReducer } = getState();
-  if (SystemReducer.network.connected === 'cellular' && preferences[preferenceKeys.celluarDataKey] !== 'true') {
+  if (
+    SystemReducer.network.connected === 'cellular' &&
+    preferences[preferenceKeys.celluarDataKey] !== 'true'
+  ) {
     throw new Error('cellular');
   } else if (SystemReducer.network.connected === '' || SystemReducer.network.connected === 'none') {
     throw new Error('network');
@@ -128,17 +129,18 @@ const asyncFetchWithPreferences = async (url, fetchParams, getState) => {
   }
 };
 
-const mapPreferences = preferences => preferenceKeys.reduce((accumulator, preferenceKey) => {
-  const current = preferences.find(x => x[0] === preferenceKey);
+const mapPreferences = preferences =>
+  preferenceKeys.reduce((accumulator, preferenceKey) => {
+    const current = preferences.find(x => x[0] === preferenceKey);
 
-  if (current == null) {
+    if (current == null) {
+      return {
+        ...accumulator,
+        [preferenceKey]: defaultValuePreference(preferenceKey),
+      };
+    }
     return {
       ...accumulator,
-      [preferenceKey]: defaultValuePreference(preferenceKey),
+      [preferenceKey]: current[1],
     };
-  }
-  return {
-    ...accumulator,
-    [preferenceKey]: current[1],
-  };
-}, {});
+  }, {});

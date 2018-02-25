@@ -1,6 +1,4 @@
-import {
-  RecordingActionTypes,
-} from '../actions/ActionTypes';
+import { RecordingActionTypes } from '../actions/ActionTypes';
 
 import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 
@@ -48,13 +46,22 @@ export default (state = DEFAULT_RECORDINGS_STATE, action) => {
       logErrorToCrashlytics({ customMessage: 'Save Recordings Error', message: { error, state } });
       break;
     case deleteRecordingTypes.error:
-      logErrorToCrashlytics({ customMessage: 'Delete Recordings Error', message: { error, state } });
+      logErrorToCrashlytics({
+        customMessage: 'Delete Recordings Error',
+        message: { error, state },
+      });
       break;
     case uploadRecordingTypes.error:
-      logErrorToCrashlytics({ customMessage: 'Upload Recordings Error', message: { error, state } });
+      logErrorToCrashlytics({
+        customMessage: 'Upload Recordings Error',
+        message: { error, state },
+      });
       break;
     case downloadRecordingTypes.error:
-      logErrorToCrashlytics({ customMessage: 'Download Recordings Error', message: { error, state } });
+      logErrorToCrashlytics({
+        customMessage: 'Download Recordings Error',
+        message: { error, state },
+      });
       break;
     case syncDownRecordingsTypes.error:
       logErrorToCrashlytics({ customMessage: 'Sync Recordings Error', message: { error, state } });
@@ -107,10 +114,13 @@ export default (state = DEFAULT_RECORDINGS_STATE, action) => {
         processing: false,
         recordings: {
           ...state.recordings,
-          local: state.recordings.local[action.record.id] != null ? {
-            ...state.recordings.local,
-            [action.record.id]: null,
-          } : state.recordings.local,
+          local:
+            state.recordings.local[action.record.id] != null
+              ? {
+                  ...state.recordings.local,
+                  [action.record.id]: null,
+                }
+              : state.recordings.local,
           networked: {
             ...state.recordings.networked,
             [action.record.id]: action.record,
@@ -123,14 +133,20 @@ export default (state = DEFAULT_RECORDINGS_STATE, action) => {
         processing: false,
         recordings: {
           ...state.recordings,
-          local: state.recordings.local[action.record.id] == null ? state.recordings.local : {
-            ...state.recordings.local,
-            [action.record.id]: action.record,
-          },
-          networked: state.recordings.networked[action.record.resourceId] == null ? state.recordings.networked : {
-            ...state.recordings.networked,
-            [action.record.id]: action.record,
-          },
+          local:
+            state.recordings.local[action.record.id] == null
+              ? state.recordings.local
+              : {
+                  ...state.recordings.local,
+                  [action.record.id]: action.record,
+                },
+          networked:
+            state.recordings.networked[action.record.resourceId] == null
+              ? state.recordings.networked
+              : {
+                  ...state.recordings.networked,
+                  [action.record.id]: action.record,
+                },
         },
       };
     case syncDownRecordingsTypes.success:

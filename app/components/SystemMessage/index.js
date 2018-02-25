@@ -1,12 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Animated,
-  Easing,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import { Animated, Easing, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { colors } from '../../styles';
 
 export default class SystemMessage extends PureComponent {
@@ -21,7 +15,7 @@ export default class SystemMessage extends PureComponent {
     opacityAnimation: new Animated.Value(0),
     message: this.props.message,
     kind: this.props.kind,
-  }
+  };
 
   componentDidMount() {
     this.start();
@@ -29,7 +23,11 @@ export default class SystemMessage extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.message !== this.state.oldMessage && nextProps.message !== '') {
-      this.setState({ message: nextProps.message, kind: nextProps.kind, oldMessage: this.state.message });
+      this.setState({
+        message: nextProps.message,
+        kind: nextProps.kind,
+        oldMessage: this.state.message,
+      });
       if (this.timeout == null) {
         this.start();
       }
@@ -37,21 +35,17 @@ export default class SystemMessage extends PureComponent {
   }
 
   start = () => {
-    const top = Animated.timing(
-      this.state.topAnimation, {
-        duration: 400,
-        easing: Easing.linear,
-        toValue: 40,
-      },
-    );
+    const top = Animated.timing(this.state.topAnimation, {
+      duration: 400,
+      easing: Easing.linear,
+      toValue: 40,
+    });
 
-    const opacity = Animated.timing(
-      this.state.opacityAnimation, {
-        duration: 400,
-        easing: Easing.lienar,
-        toValue: 1,
-      },
-    );
+    const opacity = Animated.timing(this.state.opacityAnimation, {
+      duration: 400,
+      easing: Easing.lienar,
+      toValue: 1,
+    });
 
     Animated.parallel([top, opacity]).start();
 
@@ -59,37 +53,47 @@ export default class SystemMessage extends PureComponent {
       oldMessage: this.state.message,
     });
 
-    this.timeout = this.props.persistent ? null : setTimeout(() => {
-      this.timeout = null;
-      this.close();
-    }, 5000);
-  }
+    this.timeout = this.props.persistent
+      ? null
+      : setTimeout(() => {
+          this.timeout = null;
+          this.close();
+        }, 5000);
+  };
 
   close = () => {
     this.setState({ oldMessage: this.state.message, message: '' });
-    const top = Animated.timing(
-      this.state.topAnimation, {
-        duration: 300,
-        easing: Easing.linear,
-        toValue: 0,
-      },
-    ).start();
+    const top = Animated.timing(this.state.topAnimation, {
+      duration: 300,
+      easing: Easing.linear,
+      toValue: 0,
+    }).start();
 
-    const opacity = Animated.timing(
-      this.state.opacityAnimation, {
-        duration: 300,
-        easing: Easing.linear,
-        toValue: 0,
-      },
-    );
+    const opacity = Animated.timing(this.state.opacityAnimation, {
+      duration: 300,
+      easing: Easing.linear,
+      toValue: 0,
+    });
 
     Animated.parallel([top, opacity]).start();
-  }
+  };
 
   render() {
     return (
-      <Animated.View style={[styles.messageContainer, { opacity: this.state.opacityAnimation, transform: [{ translateY: this.state.topAnimation }], backgroundColor: this.state.kind === 'error' ? colors.error : colors.success }]}>
-        <TouchableOpacity style={{ width: '100%', height: '100%', justifyContent: 'center' }} onPress={() => this.close()}>
+      <Animated.View
+        style={[
+          styles.messageContainer,
+          {
+            opacity: this.state.opacityAnimation,
+            transform: [{ translateY: this.state.topAnimation }],
+            backgroundColor: this.state.kind === 'error' ? colors.error : colors.success,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={{ width: '100%', height: '100%', justifyContent: 'center' }}
+          onPress={() => this.close()}
+        >
           <Text style={styles.message}>{this.state.message}</Text>
         </TouchableOpacity>
       </Animated.View>

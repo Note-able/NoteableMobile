@@ -17,17 +17,11 @@ import {
   uploadRecording,
 } from '../../actions/recordingActions';
 
-import {
-  startPlayer,
-} from '../../actions/playerActions';
+import { startPlayer } from '../../actions/playerActions';
 
-import {
-  getCurrentUser,
-} from '../../actions/accountActions';
+import { getCurrentUser } from '../../actions/accountActions';
 
-import {
-  alert,
-} from '../../actions/systemActions';
+import { alert } from '../../actions/systemActions';
 
 const mapStateToProps = state => ({
   recordings: state.RecordingsReducer,
@@ -65,7 +59,7 @@ class AudioRecorder extends Component {
 
   state = {
     screen: '',
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.screenProps.screen === 'Record' && this.state.screen === '') {

@@ -5,7 +5,6 @@ export const createAsyncActionTypes = type => ({
   queue: `QUEUE.${type}`,
 });
 
-
 export const RecordingActionTypes = {
   deleteRecordingTypes: createAsyncActionTypes('DELETE_RECORDINGS'),
   downloadRecordingTypes: createAsyncActionTypes('DOWNLOAD_RECORDINGS'),

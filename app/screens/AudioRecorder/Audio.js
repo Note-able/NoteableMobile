@@ -82,8 +82,12 @@ export default class Audio extends Component {
 
   componentDidMount() {
     if (Platform.OS === 'android') {
-      const audioGrantedPromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
-      const writeStoragePromise = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+      const audioGrantedPromise = PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+      );
+      const writeStoragePromise = PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      );
 
       Promise.all([audioGrantedPromise, writeStoragePromise]).then(this.requestPermissions);
     }
@@ -92,8 +96,7 @@ export default class Audio extends Component {
 
     AudioRecorder.onProgress = () => {};
     AudioRecorder.onFinished = () => {
-      RNFetchBlob.fs.stat(this.state.audioPath)
-        .then(stats => this.setState({ fileStats: stats }));
+      RNFetchBlob.fs.stat(this.state.audioPath).then(stats => this.setState({ fileStats: stats }));
 
       this.toggleTiming();
     };
@@ -111,7 +114,7 @@ export default class Audio extends Component {
       const permissions = await PermissionsAndroid.requestMultiple(request);
       this.setState({ permissions });
     }
-  }
+  };
 
   componentWillUnmount() {
     if (!this.state.didSave) {
@@ -141,14 +144,14 @@ export default class Audio extends Component {
     });
 
     this.interval = setInterval(() => {
-      const currentTime = (new Date() - this.state.start);
+      const currentTime = new Date() - this.state.start;
       this.setState({
         currentTime,
         displayTime: DisplayTime(currentTime),
         isTiming: true,
       });
     }, 50);
-  }
+  };
 
   async prepareRecordingPath(audioPath) {
     await AudioRecorder.prepareRecordingAtPath(audioPath, {
@@ -165,7 +168,7 @@ export default class Audio extends Component {
       AudioRecorder.pauseRecording();
       this.setState({ stoppedRecording: true, recording: false });
     }
-  }
+  };
 
   async stop() {
     if (this.state.recording) {
@@ -173,51 +176,49 @@ export default class Audio extends Component {
     }
   }
 
-  getAudio = () => new Promise((resolve) => {
-    const audio = new Sound(this.state.audioPath, '', (error) => {
-      if (error) {
-        logErrorToCrashlytics(`${error.message}`);
-      }
-      resolve(audio);
+  getAudio = () =>
+    new Promise(resolve => {
+      const audio = new Sound(this.state.audioPath, '', error => {
+        if (error) {
+          logErrorToCrashlytics(`${error.message}`);
+        }
+        resolve(audio);
+      });
     });
-  });
 
   pausePlay = () => {
-    this.getAudio()
-      .then((audio) => {
-        this.timingAnimation.stop();
-        audio.pause();
-        this.setState({ isPlaying: false, isPaused: true });
-      });
-  }
+    this.getAudio().then(audio => {
+      this.timingAnimation.stop();
+      audio.pause();
+      this.setState({ isPlaying: false, isPaused: true });
+    });
+  };
 
   startPlay = () => {
-    this.getAudio()
-      .then((audio) => {
-        const timingBarWidth = this.state.isPaused ? this.state.timingBarWidth : new Animated.Value(0);
-        this.setState({ timingBarWidth, isPlaying: true }, () => {
-          this.playAndAnimate(audio);
-        });
+    this.getAudio().then(audio => {
+      const timingBarWidth = this.state.isPaused
+        ? this.state.timingBarWidth
+        : new Animated.Value(0);
+      this.setState({ timingBarWidth, isPlaying: true }, () => {
+        this.playAndAnimate(audio);
       });
-  }
+    });
+  };
 
   playAndAnimate(audio) {
-    audio.getCurrentTime((time) => {
+    audio.getCurrentTime(time => {
       const duration = (audio.getDuration() - time) * 1000;
-      this.timingAnimation = Animated.timing(
-        this.state.timingBarWidth,
-        {
-          easing: Easing.linear,
-          toValue: WINDOW_WIDTH,
-          duration,
-        },
-      );
+      this.timingAnimation = Animated.timing(this.state.timingBarWidth, {
+        easing: Easing.linear,
+        toValue: WINDOW_WIDTH,
+        duration,
+      });
       this.timingAnimation.start();
       this.playSound(audio);
     });
   }
 
-  playSound = (audio) => {
+  playSound = audio => {
     audio.play(() => {
       this.setState({
         isPaused: false,
@@ -225,12 +226,19 @@ export default class Audio extends Component {
         timingBarWidth: null,
       });
     });
-  }
+  };
 
   async toggleRecording(isRecording) {
     const { permissions } = this.state;
-    if (permissions && (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' || permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied')) {
-      this.requestPermissions([permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] !== 'denied', permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] !== 'denied']);
+    if (
+      permissions &&
+      (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' ||
+        permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied')
+    ) {
+      this.requestPermissions([
+        permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] !== 'denied',
+        permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] !== 'denied',
+      ]);
       return;
     }
 
@@ -263,7 +271,13 @@ export default class Audio extends Component {
       const modal = !!recordingStarted;
       const reviewMode = !!recordingStarted;
       Metronome.stop();
-      this.setState({ recordingStarted: false, stoppedRecording: true, recording: false, reviewMode, modal });
+      this.setState({
+        recordingStarted: false,
+        stoppedRecording: true,
+        recording: false,
+        reviewMode,
+        modal,
+      });
     }
   }
 
@@ -280,8 +294,8 @@ export default class Audio extends Component {
     }
   }
 
-  saveAudio = (recording) => {
-    const audio = new Sound(this.state.audioPath, '', (error) => {
+  saveAudio = recording => {
+    const audio = new Sound(this.state.audioPath, '', error => {
       if (error || audio.getDuration === -1) {
         logErrorToCrashlytics(`${error.message}`);
         return;
@@ -318,7 +332,7 @@ export default class Audio extends Component {
         fileStats: null,
       });
     });
-  }
+  };
 
   deleteRecording = () => {
     RNFetchBlob.fs.unlink(this.state.audioPath);
@@ -328,9 +342,9 @@ export default class Audio extends Component {
       reviewMode: false,
       displayTime: DisplayTime(0),
     });
-  }
+  };
 
-  editRecording = (recording) => {
+  editRecording = recording => {
     this.setState({
       modal: {
         id: recording.id,
@@ -339,9 +353,9 @@ export default class Audio extends Component {
       fileName: recording.name,
       recording,
     });
-  }
+  };
 
-  updateRecording = (recordingInfo) => {
+  updateRecording = recordingInfo => {
     this.props.updateRecording({
       ...this.state.recording,
       name: recordingInfo.fileName,
@@ -353,41 +367,44 @@ export default class Audio extends Component {
       modal: null,
       fileName: '',
     });
-  }
+  };
 
-  uploadRecording = (recording) => {
+  uploadRecording = recording => {
     this.props.uploadRecording(recording, this.props.currentUser);
-  }
+  };
 
   toggleMetronomeSettings = () => {
     const { showMetronomeMenu } = this.state;
-    const metronomeMenuWidth = showMetronomeMenu ? this.state.metronomeMenuWidth : new Animated.Value(0);
-    const metronomeMenuHeight = showMetronomeMenu ? this.state.metronomeMenuHeight : new Animated.Value(0);
-    this.setState({ metronomeMenuWidth, metronomeMenuHeight, showMetronomeMenu: !showMetronomeMenu }, () => {
-      this.metronomeTimingAnimation = Animated.parallel([
-        Animated.timing(
-          this.state.metronomeMenuWidth,
-          {
+    const metronomeMenuWidth = showMetronomeMenu
+      ? this.state.metronomeMenuWidth
+      : new Animated.Value(0);
+    const metronomeMenuHeight = showMetronomeMenu
+      ? this.state.metronomeMenuHeight
+      : new Animated.Value(0);
+    this.setState(
+      { metronomeMenuWidth, metronomeMenuHeight, showMetronomeMenu: !showMetronomeMenu },
+      () => {
+        this.metronomeTimingAnimation = Animated.parallel([
+          Animated.timing(this.state.metronomeMenuWidth, {
             easing: Easing.linear,
             toValue: showMetronomeMenu ? 0 : WINDOW_WIDTH,
             duration: 150,
-          },
-        ),
-        Animated.timing(
-          this.state.metronomeMenuHeight,
-          {
+          }),
+          Animated.timing(this.state.metronomeMenuHeight, {
             easing: Easing.linear,
             toValue: showMetronomeMenu ? 0 : 50,
             duration: 150,
-          },
-        ),
-      ]);
-      this.metronomeTimingAnimation.start(() => this.setState({ metronomeMenuVisible: !showMetronomeMenu }));
-    });
-  }
+          }),
+        ]);
+        this.metronomeTimingAnimation.start(() =>
+          this.setState({ metronomeMenuVisible: !showMetronomeMenu })
+        );
+      }
+    );
+  };
 
   handleChangeMetronomeState = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const { metronomeState } = prevState;
       switch (metronomeState) {
         case metronomeStates.off:
@@ -398,9 +415,9 @@ export default class Audio extends Component {
           return { metronomeState: metronomeStates.off };
       }
     });
-  }
+  };
 
-  handleChangeBPM = (text) => {
+  handleChangeBPM = text => {
     if (!text) {
       this.setState({ metronomeBPM: text });
     } else {
@@ -409,9 +426,9 @@ export default class Audio extends Component {
         this.setState({ metronomeBPM: BPM.toString() });
       }
     }
-  }
+  };
 
-  handleChangeCountIn = (text) => {
+  handleChangeCountIn = text => {
     if (!text) {
       this.setState({ countIn: text });
     } else {
@@ -420,25 +437,65 @@ export default class Audio extends Component {
         this.setState({ countIn: countIn.toString() });
       }
     }
-  }
+  };
 
   startMetronome = () => {
     const { metronomeState, metronomeBPM, countIn, timeSignature } = this.state;
-    if (metronomeState === metronomeStates.off || metronomeBPM.length === 0 || countIn.length === 0) {
+    if (
+      metronomeState === metronomeStates.off ||
+      metronomeBPM.length === 0 ||
+      countIn.length === 0
+    ) {
       return;
     }
 
     const [beatCount, barCount] = timeSignature.value.split(',');
     const BPM = parseInt(metronomeBPM, 10);
     this.metronomeCount = 0;
-    Metronome.start(parseInt(countIn, 10) * beatCount, BPM, parseInt(beatCount, 10), metronomeState === metronomeStates.always, () => { this.startRecording(); });
-  }
+    Metronome.start(
+      parseInt(countIn, 10) * beatCount,
+      BPM,
+      parseInt(beatCount, 10),
+      metronomeState === metronomeStates.always,
+      () => {
+        this.startRecording();
+      }
+    );
+  };
 
   render() {
-    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature, mixerOn, permissions } = this.state;
-    const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
+    const {
+      metronomeMenuVisible,
+      showMetronomeMenu,
+      metronomeMenuWidth,
+      metronomeMenuHeight,
+      metronomeBPM,
+      metronomeState,
+      displayTime,
+      reviewMode,
+      recording,
+      modal,
+      fileName,
+      countIn,
+      timeSignature,
+      mixerOn,
+      permissions,
+    } = this.state;
+    const metronomeMenuProps = {
+      metronomeMenuVisible,
+      showMetronomeMenu,
+      metronomeMenuWidth,
+      metronomeMenuHeight,
+      metronomeState,
+      metronomeBPM,
+      countIn,
+      timeSignature,
+    };
 
-    const showSystemMessage = permissions && (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' || permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied');
+    const showSystemMessage =
+      permissions &&
+      (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' ||
+        permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied');
 
     return (
       <View style={styles.container}>
@@ -447,13 +504,38 @@ export default class Audio extends Component {
           end={{ x: 0.1, y: 0.9 }}
           locations={[0.1, 0.3, 0.8]}
           colors={[colorRGBA.red, colorRGBA.lightRed, colors.shade0]}
-          style={{ position: 'absolute', width: 600, height: 600, top: -300, right: -300, borderRadius: 300 }}
+          style={{
+            position: 'absolute',
+            width: 600,
+            height: 600,
+            top: -300,
+            right: -300,
+            borderRadius: 300,
+          }}
         />
-        <View style={{ width: '100%', position: 'absolute', top: -20, display: showSystemMessage ? 'flex' : 'none' }}>
-          <SystemMessage message={'Noteable needs permissions to record.'} kind={'audioPermissions'} persistent />
+        <View
+          style={{
+            width: '100%',
+            position: 'absolute',
+            top: -20,
+            display: showSystemMessage ? 'flex' : 'none',
+          }}
+        >
+          <SystemMessage
+            message={'Noteable needs permissions to record.'}
+            kind={'audioPermissions'}
+            persistent
+          />
         </View>
         <TouchableOpacity onPress={this.toggleMetronomeSettings}>
-          <Image source={metronomeState === metronomeStates.off ? require('../../img/metronome.png') : require('../../img/metronome_green.png')} style={{ width: 30, height: 40, margin: 10 }} />
+          <Image
+            source={
+              metronomeState === metronomeStates.off
+                ? require('../../img/metronome.png')
+                : require('../../img/metronome_green.png')
+            }
+            style={{ width: 30, height: 40, margin: 10 }}
+          />
         </TouchableOpacity>
         <MetronomeMenu
           {...metronomeMenuProps}
@@ -462,26 +544,49 @@ export default class Audio extends Component {
           onCountInChange={this.handleChangeCountIn}
           onTimeSigantureChange={value => this.setState({ timeSignature: value })}
         />
-        <Text style={{ fontSize: 20, color: 'white', paddingTop: 28, backgroundColor: 'transparent' }}>Recording Time</Text>
-        <View style={[styles.detailsContainer, reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' }]}>
+        <Text
+          style={{ fontSize: 20, color: 'white', paddingTop: 28, backgroundColor: 'transparent' }}
+        >
+          Recording Time
+        </Text>
+        <View
+          style={[
+            styles.detailsContainer,
+            reviewMode ? { justifyContent: 'center' } : { justifyContent: 'center' },
+          ]}
+        >
           <View style={styles.progressTextContainer}>
-            <Text style={[styles.progressText, displayTime.length > 7 ? { width: 110 } : null]}>{displayTime}</Text>
+            <Text style={[styles.progressText, displayTime.length > 7 ? { width: 110 } : null]}>
+              {displayTime}
+            </Text>
           </View>
         </View>
         <View style={[styles.buttonContainer, { marginBottom: 75 }]}>
-          <TouchableHighlight onPress={() => { this.toggleRecording(recording); }}>
-            { this.state.recording ?
-              <View style={styles.stopButton} /> :
+          <TouchableHighlight
+            onPress={() => {
+              this.toggleRecording(recording);
+            }}
+          >
+            {this.state.recording ? (
+              <View style={styles.stopButton} />
+            ) : (
               <View style={styles.recordButton}>
-                <Icon name="mic" size={40} style={{ width: 40, height: 40, margin: 10 }} color={'white'} />
+                <Icon
+                  name="mic"
+                  size={40}
+                  style={{ width: 40, height: 40, margin: 10 }}
+                  color={'white'}
+                />
               </View>
-            }
+            )}
           </TouchableHighlight>
         </View>
         <View style={styles.recordingsContainer}>
           <MultiTrackMixer
             recordings={this.state.recordings || []}
-            toggleMixer={() => { this.setState(state => ({ mixerOn: !state.mixerOn })); }}
+            toggleMixer={() => {
+              this.setState(state => ({ mixerOn: !state.mixerOn }));
+            }}
             isMixerOn={mixerOn}
             saveMix={this.props.saveRecording}
           />
@@ -491,7 +596,9 @@ export default class Audio extends Component {
           animationType={'slide'}
           transparent
           visible={modal}
-          onRequestClose={() => { this.setState({ modal: false }); }}
+          onRequestClose={() => {
+            this.setState({ modal: false });
+          }}
         >
           <RecordingModal
             initialValue={fileName}
@@ -502,7 +609,9 @@ export default class Audio extends Component {
               }
             }}
             cancelText={modal.id == null ? 'Delete' : 'Cancel'}
-            save={recordingInfo => (modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo))}
+            save={recordingInfo =>
+              modal.id == null ? this.saveAudio(recordingInfo) : this.updateRecording(recordingInfo)
+            }
           />
         </Modal>
       </View>
@@ -510,12 +619,42 @@ export default class Audio extends Component {
   }
 }
 
-const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature, onMetronomeStateChange, onBPMChange, onCountInChange, onTimeSigantureChange }) => (
+const MetronomeMenu = ({
+  metronomeMenuVisible,
+  showMetronomeMenu,
+  metronomeMenuWidth,
+  metronomeMenuHeight,
+  metronomeState,
+  metronomeBPM,
+  countIn,
+  timeSignature,
+  onMetronomeStateChange,
+  onBPMChange,
+  onCountInChange,
+  onTimeSigantureChange,
+}) => (
   <View style={{ height: 50, width: WINDOW_WIDTH, alignItems: 'center', justifyContent: 'center' }}>
-    <Animated.View style={[styles.metronomeMenuContainer, { width: metronomeMenuWidth, height: metronomeMenuHeight }]}>
-        {showMetronomeMenu && (<View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
-          <TouchableHighlight onPress={onMetronomeStateChange} style={styles.metronomeMenuTouchableHighlight}>
-            <Text style={[styles.metronomeLabel, metronomeState !== metronomeStates.off ? styles.metronomeOnText : null, { width: 90 }]}>{ metronomeState }</Text>
+    <Animated.View
+      style={[
+        styles.metronomeMenuContainer,
+        { width: metronomeMenuWidth, height: metronomeMenuHeight },
+      ]}
+    >
+      {showMetronomeMenu && (
+        <View style={[styles.metronomeMenu, { opacity: metronomeMenuVisible ? 1 : 0 }]}>
+          <TouchableHighlight
+            onPress={onMetronomeStateChange}
+            style={styles.metronomeMenuTouchableHighlight}
+          >
+            <Text
+              style={[
+                styles.metronomeLabel,
+                metronomeState !== metronomeStates.off ? styles.metronomeOnText : null,
+                { width: 90 },
+              ]}
+            >
+              {metronomeState}
+            </Text>
           </TouchableHighlight>
           <Text style={styles.metronomeLabel}>BPM:</Text>
           <TextInput
@@ -536,8 +675,8 @@ const MetronomeMenu = ({ metronomeMenuVisible, showMetronomeMenu, metronomeMenuW
             selectedValue={timeSignature}
             options={timeSignatures}
           />
-        </View>)}
-      </Animated.View>
+        </View>
+      )}
+    </Animated.View>
   </View>
-  );
-
+);

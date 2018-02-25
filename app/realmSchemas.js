@@ -22,24 +22,26 @@ import Realm from 'realm';
 const RecordingSchemas = {
   0: {
     schemaVersion: 0,
-    schema: [{
-      name: 'Recording',
-      primaryKey: 'id',
-      properties: {
-        name: 'string',
-        path: 'string',
-        duration: { type: 'double', optional: true },
-        description: 'string',
-        isSynced: 'bool',
-        id: 'int',
-        dateCreated: 'date',
-        dateModified: 'date',
-        resourceId: { type: 'int', default: -1 },
-        size: { type: 'int', optional: true },
-        audioUrl: { type: 'string', default: '' },
-        tags: { type: 'string', default: '' },
+    schema: [
+      {
+        name: 'Recording',
+        primaryKey: 'id',
+        properties: {
+          name: 'string',
+          path: 'string',
+          duration: { type: 'double', optional: true },
+          description: 'string',
+          isSynced: 'bool',
+          id: 'int',
+          dateCreated: 'date',
+          dateModified: 'date',
+          resourceId: { type: 'int', default: -1 },
+          size: { type: 'int', optional: true },
+          audioUrl: { type: 'string', default: '' },
+          tags: { type: 'string', default: '' },
+        },
       },
-    }],
+    ],
   },
   // {
   //   schemaVersion: 6,
@@ -72,7 +74,7 @@ const RecordingSchemas = {
 //   migratedRealm.close();
 // }
 
-const GetId = (realm) => {
+const GetId = realm => {
   const result = realm.sorted('id', true);
   if (result.length === 0) {
     return 1;

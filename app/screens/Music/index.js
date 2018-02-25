@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Animated,
-  Easing,
-  Modal,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  View,
-} from 'react-native';
+import { Animated, Easing, Modal, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -23,9 +15,7 @@ import {
   uploadRecording,
 } from '../../actions/recordingActions';
 
-import {
-  startPlayer,
-} from '../../actions/playerActions';
+import { startPlayer } from '../../actions/playerActions';
 
 import { colors, colorRGBA } from '../../styles';
 import { Recordings, RecordingModal } from '../../components';
@@ -83,38 +73,43 @@ class Music extends Component {
     this.setState(stateUpdate);
   }
 
-  search = (search) => {
+  search = search => {
     this.setState({ search });
-    debounceFunc('searchRecordings', () => {
-      this.props.searchRecordings(search);
-    }, 300);
-  }
+    debounceFunc(
+      'searchRecordings',
+      () => {
+        this.props.searchRecordings(search);
+      },
+      300
+    );
+  };
 
   showFilter = () => {
-    this.setState({
-      options: this.state.options === 'filter' ? '' : 'filter',
-      filterOpen: !this.state.filterOpen,
-    }, () => {
-      this.state.height.setValue(this.state.filterOpen ? 0 : 120);
-      Animated.timing(
-        this.state.height, {
+    this.setState(
+      {
+        options: this.state.options === 'filter' ? '' : 'filter',
+        filterOpen: !this.state.filterOpen,
+      },
+      () => {
+        this.state.height.setValue(this.state.filterOpen ? 0 : 120);
+        Animated.timing(this.state.height, {
           easing: Easing.ease,
           toValue: this.state.filterOpen ? 120 : 0,
           duration: 100,
-        },
-      ).start();
-    });
-  }
+        }).start();
+      }
+    );
+  };
 
-  filter = (filter) => {
+  filter = filter => {
     this.props.filterRecordings(filter);
     this.setState({
       activeFilter: filter,
       options: '',
     });
-  }
+  };
 
-  editRecording = (recording) => {
+  editRecording = recording => {
     this.setState({
       modal: {
         id: recording.id,
@@ -124,9 +119,9 @@ class Music extends Component {
       tags: recording.tags,
       recording,
     });
-  }
+  };
 
-  updateRecording = (recordingInfo) => {
+  updateRecording = recordingInfo => {
     this.props.updateRecording({
       ...this.state.recording,
       name: recordingInfo.fileName,
@@ -139,18 +134,38 @@ class Music extends Component {
       fileName: '',
       tags: '',
     });
-  }
+  };
 
   render() {
-    const check = <Icon name="check" size={18} style={{ width: 18, height: 18, marginRight: 4 }} color={colors.green} />;
+    const check = (
+      <Icon
+        name="check"
+        size={18}
+        style={{ width: 18, height: 18, marginRight: 4 }}
+        color={colors.green}
+      />
+    );
     return (
       <View style={styles.recordingsContainer}>
         <View style={styles.headerBar}>
           <TouchableHighlight style={styles.sortOptions} onPress={this.showFilter}>
-            <Icon name="filter-list" size={28} style={{ width: 28, height: 28 }} color={colors.shade90} />
+            <Icon
+              name="filter-list"
+              size={28}
+              style={{ width: 28, height: 28 }}
+              color={colors.shade90}
+            />
           </TouchableHighlight>
           <View style={styles.searchInput}>
-            <TextInput style={styles.input} value={this.state.search} onFocus={() => this.setState({ options: 'search' })} onChangeText={this.search} placeholder="Search recordings" placeholderTextColor={colors.shade90} underlineColorAndroid="transparent" />
+            <TextInput
+              style={styles.input}
+              value={this.state.search}
+              onFocus={() => this.setState({ options: 'search' })}
+              onChangeText={this.search}
+              placeholder="Search recordings"
+              placeholderTextColor={colors.shade90}
+              underlineColorAndroid="transparent"
+            />
           </View>
         </View>
         <Animated.View style={[styles.filterContainer, { height: this.state.height }]}>
@@ -178,7 +193,14 @@ class Music extends Component {
           end={{ x: 0.9, y: 0.9 }}
           locations={[0.1, 0.3, 0.8]}
           colors={[colorRGBA.green, colorRGBA.lightGreen, colors.shade0]}
-          style={{ position: 'absolute', width: 800, height: 800, top: -400, left: -400, borderRadius: 400 }}
+          style={{
+            position: 'absolute',
+            width: 800,
+            height: 800,
+            top: -400,
+            left: -400,
+            borderRadius: 400,
+          }}
         />
         <Recordings
           deleteRecording={this.props.deleteRecording}
@@ -197,7 +219,9 @@ class Music extends Component {
           animationType={'none'}
           transparent
           visible={this.state.modal != null}
-          onRequestClose={() => { this.setState({ modal: null }); }}
+          onRequestClose={() => {
+            this.setState({ modal: null });
+          }}
         >
           <RecordingModal
             initialFileName={this.state.fileName}

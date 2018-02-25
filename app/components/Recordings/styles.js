@@ -1,8 +1,5 @@
 import { StyleSheet } from 'react-native';
-import {
-  colors,
-  shadowProps,
-} from '../../styles';
+import { colors, shadowProps } from '../../styles';
 
 export default StyleSheet.create({
   recordings: {

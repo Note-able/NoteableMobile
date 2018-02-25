@@ -25,49 +25,53 @@ export default class MultiTrackMixer extends Component {
     saveMix: PropTypes.func.isRequired,
     toggleMixer: PropTypes.func.isRequired,
     isMixerOn: PropTypes.bool,
-  }
+  };
 
   state = {
     selectedRecordings: [],
     tracksToAdd: [],
     modal: { visible: false },
-  }
+  };
 
-  selectTrack = (recording) => {
+  selectTrack = recording => {
     const { tracksToAdd } = this.state;
     tracksToAdd.push(recording);
     this.setState({ tracksToAdd });
-  }
+  };
 
-  unselectTrack = (recording) => {
+  unselectTrack = recording => {
     const { tracksToAdd } = this.state;
     tracksToAdd.splice(tracksToAdd.findIndex(r => r.id === recording.id), 1);
     this.setState({ tracksToAdd });
-  }
+  };
 
   addTracks = () => {
     const { tracksToAdd } = this.state;
-    tracksToAdd.forEach((recording) => {
+    tracksToAdd.forEach(recording => {
       const splits = recording.path.split('/');
       const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
       MultiTrack.AddTrack(`${recording.id}`, realPath);
     });
-    this.setState({ tracksToAdd: [], modal: { visible: false }, selectedRecordings: [...this.state.selectedRecordings, ...tracksToAdd] });
-  }
+    this.setState({
+      tracksToAdd: [],
+      modal: { visible: false },
+      selectedRecordings: [...this.state.selectedRecordings, ...tracksToAdd],
+    });
+  };
 
   cancelAddTracks = () => {
     this.setState({ tracksToAdd: [], modal: { visible: false } });
-  }
+  };
 
-  removeTrack = (recording) => {
+  removeTrack = recording => {
     MultiTrack.RemoveTrack(`${recording.id}`);
     const { selectedRecordings } = this.state;
     const index = selectedRecordings.findIndex(r => r.id === recording.id);
     selectedRecordings.splice(index, 1);
     this.setState(state => ({ selectedRecordings, showOptions: null, [state.showOptions]: null }));
-  }
+  };
 
-  createAnimations = (recordingId) => {
+  createAnimations = recordingId => {
     const animations = [];
     let oldOptions = null;
 
@@ -80,12 +84,13 @@ export default class MultiTrackMixer extends Component {
     });
 
     if (oldOptions == null || oldOptions !== recordingId) {
-      animations.push(Animated.spring(
-        this.state[recordingId], {
+      animations.push(
+        Animated.spring(this.state[recordingId], {
           easing: Easing.quad,
           toValue: 1,
           duration: 100,
-        }));
+        })
+      );
     }
 
     if (oldOptions != null) {
@@ -95,26 +100,30 @@ export default class MultiTrackMixer extends Component {
         });
       }
 
-      animations.push(Animated.spring(
-        this.state[oldOptions], {
+      animations.push(
+        Animated.spring(this.state[oldOptions], {
           easing: Easing.linear,
           toValue: 0,
           duration: 50,
-        }));
+        })
+      );
     }
 
     Animated.parallel(animations).start();
-  }
+  };
 
-  showOptions = (recordingId) => {
+  showOptions = recordingId => {
     if (this.state[recordingId] == null) {
-      this.setState({
-        [recordingId]: new Animated.Value(0),
-      }, () => this.createAnimations(recordingId));
+      this.setState(
+        {
+          [recordingId]: new Animated.Value(0),
+        },
+        () => this.createAnimations(recordingId)
+      );
     } else {
       this.createAnimations(recordingId);
     }
-  }
+  };
 
   showRecordingSelector = () => this.setState({ modal: { visible: true, content: 'recordings' } });
 
@@ -123,11 +132,15 @@ export default class MultiTrackMixer extends Component {
   togglePlay = () => {
     const { isPlaying } = this.state;
     if (isPlaying) {
-      this.setState({ isPlaying: false }, () => { MultiTrack.Stop(); });
+      this.setState({ isPlaying: false }, () => {
+        MultiTrack.Stop();
+      });
     } else {
-      this.setState({ isPlaying: true }, () => { MultiTrack.Start().then(() => this.setState({ isPlaying: false })); });
+      this.setState({ isPlaying: true }, () => {
+        MultiTrack.Start().then(() => this.setState({ isPlaying: false }));
+      });
     }
-  }
+  };
 
   saveMix = async ({ fileName, tags }) => {
     const { selectedRecordings } = this.state;
@@ -147,7 +160,7 @@ export default class MultiTrackMixer extends Component {
       tags,
     });
     this.setState({ modal: { visible: false } });
-  }
+  };
 
   renderRecordingsModalContent = () => {
     const { recordings } = this.props;
@@ -155,30 +168,57 @@ export default class MultiTrackMixer extends Component {
     return (
       <View style={styles.modal}>
         <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
-          {recordings.order.filter(x => selectedRecordings.findIndex(r => r.id === x) === -1).map((recordingId) => {
-            const recording = recordings.local[recordingId] || recordings.networked[recordingId];
-            const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
-            return (
-              <TouchableOpacity style={{ width: '100%' }} key={recording.id} onPress={() => { if (selected) { this.unselectTrack(recording); } else { this.selectTrack(recording); } }}>
-                <View style={styles.modalRecordingContainer}>
-                  <Icon name={selected ? 'check-box' : 'check-box-outline-blank'} size={20} color={colors.white} />
-                  <Text style={{ marginLeft: 20, color: colors.white, flex: 2 }} numberOfLines={1}>{recording.name}</Text>
-                  <Text style={{ marginLeft: 20, color: colors.medium, flex: 1 }}>{moment.utc(recording.duration * 1000).format('mm:ss')}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+          {recordings.order
+            .filter(x => selectedRecordings.findIndex(r => r.id === x) === -1)
+            .map(recordingId => {
+              const recording = recordings.local[recordingId] || recordings.networked[recordingId];
+              const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
+              return (
+                <TouchableOpacity
+                  style={{ width: '100%' }}
+                  key={recording.id}
+                  onPress={() => {
+                    if (selected) {
+                      this.unselectTrack(recording);
+                    } else {
+                      this.selectTrack(recording);
+                    }
+                  }}
+                >
+                  <View style={styles.modalRecordingContainer}>
+                    <Icon
+                      name={selected ? 'check-box' : 'check-box-outline-blank'}
+                      size={20}
+                      color={colors.white}
+                    />
+                    <Text
+                      style={{ marginLeft: 20, color: colors.white, flex: 2 }}
+                      numberOfLines={1}
+                    >
+                      {recording.name}
+                    </Text>
+                    <Text style={{ marginLeft: 20, color: colors.medium, flex: 1 }}>
+                      {moment.utc(recording.duration * 1000).format('mm:ss')}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
         </ScrollView>
         <View style={styles.modalButtons}>
-          <TouchableOpacity onPress={() => this.setState({ modal: { visible: false } })} style={styles.modalCancelButton}>
+          <TouchableOpacity
+            onPress={() => this.setState({ modal: { visible: false } })}
+            style={styles.modalCancelButton}
+          >
             <Text style={styles.modalButtonText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={this.addTracks} style={styles.modalAddButton}>
             <Text style={styles.modalButtonText}>Add</Text>
           </TouchableOpacity>
         </View>
-      </View>);
-  }
+      </View>
+    );
+  };
 
   renderSaveModalContent = () => (
     <RecordingModal
@@ -186,7 +226,8 @@ export default class MultiTrackMixer extends Component {
       cancel={this.cancelAddTracks}
       cancelText={'Delete'}
       save={this.saveMix}
-    />);
+    />
+  );
 
   render() {
     const { isMixerOn, toggleMixer } = this.props;
@@ -199,11 +240,18 @@ export default class MultiTrackMixer extends Component {
             <Icon name={isPlaying ? 'stop' : 'play-arrow'} size={25} color={colors.green} />
           </TouchableOpacity>
           <View style={styles.headerRight}>
-            <TouchableOpacity onPress={selectedRecordings.length !== 0 ? this.showSaveDialog : null}>
+            <TouchableOpacity
+              onPress={selectedRecordings.length !== 0 ? this.showSaveDialog : null}
+            >
               <Icon name={'save'} size={25} style={styles.headerIcon} color={colors.green} />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleMixer}>
-              <Icon name={isMixerOn ? 'layers' : 'layers-clear'} size={25} style={styles.headerIcon} color={isMixerOn ? colors.green : colors.white} />
+              <Icon
+                name={isMixerOn ? 'layers' : 'layers-clear'}
+                size={25}
+                style={styles.headerIcon}
+                color={isMixerOn ? colors.green : colors.white}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={this.showRecordingSelector}>
               <Icon name="add" size={25} style={styles.headerIcon} color={colors.green} />
@@ -211,9 +259,14 @@ export default class MultiTrackMixer extends Component {
           </View>
         </View>
         <ScrollView contentContainerStyle={styles.recordingsContainer}>
-          { selectedRecordings.map(recording => (
+          {selectedRecordings.map(recording => (
             <View key={recording.id}>
-              <View style={[styles.rowOptions, { width: OPTIONS_WIDTH, position: 'absolute', right: 0 }]}>
+              <View
+                style={[
+                  styles.rowOptions,
+                  { width: OPTIONS_WIDTH, position: 'absolute', right: 0 },
+                ]}
+              >
                 <TouchableOpacity onPress={() => this.removeTrack(recording)}>
                   <Icon name="close" size={20} color={colors.red} />
                 </TouchableOpacity>
@@ -221,12 +274,18 @@ export default class MultiTrackMixer extends Component {
               <Animated.View
                 style={[
                   styles.row,
-                  this.state[recording.id] == null ? null : {
-                    transform: [{ translateX: this.state[recording.id].interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -1 * OPTIONS_WIDTH],
-                    }) }],
-                  },
+                  this.state[recording.id] == null
+                    ? null
+                    : {
+                        transform: [
+                          {
+                            translateX: this.state[recording.id].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [0, -1 * OPTIONS_WIDTH],
+                            }),
+                          },
+                        ],
+                      },
                 ]}
               >
                 <Recording
@@ -238,11 +297,18 @@ export default class MultiTrackMixer extends Component {
                 />
               </Animated.View>
             </View>
-          )) }
+          ))}
         </ScrollView>
-        <Modal visible={modal.visible} transparent animationType="slide" onRequestClose={() => { this.setState({ modal: { visible: false } }); }}>
-          { modal.content === 'recordings' ? this.renderRecordingsModalContent() : null }
-          { modal.content === 'save' ? this.renderSaveModalContent() : null }
+        <Modal
+          visible={modal.visible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => {
+            this.setState({ modal: { visible: false } });
+          }}
+        >
+          {modal.content === 'recordings' ? this.renderRecordingsModalContent() : null}
+          {modal.content === 'save' ? this.renderSaveModalContent() : null}
         </Modal>
       </View>
     );

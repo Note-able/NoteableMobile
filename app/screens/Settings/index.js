@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import { preferenceKeyValues } from '../../constants';
 import { colors } from '../../styles';
@@ -19,9 +13,7 @@ import {
   updateRecording,
 } from '../../actions/recordingActions';
 
-import {
-  startPlayer,
-} from '../../actions/playerActions';
+import { startPlayer } from '../../actions/playerActions';
 
 import {
   getCurrentUser,
@@ -58,7 +50,12 @@ const mapDispatchToProps = dispatch => ({
 const ToggleSetting = props => (
   <View style={styles.toggleContainer}>
     <Text style={styles.toggleText}>{props.text}</Text>
-    <Switch onValueChange={props.onChange} value={props.value === 'true'} onTintColor={colors.green} style={styles.toggleControl} />
+    <Switch
+      onValueChange={props.onChange}
+      value={props.value === 'true'}
+      onTintColor={colors.green}
+      style={styles.toggleControl}
+    />
   </View>
 );
 
@@ -81,25 +78,29 @@ class Settings extends Component {
     this.props.accountActions.getUserPreferences();
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    if (nextProps.users.preferences != null
-      && Object.keys(nextProps.users.preferences)
-        .filter(key => this.state.preferences[key] == null || this.state.preferences[key] !== nextProps.users.preferences[key]).length !== 0
+  componentWillReceiveProps = nextProps => {
+    if (
+      nextProps.users.preferences != null &&
+      Object.keys(nextProps.users.preferences).filter(
+        key =>
+          this.state.preferences[key] == null ||
+          this.state.preferences[key] !== nextProps.users.preferences[key]
+      ).length !== 0
     ) {
       this.setState({ preferences: nextProps.users.preferences });
     }
-  }
+  };
 
   logout = () => {
     this.props.recordingActions.logout();
     this.props.accountActions.logout();
-  }
+  };
 
   login = () => {
     this.props.screenProps.stackNavigation.navigate('Authentication');
-  }
+  };
 
-  setPreference = (preferenceValue) => {
+  setPreference = preferenceValue => {
     this.props.accountActions.setUserPreferences([preferenceValue]);
     this.setState({
       preferences: {
@@ -107,17 +108,46 @@ class Settings extends Component {
         [preferenceValue[0]]: preferenceValue[1],
       },
     });
-  }
+  };
 
   render() {
     const isAuthenticated = this.props.users.user != null;
     return (
-      <View style={{ flex: 1, paddingTop: 40, paddingHorizontal: 20, backgroundColor: colors.shade0, height: '100%', width: '100%' }}>
-        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 1, padding: 4, marginBottom: 8 }}>
+      <View
+        style={{
+          flex: 1,
+          paddingTop: 40,
+          paddingHorizontal: 20,
+          backgroundColor: colors.shade0,
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        <View
+          style={{
+            borderBottomColor: colors.green,
+            borderBottomWidth: 1,
+            padding: 4,
+            marginBottom: 8,
+          }}
+        >
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Network</Text>
         </View>
-        <ToggleSetting onChange={value => this.setPreference([preferenceKeyValues.celluarDataKey, value.toString()])} text="Use cellular data for downloads" value={this.state.preferences[preferenceKeyValues.celluarDataKey]} />
-        <View style={{ borderBottomColor: colors.green, borderBottomWidth: 1, padding: 4, marginBottom: 8 }}>
+        <ToggleSetting
+          onChange={value =>
+            this.setPreference([preferenceKeyValues.celluarDataKey, value.toString()])
+          }
+          text="Use cellular data for downloads"
+          value={this.state.preferences[preferenceKeyValues.celluarDataKey]}
+        />
+        <View
+          style={{
+            borderBottomColor: colors.green,
+            borderBottomWidth: 1,
+            padding: 4,
+            marginBottom: 8,
+          }}
+        >
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Account</Text>
         </View>
         <TouchableOpacity onPress={isAuthenticated ? this.logout : this.login}>

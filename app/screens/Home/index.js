@@ -1,20 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  ActivityIndicator,
-  AppState,
-  NetInfo,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, AppState, NetInfo, Text, View } from 'react-native';
 import { connect } from 'react-redux';
 import { TabNavigator } from 'react-navigation';
 import BackgroundFetch from 'react-native-background-fetch';
 
-import {
-  Footer,
-  SystemMessage,
-} from '../../components';
+import { Footer, SystemMessage } from '../../components';
 import { appScreens } from '../../screens';
 import { colors } from '../../styles';
 
@@ -26,18 +17,11 @@ import {
   updateRecording,
 } from '../../actions/recordingActions';
 
-import {
-  startPlayer,
-} from '../../actions/playerActions';
+import { startPlayer } from '../../actions/playerActions';
 
-import {
-  getCurrentUser,
-} from '../../actions/accountActions';
+import { getCurrentUser } from '../../actions/accountActions';
 
-import {
-  networkConnectivityChange,
-  runBackgroundRequests,
-} from '../../actions/systemActions';
+import { networkConnectivityChange, runBackgroundRequests } from '../../actions/systemActions';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
@@ -90,7 +74,7 @@ class Home extends Component {
     users: PropTypes.shape({}),
     recordings: PropTypes.shape({}),
     system: PropTypes.shape({}),
-  }
+  };
 
   state = {
     users: this.props.users,
@@ -107,7 +91,7 @@ class Home extends Component {
   componentDidMount() {
     this.props.accountActions.getCurrentUser();
     NetInfo.addEventListener('change', this.handleConnectivityChange);
-    NetInfo.fetch().done((reach) => {
+    NetInfo.fetch().done(reach => {
       this.setState({ isConnected: reach !== 'none' });
       this.props.systemActions.networkConnectivityChange(reach);
     });
@@ -132,9 +116,9 @@ class Home extends Component {
     });
   }
 
-  _handleAppStateChange = (nextAppState) => {
+  _handleAppStateChange = nextAppState => {
     if (this.state.appState.match(/active/) && nextAppState === 'background') {
-      BackgroundFetch.status((status) => {
+      BackgroundFetch.status(status => {
         if (status === BackgroundFetch.STATUS_AVAILABLE) {
           this.props.systemActions.runBackgroundRequests();
         }
@@ -142,11 +126,11 @@ class Home extends Component {
     }
 
     this.setState({ appState: nextAppState });
-  }
+  };
 
   handleConnectivityChange = reach => this.props.systemActions.networkConnectivityChange(reach);
 
-  getCurrentRouteName = (navigationState) => {
+  getCurrentRouteName = navigationState => {
     if (!navigationState) {
       return null;
     }
@@ -155,18 +139,29 @@ class Home extends Component {
       return this.getCurrentRouteName(route);
     }
     return route.routeName;
-  }
+  };
 
   navigationStateChange = (prevState, currentState) => {
     this.setState({
       screen: this.getCurrentRouteName(currentState),
     });
-  }
+  };
 
   render() {
-    if ((this.state.users.user == null || this.state.users.user.id != null) && this.state.isProcessing) {
+    if (
+      (this.state.users.user == null || this.state.users.user.id != null) &&
+      this.state.isProcessing
+    ) {
       return (
-        <View style={{ backgroundColor: colors.shade10, height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{
+            backgroundColor: colors.shade10,
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           <Text style={{ color: colors.shade90, fontSize: 20, marginBottom: 20 }}>Loading</Text>
           <ActivityIndicator size="large" />
         </View>
@@ -175,8 +170,16 @@ class Home extends Component {
 
     return (
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
-        {(this.state.systemMessage == null || this.state.systemMessage.message == null) && !this.state.recordings.isProcessing ? null : <SystemMessage message={this.state.systemMessage.message} kind={this.state.systemMessage.kind} />}
-        {this.state.isConnected ? null : <SystemMessage message="No internet connection" kind="error" />}
+        {(this.state.systemMessage == null || this.state.systemMessage.message == null) &&
+        !this.state.recordings.isProcessing ? null : (
+          <SystemMessage
+            message={this.state.systemMessage.message}
+            kind={this.state.systemMessage.kind}
+          />
+        )}
+        {this.state.isConnected ? null : (
+          <SystemMessage message="No internet connection" kind="error" />
+        )}
         <App
           onNavigationStateChange={this.navigationStateChange}
           screenProps={{

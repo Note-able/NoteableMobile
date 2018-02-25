@@ -1,6 +1,4 @@
-import {
-  AccountActionTypes,
-} from '../actions/ActionTypes';
+import { AccountActionTypes } from '../actions/ActionTypes';
 
 import { logErrorToCrashlytics, logCustomToFabric } from '../util.js';
 

@@ -1,43 +1,35 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Animated,
-  Easing,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { Animated, Easing, StyleSheet, TextInput, View } from 'react-native';
 
 import { colors } from '../../styles';
 
 export default class InputField extends Component {
   static props = {
     inputContainerStyles: PropTypes.shape({}),
-  }
+  };
 
   state = {
     fieldAnimation: new Animated.Value(0),
-  }
+  };
 
-  focus = (value) => {
-    Animated.spring(
-      this.state.fieldAnimation, {
-        duration: 30,
-        easing: Easing.quad,
-        toValue: value,
-      },
-    ).start();
-  }
+  focus = value => {
+    Animated.spring(this.state.fieldAnimation, {
+      duration: 30,
+      easing: Easing.quad,
+      toValue: value,
+    }).start();
+  };
 
   onBlur = () => {
     if (this._input._getText() === '') {
       this.focus(0);
     }
-  }
+  };
 
   focusInput = () => {
     this._input.focus();
-  }
+  };
 
   render() {
     return (
@@ -46,22 +38,28 @@ export default class InputField extends Component {
           style={[
             styles.floater,
             {
-              transform: [{
-                translateY: this.state.fieldAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [8, -20],
-                }),
-              }],
+              transform: [
+                {
+                  translateY: this.state.fieldAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [8, -20],
+                  }),
+                },
+              ],
               fontSize: this.state.fieldAnimation.interpolate({
                 inputRange: [0, 1],
                 outputRange: [16, 13],
               }),
             },
           ]}
-        >{this.props.name}</Animated.Text>
+        >
+          {this.props.name}
+        </Animated.Text>
         <TextInput
           autoCapitalize="none"
-          ref={(ref) => { this._input = ref; }}
+          ref={ref => {
+            this._input = ref;
+          }}
           onFocus={() => this.focus(1)}
           onBlur={this.onBlur}
           {...this.props.inputProps}
@@ -71,7 +69,6 @@ export default class InputField extends Component {
   }
 }
 
-
 const styles = StyleSheet.create({
   floater: {
     backgroundColor: 'transparent',
@@ -79,8 +76,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     left: 8,
     position: 'absolute',
-    transform: [{
-      translateY: 8,
-    }],
+    transform: [
+      {
+        translateY: 8,
+      },
+    ],
   },
 });

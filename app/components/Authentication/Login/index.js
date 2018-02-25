@@ -1,21 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FBSDK from 'react-native-fbsdk';
 import { colors } from '../../../styles';
 import { InputField } from '../../';
 import { emailRegex } from '../../../constants';
 import { logErrorToCrashlytics } from '../../../util';
 
-const {
-  AccessToken,
-  LoginManager,
-} = FBSDK;
+const { AccessToken, LoginManager } = FBSDK;
 
 export default class Login extends Component {
   static propTypes = {
@@ -32,22 +24,18 @@ export default class Login extends Component {
   };
 
   facebookLogin = () => {
-    LoginManager.logInWithReadPermissions(['public_profile']).then(
-      (result) => {
-        if (!result.isCancelled) {
-          AccessToken.getCurrentAccessToken().then(
-            (data) => {
-              this.props.loginFacebook(data.accessToken.toString());
-            },
-          );
-        }
-      }, logErrorToCrashlytics,
-    );
-  }
+    LoginManager.logInWithReadPermissions(['public_profile']).then(result => {
+      if (!result.isCancelled) {
+        AccessToken.getCurrentAccessToken().then(data => {
+          this.props.loginFacebook(data.accessToken.toString());
+        });
+      }
+    }, logErrorToCrashlytics);
+  };
 
   finishEmail = () => {
     this._password.focusInput();
-  }
+  };
 
   loginLocal = () => {
     if (this.state.email === '' || this.state.password === '') {
@@ -58,12 +46,14 @@ export default class Login extends Component {
     }
 
     this.props.submitLogin(this.state.email, this.state.password);
-  }
+  };
 
   render() {
     return (
       <View style={{ marginTop: this.state.emailError ? 6 : 24, paddingTop: 12 }}>
-        {this.state.emailError !== '' && <Text style={styles.errorText}>{this.state.emailError}</Text>}
+        {this.state.emailError !== '' && (
+          <Text style={styles.errorText}>{this.state.emailError}</Text>
+        )}
         <InputField
           name="Email"
           inputContainerStyles={[styles.input, { marginBottom: 12 }]}
@@ -80,7 +70,9 @@ export default class Login extends Component {
         />
         <InputField
           name="Password"
-          ref={(ref) => { this._password = ref; }}
+          ref={ref => {
+            this._password = ref;
+          }}
           inputContainerStyles={[styles.input]}
           inputProps={{
             autoCorrect: false,

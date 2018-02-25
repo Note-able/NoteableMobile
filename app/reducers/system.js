@@ -6,12 +6,7 @@ import {
   SystemActionTypes,
 } from '../actions/ActionTypes';
 
-const {
-  fetchSignInTypes,
-  loginFacebookTypes,
-  logoutTypes,
-  registerUserTypes,
-} = AccountActionTypes;
+const { fetchSignInTypes, loginFacebookTypes, logoutTypes, registerUserTypes } = AccountActionTypes;
 
 const {
   downloadRecordingTypes,
@@ -20,9 +15,7 @@ const {
   uploadRecordingTypes,
 } = RecordingActionTypes;
 
-const {
-  networkingFailureType,
-} = SystemMessageActionTypes;
+const { networkingFailureType } = SystemMessageActionTypes;
 
 const {
   alertType,
@@ -31,11 +24,12 @@ const {
   networkChangeType,
 } = SystemActionTypes;
 
-const {
-  startPlayerTypes,
-} = PlayerActionTypes;
+const { startPlayerTypes } = PlayerActionTypes;
 
-export default (state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } }, action) => {
+export default (
+  state = { systemMessage: {}, authMessage: {}, network: { connected: '', queued: {} } },
+  action
+) => {
   const { type } = action;
   switch (type) {
     case startPlayerTypes.error:

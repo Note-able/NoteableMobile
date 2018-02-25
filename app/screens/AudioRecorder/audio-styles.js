@@ -1,7 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import {
-  colors,
-} from '../../styles';
+import { colors } from '../../styles';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 

@@ -20,7 +20,10 @@ const DEFAULT_MESSAGES_STATE = {
   },
 };
 
-const messagesReducer = (state = DEFAULT_MESSAGES_STATE, { type, conversation, userName, conversations, message }) => {
+const messagesReducer = (
+  state = DEFAULT_MESSAGES_STATE,
+  { type, conversation, userName, conversations, message }
+) => {
   switch (type) {
     case 'HEADER_SEARCH':
       return { ...state, nav: { search: true } };
@@ -29,7 +32,12 @@ const messagesReducer = (state = DEFAULT_MESSAGES_STATE, { type, conversation, u
     case 'MESSAGES/OPEN_CONVERSATION':
       conversations = { ...state.conversations };
       conversations[conversation.id].messages = conversation.messages;
-      return { ...state, nav: { conversation: true, name: userName }, conversations, selectedConversationId: conversation.id };
+      return {
+        ...state,
+        nav: { conversation: true, name: userName },
+        conversations,
+        selectedConversationId: conversation.id,
+      };
     case 'MESSAGES/GET_CONVERSATIONS':
       return { ...state, conversations };
     case 'MESSAGES/SEND_MESSAGE':
