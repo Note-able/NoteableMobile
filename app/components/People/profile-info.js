@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import * as Animatable from 'react-native-animatable';
 import {
   ActivityIndicator,
   Dimensions,
@@ -20,10 +21,22 @@ import {
   saveProfile,
 } from '../../actions/accountActions';
 
+Animatable.initializeRegistryWithDefinitions({
+  fadeInUpCust: {
+    from: { translateY: 40, opacity: 0 },
+    to: { translateY: 0, opacity: 1 },
+  },
+  fadeInDownCust: {
+    from: { translateY: -40, opacity: 0 },
+    to: { translateY: 0, opacity: 1 },
+  },
+});
+
 const mapStateToProps = state => ({
   user: state.AccountReducer.user,
   profile: state.AccountReducer.profile,
   isProcessing: state.AccountReducer.isProcessing,
+  isLoading: state.AccountReducer.isLoading,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -46,7 +59,8 @@ class ProfileInfo extends Component {
   };
 
   state = {
-    isEditMode: true,
+    isEditMode: false,
+    isLoading: true,
   }
 
   componentDidMount() {
@@ -67,11 +81,7 @@ class ProfileInfo extends Component {
   componentWillReceiveProps(nextProps) {
     const { coverImage, avatarUrl, firstName, lastName, bio } = this.props;
 
-    if (this.props.isProcessing && this.props.profile == null) {
-      this.setState({
-        isLoading: true,
-      });
-    } else {
+    if (!this.props.isLoading && this.state.isLoading) {
       this.setState({
         isLoading: false,
       });
@@ -134,14 +144,18 @@ class ProfileInfo extends Component {
     return (
       <View style={styles.edit.screen}>
         <View style={styles.edit.buttons}>
-          <TouchableOpacity style={[styles.edit.save, styles.edit.cancel]} onPress={() => this.setState({ isEditMode: false })}>
-            <Text style={{ color: colors.red, fontSize: 16 }}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.edit.save} onPress={this.saveProfile}>
-            <Text style={{ color: colors.white, fontSize: 16 }}>Save</Text>
-          </TouchableOpacity>
+          <Animatable.View animation="slideInRight" easing="ease-out-expo" duration={500} delay={100}>
+            <TouchableOpacity style={[styles.edit.save, styles.edit.cancel]} onPress={() => this.setState({ isEditMode: false })}>
+              <Text style={{ color: colors.red, fontSize: 16 }}>Cancel</Text>
+            </TouchableOpacity>
+          </Animatable.View>
+          <Animatable.View animation="slideInRight" easing="ease-out-expo" duration={500}>
+            <TouchableOpacity style={styles.edit.save} onPress={this.saveProfile}>
+              <Text style={{ color: colors.white, fontSize: 16 }}>Save</Text>
+            </TouchableOpacity>
+          </Animatable.View>
         </View>
-        <View style={[styles.coverImageView, { backgroundColor: 'transparent' }]}>
+        <Animatable.View animation="fadeIn" duration={500} style={[styles.coverImageView, { backgroundColor: 'transparent' }]}>
           <TouchableOpacity onPress={() => this.pickImage('editCoverImage')} style={styles.edit.coverImageButton}>
             <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
           </TouchableOpacity>
@@ -152,15 +166,15 @@ class ProfileInfo extends Component {
             /> :
             <View
               style={[styles.coverImage, { backgroundColor: 'transparent' }]}
-            /> }
-        </View>
+            />}
+        </Animatable.View>
         <View style={styles.profileHeader}>
-          <View style={[styles.profileImageView, { backgroundColor: 'transparent' }]}>
+          <Animatable.View animation="fadeIn" duration={500} style={[styles.profileImageView, { backgroundColor: 'transparent' }]}>
             {this.state.editImage && <Image source={{ uri: this.state.editImage }} style={styles.profileImage} />}
             <TouchableOpacity onPress={() => this.pickImage('editImage')} style={[styles.profileImage, styles.edit.profileImage]}>
               <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
             </TouchableOpacity>
-          </View>
+          </Animatable.View>
           <View style={styles.edit.name}>
             <TextInput numberOfLines={1} onChangeText={text => this.setState({ editName: text })} style={styles.edit.nameInput} value={this.state.editName} />
           </View>
@@ -183,9 +197,13 @@ class ProfileInfo extends Component {
     );
   }
 
+  goHome = () => {
+    this.props.navigation.goBack();
+  }
+
   render() {
     const globalNav = this.props.screenProps.screenProps.stackNavigation.navigate;
-    if (this.state.isLoading) {
+    if (this.state.isLoading && this.props.profile == null) {
       return (
         <View style={{ backgroundColor: colors.shade10, height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: colors.shade90, fontSize: 20, marginBottom: 20 }}>Loading</Text>
@@ -219,30 +237,34 @@ class ProfileInfo extends Component {
     return (
       <View style={{ height: '100%', backgroundColor: 'white' }}>
         {this.state.isEditMode && canEdit && this.renderEditMode()}
-        <View style={styles.coverImageView}>
+        {!this.state.isEditMode &&
+          <TouchableOpacity style={{ position: 'absolute', top: 28, left: 20, zIndex: 11, backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: 18 }} onPress={this.goHome}>
+            <Icon name="keyboard-arrow-left" size={36} style={{ width: 36, height: 36 }} color={colors.shade140} />
+          </TouchableOpacity>}
+        <Animatable.View style={styles.coverImageView} animation="fadeInDownCust" duration={500} easing="ease-out-cubic">
           <Image
             source={{ uri: coverImage }}
             style={styles.coverImage}
           />
           <View style={styles.coverImageScreen} />
-        </View>
+        </Animatable.View>
         <View style={styles.profileHeader}>
-          <View style={styles.profileImageView}>
+          <Animatable.View style={styles.profileImageView} animation="fadeInUpCust" duration={800}>
             <Image
               source={{ uri: avatarUrl }}
               style={styles.profileImage}
             />
-          </View>
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.name}>{name}</Text>
-          {canEdit &&
+          </Animatable.View>
+          {!this.state.isEditMode && <Animatable.Text ellipsizeMode="tail" numberOfLines={1} style={styles.name} animation="fadeIn">{name}</Animatable.Text>}
+          {!this.state.isEditMode && canEdit &&
             <TouchableOpacity style={styles.button} onPress={() => this.setState({ isEditMode: true })}>
               <Icon name="create" size={24} style={{ width: 24, height: 24 }} color={colors.shade140} />
             </TouchableOpacity>
           }
         </View>
         {!this.state.isEditMode && <View style={styles.bio}>
-          <Text style={styles.header}>About</Text>
-          <Text style={styles.description}>{bio}</Text>
+          <Animatable.Text animation="fadeIn" duration={700} style={styles.header}>About</Animatable.Text>
+          <Animatable.Text animation="fadeIn" duration={700} style={styles.description}>{bio}</Animatable.Text>
         </View>}
       </View>
     );
@@ -293,12 +315,14 @@ const styles = {
   },
   description: {
     fontSize: 16,
+    backgroundColor: 'transparent',
     marginHorizontal: 10,
   },
   header: {
     fontSize: 24,
     marginBottom: 10,
     marginHorizontal: 8,
+    backgroundColor: 'transparent',
   },
   profileHeader: {
     width: windowWidth,

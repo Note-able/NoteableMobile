@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
+import { connect } from 'react-redux';
 import { profileScreens } from '../../components/People/index.js';
+import {
+  loadCurrentProfile,
+} from '../../actions/accountActions';
+
 
 const AppNavigator = StackNavigator(profileScreens, {
-  initialRouteName: 'Me',
+  initialRouteName: 'Main',
   navigationOptions: { header: null },
 });
 

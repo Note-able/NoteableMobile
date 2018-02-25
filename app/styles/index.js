@@ -50,7 +50,7 @@ export const gradients = {
 
 export const shadowProps = {
   shadowColor: colors.black,
-  shadowOffset: { height: 5, width: 5 },
+  shadowOffset: { height: 1, width: 1 },
   shadowOpacity: 0.8,
-  shadowRadius: 10,
+  shadowRadius: 5,
 };

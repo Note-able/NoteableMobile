@@ -20,6 +20,7 @@ const defaultState = {
     query: {},
     results: {},
   },
+  isLoading: true,
 };
 
 export default (state = defaultState, action) => {
@@ -64,7 +65,7 @@ export default (state = defaultState, action) => {
     case loginFacebookTypes.processing:
     case saveProfileTypes.processing:
     case loadCurrentProfileTypes.processing:
-      return { ...state, done: false, isProcessing: true };
+      return { ...state, done: false, isProcessing: true, isLoading: true };
     case getUserPreferencesTypes.success:
       return {
         ...state,
@@ -118,6 +119,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         isProcessing: false,
+        isLoading: false,
         profile: action.profile,
       };
     default:

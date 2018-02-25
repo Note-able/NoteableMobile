@@ -69,6 +69,7 @@ export const loadCurrentProfile = () => (
         })
         .catch((error) => { throw error; });
     } catch (error) {
+      console.log(error);
       return dispatch({ type: loadCurrentProfileTypes.error, error: error.message });
     }
   }
