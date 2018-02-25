@@ -299,6 +299,7 @@ export default class Audio extends Component {
         isSynced: false,
         size: this.state.fileStats.size,
         id: Schemas.GetId(realm.objects('Recording')) + 1,
+        tags: recording.tags,
       });
 
       if (recording.fileName === `Untitled ${untitledTitle}`) {
@@ -434,10 +435,9 @@ export default class Audio extends Component {
   }
 
   render() {
-    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature, mixerOn } = this.state;
+    const { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeBPM, metronomeState, displayTime, reviewMode, recording, modal, fileName, countIn, timeSignature, mixerOn, permissions } = this.state;
     const metronomeMenuProps = { metronomeMenuVisible, showMetronomeMenu, metronomeMenuWidth, metronomeMenuHeight, metronomeState, metronomeBPM, countIn, timeSignature };
 
-    const { permissions } = this.state;
     const showSystemMessage = permissions && (permissions[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === 'denied' || permissions[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === 'denied');
 
     return (
@@ -483,6 +483,7 @@ export default class Audio extends Component {
             recordings={this.state.recordings || []}
             toggleMixer={() => { this.setState(state => ({ mixerOn: !state.mixerOn })); }}
             isMixerOn={mixerOn}
+            saveMix={this.props.saveRecording}
           />
         </View>
         <View />

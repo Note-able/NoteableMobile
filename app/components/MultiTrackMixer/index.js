@@ -1,30 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
+import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { AudioUtils } from 'react-native-audio';
 import moment from 'moment';
+import RNFetchBlob from 'react-native-fetch-blob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { RecordingModal } from '../../components';
+import Schemas from '../../realmSchemas';
 import { colors } from '../../styles';
 import Recording from '../Recording';
 import { MultiTrack } from '../../nativeModules';
 import styles from './styles';
 
 const OPTIONS_WIDTH = 100;
-
-/*
-recording:
-PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-  path: PropTypes.string.isRequired,
-  dateCreated: PropTypes.string.isRequired,
-  durationDisplay: PropTypes.string.isRequired,
-  audioUrl: PropTypes.string,
-  isSynced: PropTypes.bool,
-  size: PropTypes.number,
-}
-*/
 
 export default class MultiTrackMixer extends Component {
   static propTypes = {
@@ -33,6 +22,7 @@ export default class MultiTrackMixer extends Component {
       networked: PropTypes.object.isRequired,
       order: PropTypes.arrayOf(PropTypes.number),
     }),
+    saveMix: PropTypes.func.isRequired,
     toggleMixer: PropTypes.func.isRequired,
     isMixerOn: PropTypes.bool,
   }
@@ -139,11 +129,24 @@ export default class MultiTrackMixer extends Component {
     }
   }
 
-  saveMix = () => {
-    const { fileName } = this.state;
-    MultiTrack.WriteMixToFile(`${AudioUtils.DocumentDirectoryPath}/${fileName}`).then(() => {
-      // do something
+  saveMix = async ({ fileName, tags }) => {
+    const { selectedRecordings } = this.state;
+    const filePath = `${AudioUtils.DocumentDirectoryPath}/${fileName.replace(/\s/g, '_')}`;
+    await MultiTrack.WriteMixToFile(`${filePath}`);
+    const stats = await RNFetchBlob.fs.stat(`${filePath}.aac`);
+    this.props.saveMix({
+      name: fileName,
+      path: `${filePath}.aac`,
+      dateCreated: moment.utc().toDate(),
+      dateModified: moment.utc().toDate(),
+      duration: Math.max(...selectedRecordings.map(x => x.duration)),
+      description: '',
+      isSynced: false,
+      size: stats.size,
+      id: Schemas.GetId(Schemas.RecordingSchema.objects('Recording')) + 1,
+      tags,
     });
+    this.setState({ modal: { visible: false } });
   }
 
   renderRecordingsModalContent = () => {
@@ -178,17 +181,12 @@ export default class MultiTrackMixer extends Component {
   }
 
   renderSaveModalContent = () => (
-    <View style={styles.modal}>
-      <TextInput style={{ color: 'white' }} value={this.state.fileName} onChangeText={text => this.setState({ fileName: text })} />
-      <View style={styles.modalButtons}>
-        <TouchableOpacity onPress={this.cancelAddTracks} style={styles.modalCancelButton}>
-          <Text style={styles.modalButtonText}>Delete</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={this.saveMix} style={styles.modalAddButton}>
-          <Text style={styles.modalButtonText}>Save</Text>
-        </TouchableOpacity>
-      </View>
-    </View>);
+    <RecordingModal
+      initialValue={''}
+      cancel={this.cancelAddTracks}
+      cancelText={'Delete'}
+      save={this.saveMix}
+    />);
 
   render() {
     const { isMixerOn, toggleMixer } = this.props;
@@ -201,8 +199,8 @@ export default class MultiTrackMixer extends Component {
             <Icon name={isPlaying ? 'stop' : 'play-arrow'} size={25} color={colors.green} />
           </TouchableOpacity>
           <View style={styles.headerRight}>
-            <TouchableOpacity onPress={this.showSaveDialog}>
-              <Text>SAVE</Text>
+            <TouchableOpacity onPress={selectedRecordings.length !== 0 ? this.showSaveDialog : null}>
+              <Icon name={'save'} size={25} style={styles.headerIcon} color={colors.green} />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleMixer}>
               <Icon name={isMixerOn ? 'layers' : 'layers-clear'} size={25} style={styles.headerIcon} color={isMixerOn ? colors.green : colors.white} />
