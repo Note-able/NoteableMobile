@@ -13,13 +13,13 @@
     "verbose": true
   },
   "dependencies": {
-    "moment": "^2.18.1",
+    "moment": "^2.21.0",
     "prop-types": "^15.5.8",
     "react": "^16.0.0",
     "react-addons-pure-render-mixin": "^15.5.2",
     "react-native": "^0.51.0",
-    "react-native-audio": "^3.5.1",
     "react-native-animatable": "^1.2.4",
+    "react-native-audio": "^3.5.1",
     "react-native-audio-streaming": "^2.3.2",
     "react-native-background-fetch": "^2.0.8",
     "react-native-fabric": "^0.4.1",
