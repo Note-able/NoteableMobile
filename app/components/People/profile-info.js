@@ -37,6 +37,7 @@ const mapStateToProps = state => ({
   profile: state.AccountReducer.profile,
   isProcessing: state.AccountReducer.isProcessing,
   isLoading: state.AccountReducer.isLoading,
+  visibleProfile: state.AccountReducer.visibleProfile,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -61,9 +62,14 @@ class ProfileInfo extends Component {
   state = {
     isEditMode: false,
     isLoading: true,
+    profile: this.props.visibleProfile || this.props.profile,
   }
 
   componentDidMount() {
+    if (this.props.visibleProfile != null) {
+      return;
+    }
+
     if (this.props.profile != null) {
       this.setEditProfile(this.props);
     } else {
@@ -225,35 +231,35 @@ class ProfileInfo extends Component {
       );
     }
 
-    const { coverImage, avatarUrl, bio } = this.props.profile;
-    let { firstName, lastName } = this.props.profile;
+    const { coverImage, avatarUrl, bio } = this.state.profile;
+    let { firstName, lastName } = this.state.profile;
 
     firstName = firstName[0].toUpperCase() + firstName.substring(1);
     lastName = lastName[0].toUpperCase() + lastName.substring(1);
 
-    const canEdit = this.props.profile.id === this.props.user.id;
+    const canEdit = this.state.profile.id === this.props.user.id;
     const name = `${firstName} ${lastName}`;
 
     return (
       <View style={{ height: '100%', backgroundColor: 'white' }}>
         {this.state.isEditMode && canEdit && this.renderEditMode()}
-        {!this.state.isEditMode &&
+        {!this.state.isEditMode && canEdit &&
           <TouchableOpacity style={{ position: 'absolute', top: 28, left: 20, zIndex: 11, backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: 18 }} onPress={this.goHome}>
             <Icon name="keyboard-arrow-left" size={36} style={{ width: 36, height: 36 }} color={colors.shade140} />
           </TouchableOpacity>}
         <Animatable.View style={styles.coverImageView} animation="fadeInDownCust" duration={500} easing="ease-out-cubic">
-          <Image
+          {coverImage && <Image
             source={{ uri: coverImage }}
             style={styles.coverImage}
-          />
+          />}
           <View style={styles.coverImageScreen} />
         </Animatable.View>
         <View style={styles.profileHeader}>
           <Animatable.View style={styles.profileImageView} animation="fadeInUpCust" duration={800}>
-            <Image
+            {avatarUrl ? <Image
               source={{ uri: avatarUrl }}
               style={styles.profileImage}
-            />
+            /> : <Icon name="account-circle" size={75} style={{ width: 75, height: 75, marginRight: 12, borderRadius: 37.5 }} color="white" />}
           </Animatable.View>
           {!this.state.isEditMode && <Animatable.Text ellipsizeMode="tail" numberOfLines={1} style={styles.name} animation="fadeIn">{name}</Animatable.Text>}
           {!this.state.isEditMode && canEdit &&
@@ -283,6 +289,7 @@ const styles = {
     width: 75,
     height: 75,
     borderRadius: 37.5,
+    overflow: 'hidden',
     marginLeft: 20,
     elevation: 10,
     backgroundColor: '#1B1F20',

@@ -7,9 +7,11 @@ const {
   getCurrentUserTypes,
   getUserPreferencesTypes,
   loadCurrentProfileTypes,
+  loadProfileTypes,
   loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
+  searchProfileTypes,
   saveProfileTypes,
 } = AccountActionTypes;
 
@@ -18,7 +20,7 @@ const defaultState = {
   profile: null,
   search: {
     query: {},
-    results: {},
+    results: [],
   },
   isLoading: true,
 };
@@ -53,6 +55,12 @@ export default (state = defaultState, action) => {
     case saveProfileTypes.error:
       logErrorToCrashlytics({ customMessage: 'Save Profile', error });
       break;
+    case searchProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Search Profiles', error });
+      break;
+    case loadProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Load User', error });
+      break;
     default:
       break;
   }
@@ -61,8 +69,10 @@ export default (state = defaultState, action) => {
     case fetchSignInTypes.processing:
     case getCurrentUserTypes.processing:
     case registerUserTypes.processing:
+    case loadProfileTypes.processing:
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
+    case searchProfileTypes.processing:
     case saveProfileTypes.processing:
     case loadCurrentProfileTypes.processing:
       return { ...state, done: false, isProcessing: true, isLoading: true };
@@ -84,6 +94,8 @@ export default (state = defaultState, action) => {
         isProcessing: false,
       };
     case saveProfileTypes.error:
+    case loadProfileTypes.error:
+    case searchProfileTypes.error:
     case loadCurrentProfileTypes.error:
     case logoutTypes.error:
     case registerUserTypes.error:
@@ -121,6 +133,21 @@ export default (state = defaultState, action) => {
         isProcessing: false,
         isLoading: false,
         profile: action.profile,
+      };
+    case searchProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        search: {
+          results: action.profiles,
+          query: action.text,
+        },
+      };
+    case loadProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        visibleProfile: action.profile,
       };
     default:
       return state;
