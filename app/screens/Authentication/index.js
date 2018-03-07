@@ -18,16 +18,16 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCurrentUser: user => {
+  getCurrentUser: (user) => {
     dispatch(getUser(user));
   },
   signInLocal: (email, password) => {
     dispatch(signInLocal(email, password));
   },
-  registerUser: request => {
+  registerUser: (request) => {
     dispatch(registerUser(request));
   },
-  loginFacebook: authToken => {
+  loginFacebook: (authToken) => {
     dispatch(loginFacebook(authToken));
   },
 });
@@ -49,7 +49,7 @@ class Authentication extends Component {
     if (this.props.users.registration == null && nextProps.users.registration != null) {
       this.props.signInLocal(
         nextProps.users.registration.email,
-        nextProps.users.registration.password
+        nextProps.users.registration.password,
       );
     }
 
@@ -74,7 +74,7 @@ class Authentication extends Component {
     }
   }
 
-  registerUser = user => {
+  registerUser = (user) => {
     if (!this.state.isProcessing) {
       this.props.registerUser(user);
       this.setState({
@@ -83,7 +83,7 @@ class Authentication extends Component {
     }
   };
 
-  loginFacebook = accessToken => {
+  loginFacebook = (accessToken) => {
     if (!this.state.isProcessing) {
       this.props.loginFacebook(accessToken);
       this.setState({
@@ -161,11 +161,11 @@ class Authentication extends Component {
           />
         ) : (
           <Login
-            submitLogin={this.signInLocal}
-            switchToRegister={() => this.setState({ screen: 'Register' })}
-            loginFacebook={this.loginFacebook}
-          />
-        )}
+              submitLogin={this.signInLocal}
+              switchToRegister={() => this.setState({ screen: 'Register' })}
+              loginFacebook={this.loginFacebook}
+            />
+          )}
       </View>
     );
   }

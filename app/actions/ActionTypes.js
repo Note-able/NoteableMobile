@@ -28,10 +28,14 @@ export const AccountActionTypes = {
   getCurrentUserTypes: createAsyncActionTypes('GET_CURRENT_USER'),
   getUserPreferencesTypes: createAsyncActionTypes('GET_USER_PREFERENCES'),
   fetchSignInTypes: createAsyncActionTypes('FETCH_SIGNIN'),
+  loadCurrentProfileTypes: createAsyncActionTypes('LOAD_CURRENT_PROFILE'),
+  loadProfileTypes: createAsyncActionTypes('LOAD_PROFILE'),
   loginFacebookTypes: createAsyncActionTypes('LOGIN_FACEBOOK'),
   logoutTypes: createAsyncActionTypes('LOGOUT_USER'),
   registerUserTypes: createAsyncActionTypes('REGISTER_USER'),
+  searchProfileTypes: createAsyncActionTypes('SEARCH_PROFILES'),
   setUserPreferencesTypes: createAsyncActionTypes('SET_USER_PREFERENCES'),
+  saveProfileTypes: createAsyncActionTypes('SAVE_PROFILE'),
 };
 
 export const SystemMessageActionTypes = {

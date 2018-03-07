@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { preferenceKeyValues } from '../../constants';
 import { colors } from '../../styles';
@@ -71,6 +78,7 @@ class Settings extends Component {
     navOpen: false,
     screen: '',
     preferences: {},
+    email: this.props.users.user != null ? this.props.users.user.email : '',
   };
 
   componentDidMount() {
@@ -78,13 +86,13 @@ class Settings extends Component {
     this.props.accountActions.getUserPreferences();
   }
 
-  componentWillReceiveProps = nextProps => {
+  componentWillReceiveProps = (nextProps) => {
     if (
       nextProps.users.preferences != null &&
       Object.keys(nextProps.users.preferences).filter(
         key =>
           this.state.preferences[key] == null ||
-          this.state.preferences[key] !== nextProps.users.preferences[key]
+          this.state.preferences[key] !== nextProps.users.preferences[key],
       ).length !== 0
     ) {
       this.setState({ preferences: nextProps.users.preferences });
@@ -100,7 +108,7 @@ class Settings extends Component {
     this.props.screenProps.stackNavigation.navigate('Authentication');
   };
 
-  setPreference = preferenceValue => {
+  setPreference = (preferenceValue) => {
     this.props.accountActions.setUserPreferences([preferenceValue]);
     this.setState({
       preferences: {
@@ -109,6 +117,27 @@ class Settings extends Component {
       },
     });
   };
+
+  addLocation = () => {
+    navigator.geolocation.getCurrentPosition((result) => {
+      console.log(result.coords.latitude, result.coords.longitude);
+    });
+  }
+
+  renderProfileRows = () => (
+    <View>
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>Email</Text>
+        <TextInput style={styles.editTextRow} editable={false} value={this.state.email} />
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>Location</Text>
+        {this.state.location ?
+          <TextInput style={styles.editTextRow} editable={false} value={this.state.location || ''} placeholder="Add your location" placeholderTextColor={colors.shade90} /> :
+          <TouchableOpacity style={styles.editButtonRow} onPress={this.addLocation}><Text style={{ color: colors.shade10 }}>Add your location</Text></TouchableOpacity>}
+      </View>
+    </View>
+  )
 
   render() {
     const isAuthenticated = this.props.users.user != null;
@@ -150,7 +179,8 @@ class Settings extends Component {
         >
           <Text style={{ color: colors.shade140, fontSize: 16 }}>Account</Text>
         </View>
-        <TouchableOpacity onPress={isAuthenticated ? this.logout : this.login}>
+        {isAuthenticated && this.renderProfileRows()}
+        <TouchableOpacity style={{ width: 100 }} onPress={isAuthenticated ? this.logout : this.login}>
           <View style={styles.authButton}>
             <Text>{isAuthenticated ? 'Signout' : 'Login'}</Text>
           </View>
@@ -169,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     height: 32,
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 36,
     marginHorizontal: 4,
     width: 100,
   },
@@ -185,5 +215,43 @@ const styles = StyleSheet.create({
   },
   toggleControl: {
     height: 32,
+  },
+  row: {
+    flexDirection: 'row',
+    height: 36,
+    justifyContent: 'center',
+    width: '100%',
+    marginHorizontal: -2,
+    marginTop: 8,
+  },
+  rowLabel: {
+    height: 36,
+    fontSize: 14,
+    width: '20%',
+    minWidth: 75,
+    textAlign: 'center',
+    lineHeight: 36,
+    color: colors.shade90,
+  },
+  editTextRow: {
+    fontSize: 16,
+    height: 36,
+    maxWidth: 300,
+    width: '80%',
+    borderColor: colors.shade40,
+    borderWidth: 1,
+    borderRadius: 4,
+    color: colors.shade140,
+    paddingHorizontal: 12,
+  },
+  editButtonRow: {
+    height: 36,
+    maxWidth: 300,
+    width: '80%',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
   },
 });

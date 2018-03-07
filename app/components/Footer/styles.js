@@ -12,7 +12,7 @@ export default StyleSheet.create({
     backgroundColor: colors.shade0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 50,
+    paddingHorizontal: 20,
     width: '100%',
   },
   navButton: {

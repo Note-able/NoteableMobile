@@ -27,9 +27,9 @@ export default class Register extends Component {
   };
 
   facebookLogin = () => {
-    LoginManager.logInWithReadPermissions().then(result => {
+    LoginManager.logInWithReadPermissions().then((result) => {
       if (!result.isCancelled) {
-        AccessToken.getCurrentAccessToken().then(data => {
+        AccessToken.getCurrentAccessToken().then((data) => {
           this.props.loginFacebook(data.accessToken.toString());
         });
       }
@@ -119,7 +119,7 @@ export default class Register extends Component {
           <Text style={styles.errorText}>{this.state.lastNameError}</Text>
         )}
         <InputField
-          ref={ref => {
+          ref={(ref) => {
             this._lastName = ref;
           }}
           name="Name"
@@ -138,7 +138,7 @@ export default class Register extends Component {
           <Text style={styles.errorText}>{this.state.emailError}</Text>
         )}
         <InputField
-          ref={ref => {
+          ref={(ref) => {
             this._email = ref;
           }}
           name="Email"
@@ -158,7 +158,7 @@ export default class Register extends Component {
           <Text style={styles.errorText}>{this.state.passwordError}</Text>
         )}
         <InputField
-          ref={ref => {
+          ref={(ref) => {
             this._password = ref;
           }}
           name="Password"

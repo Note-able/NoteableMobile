@@ -1,106 +1,44 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { StackNavigator } from 'react-navigation';
 import { connect } from 'react-redux';
-import { StyleSheet, Text, View, Image, TouchableHighlight, ScrollView } from 'react-native';
+import { profileScreens } from '../../components/People/index.js';
+import {
+  loadCurrentProfile,
+  loadProfile,
+  searchProfiles,
+} from '../../actions/accountActions';
 
-import ProfileInfo from '../../components/ProfileInfo/index.js';
-import { getUser } from '../../actions/accountActions';
+
+const AppNavigator = StackNavigator(profileScreens, {
+  initialRouteName: 'Main',
+  navigationOptions: { header: null },
+});
 
 const mapStateToProps = state => ({
-  user: state.AccountReducer.user,
   profile: state.AccountReducer.profile,
+  search: state.AccountReducer.search,
+  visibleProfile: state.AccountReducer.visibleProfile,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCurrentUser: user => {
-    dispatch(getUser(user));
-  },
+  loadCurrentProfile: () => dispatch(loadCurrentProfile()),
+  loadProfile: userId => dispatch(loadProfile(userId)),
+  searchProfiles: text => dispatch(searchProfiles(text)),
 });
 
 class Profile extends Component {
-  static propTypes = {
-    getCurrentUser: PropTypes.func.isRequired,
-    profile: PropTypes.shape({}),
-    user: PropTypes.shape({}),
-  };
-
-  _views = {};
-  _scrollView = {};
-
-  componentDidMount() {}
-
-  setViewY = (event, view) => {
-    this._views[view] = { y: event.nativeEvent.layout.y };
-  };
-
-  scrollToView = view => {
-    this._scrollView.scrollTo({ y: this._views[view].y });
-  };
+  componentDidMount() {
+    this.props.loadCurrentProfile();
+  }
 
   render() {
-    const { user } = this.props;
-    console.log(user);
-    if (this.props.profile == null) {
-      return null;
-    }
-
-    const { coverImage, avatarUrl, firstName, lastName, bio } = user;
-    const name = `${firstName} ${lastName}`;
     return (
-      <ScrollView
-        ref={ref => {
-          this._scrollView = ref;
-        }}
-        contentContainerStyle={styles.container}
-      >
-        <Text>Hello world</Text>
-        <ProfileInfo
-          coverImage={coverImage || 'default'}
-          profileImage={avatarUrl || 'default'}
-          name={name}
-          bio={bio}
-          onLayout={this.setViewY}
-        />
-      </ScrollView>
+      <AppNavigator screenProps={this.props} />
     );
   }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    flex: 1,
-    height: '100%',
-    width: '100%',
-  },
-  navBar: {
-    top: 0,
-    right: 0,
-    left: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#D93A64',
-    height: 45,
-  },
-  navTitle: {
-    padding: 10,
-    color: 'white',
-    fontSize: 20,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  navBackArrow: {
-    height: 30,
-    width: 30,
-    marginLeft: 16,
-  },
-  green: {
-    backgroundColor: '#31CB94',
-  },
-});
 
 /*
 profile = {

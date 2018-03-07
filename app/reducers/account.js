@@ -6,9 +6,13 @@ const {
   fetchSignInTypes,
   getCurrentUserTypes,
   getUserPreferencesTypes,
+  loadCurrentProfileTypes,
+  loadProfileTypes,
   loginFacebookTypes,
   logoutTypes,
   registerUserTypes,
+  searchProfileTypes,
+  saveProfileTypes,
 } = AccountActionTypes;
 
 const defaultState = {
@@ -16,8 +20,9 @@ const defaultState = {
   profile: null,
   search: {
     query: {},
-    results: {},
+    results: [],
   },
+  isLoading: true,
 };
 
 export default (state = defaultState, action) => {
@@ -44,6 +49,18 @@ export default (state = defaultState, action) => {
     case registerUserTypes.error:
       logErrorToCrashlytics({ customMessage: 'Register Error', error });
       break;
+    case loadCurrentProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Load Profile', error });
+      break;
+    case saveProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Save Profile', error });
+      break;
+    case searchProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Search Profiles', error });
+      break;
+    case loadProfileTypes.error:
+      logErrorToCrashlytics({ customMessage: 'Load User', error });
+      break;
     default:
       break;
   }
@@ -52,9 +69,13 @@ export default (state = defaultState, action) => {
     case fetchSignInTypes.processing:
     case getCurrentUserTypes.processing:
     case registerUserTypes.processing:
+    case loadProfileTypes.processing:
     case logoutTypes.processing:
     case loginFacebookTypes.processing:
-      return { ...state, isProcessing: true };
+    case searchProfileTypes.processing:
+    case saveProfileTypes.processing:
+    case loadCurrentProfileTypes.processing:
+      return { ...state, done: false, isProcessing: true, isLoading: true };
     case getUserPreferencesTypes.success:
       return {
         ...state,
@@ -72,6 +93,10 @@ export default (state = defaultState, action) => {
         user: JSON.parse(action.currentUser),
         isProcessing: false,
       };
+    case saveProfileTypes.error:
+    case loadProfileTypes.error:
+    case searchProfileTypes.error:
+    case loadCurrentProfileTypes.error:
     case logoutTypes.error:
     case registerUserTypes.error:
     case getCurrentUserTypes.error:
@@ -85,6 +110,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         isProcessing: false,
+        done: true,
         user,
       };
     case fetchSignInTypes.error:
@@ -98,7 +124,30 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         isProcessing: false,
-        profile: result,
+        registration: result,
+      };
+    case saveProfileTypes.success:
+    case loadCurrentProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        isLoading: false,
+        profile: action.profile,
+      };
+    case searchProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        search: {
+          results: action.profiles,
+          query: action.text,
+        },
+      };
+    case loadProfileTypes.success:
+      return {
+        ...state,
+        isProcessing: false,
+        visibleProfile: action.profile,
       };
     default:
       return state;
