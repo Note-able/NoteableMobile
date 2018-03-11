@@ -52,3 +52,9 @@ export const SystemActionTypes = {
   },
   queueNetworkRequestType: 'QUEUE_NETWORK_REQUEST',
 };
+
+export const MessageActionTypes = {
+  openConversation: createAsyncActionTypes('OPEN_CONVERSATION'),
+  getConversations: createAsyncActionTypes('GET_CONVERSATIONS'),
+  sendMessage: createAsyncActionTypes('SEND_MESSAGE'),
+};
