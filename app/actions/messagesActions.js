@@ -7,10 +7,6 @@ export const sendMessage = (user, conversationId, content) => async (dispatch) =
   dispatch({ type: MessageActionTypes.sendMessage, message });
 };
 
-export const searchNav = () => ({ type: MessageActionTypes.searchMessages });
-
-export const listNav = () => ({ type: MessageActionTypes.listMessages });
-
 export const getConversations = currentUser => async (dispatch) => {
   const conversations = await fetchConversations(currentUser);
   const conversationsByUserId = conversations.reduce((map, c) => {
@@ -22,12 +18,11 @@ export const getConversations = currentUser => async (dispatch) => {
   dispatch({ type: MessageActionTypes.getConversations, conversations: conversationsByUserId });
 };
 
-export const openConversation = (currentUser, userId, conversationId) => async (dispatch) => {
+export const openConversation = (currentUser, conversationId) => async (dispatch) => {
   const conversation = await fetchConversation(currentUser, conversationId);
   const users = conversation.users.reduce((map, user) => { map[user.id] = user; return map; }, {});
   conversation.users = users;
-  const userName = `${users[userId].firstName} ${users[userId].lastName}`;
-  dispatch({ type: MessageActionTypes.openConversation, conversation, userName });
+  dispatch({ type: MessageActionTypes.openConversation, conversation });
 };
 
 const fetchConversation = (user, id) => fetchUtil.get({ url: `https://beta.noteable.me/api/v1/conversations/${id}`, auth: user.jwt })
