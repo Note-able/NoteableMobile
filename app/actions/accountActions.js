@@ -1,4 +1,5 @@
 import RNFetchBlob from 'react-native-fetch-blob';
+import firebase from 'react-native-firebase';
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
 import { fetchUtil, getPreferences } from '../util';
@@ -150,6 +151,7 @@ export const loginFacebook = authToken => (dispatch) => {
       .then((result) => {
         const { token, user } = result;
         AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        registerDeviceForUser({ ...user, jwt: token });
         dispatch({ type: loginFacebookTypes.success, user });
       })
       .catch((error) => {
@@ -163,24 +165,19 @@ export const signInLocal = (email, password) => (dispatch) => {
 
   return fetchUtil
     .postWithBody({ url: `${authBaseUrl}/auth/local/jwt`, body: { username: email, password } })
-    .then(
-    (response) => {
+    .then((response) => {
       if (response.status < 200 || response.status >= 300) {
         throw new Error('Could not sign user in');
       }
 
       return response.json();
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
-  )
-    .then(
-    (result) => {
+    }).then((result) => {
       const { token, user } = result;
       AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+      registerDeviceForUser({ ...user, jwt: token });
       dispatch({ type: fetchSignInTypes.success, user });
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
-  );
+    })
+    .catch(error => dispatch({ type: fetchSignInTypes.error, error }));
 };
 
 export const logout = () => async (dispatch) => {
@@ -303,4 +300,21 @@ export const getUserPreferences = () => async (dispatch) => {
   } catch (error) {
     dispatch({ type: getUserPreferencesTypes.error, error });
   }
+};
+
+const registerDeviceForUser = async (user) => {
+  const deviceToken = await firebase.messaging().getToken(); //.then((deviceToken) => {
+  console.log(deviceToken);
+  return fetchUtil.postWithBody({
+    url: `${apiBaseUrl}/users/${user.id}/devices`,
+    auth: user.jwt,
+    body: {
+      deviceToken,
+    },
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+  // });
 };
