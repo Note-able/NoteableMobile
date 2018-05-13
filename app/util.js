@@ -147,3 +147,36 @@ const mapPreferences = preferences =>
       [preferenceKey]: current[1],
     };
   }, {});
+
+export const proxyReplaceNullWithEmptyString = (obj) => {
+  const handler = {
+    get: (target, prop) => {
+      if (target[prop] && typeof target[prop] === 'object') {
+        return new Proxy(target[prop], handler);
+      }
+
+      const value = Reflect.get(target, prop);
+      if (value === null || value === undefined) {
+        return '';
+      }
+      return value;
+    },
+  };
+  return typeof obj === 'object' ? new Proxy(obj, handler) : obj;
+};
+
+export const removeNullPropertiesFromObject = (obj) => {
+  const copy = JSON.parse(JSON.stringify(obj));
+  if (typeof copy !== 'object') {
+    return copy;
+  }
+  const keys = Object.keys(copy);
+  for (key of keys) {
+    if (copy[key] === null || copy[key] === undefined) {
+      delete copy[key];
+    } else if (typeof copy[key] === 'object') {
+      copy[key] = removeNullPropertiesFromObject(copy[key]);
+    }
+  }
+  return copy;
+};
