@@ -58,3 +58,6 @@ realm-object-server
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots=
+
+# CocoaPods
+ios/Pods

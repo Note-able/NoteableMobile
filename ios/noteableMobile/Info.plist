@@ -71,6 +71,11 @@
           <key>NSExceptionAllowsInsecureHTTPLoads</key>
           <true/>
         </dict>
+        <key>56def05a.ngrok.io</key>
+        <dict>
+          <key>NSExceptionAllowsInsecureHTTPLoads</key>
+          <true/>
+        </dict>
         <key>noteable.me</key>
         <dict>
           <key>NSIncludesSubdomains</key>

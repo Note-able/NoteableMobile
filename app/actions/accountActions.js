@@ -2,7 +2,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import firebase from 'react-native-firebase';
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
-import { fetchUtil, getPreferences } from '../util';
+import { fetchUtil, getPreferences, removeNullPropertiesFromObject } from '../util';
 import settings from '../settings.json';
 
 const { apiBaseUrl, authBaseUrl } = settings;
@@ -104,7 +104,9 @@ export const loadCurrentProfile = () => (
           return response.json();
         })
         .then(async (result) => {
-          AsyncStorage.setItem(profileKey, JSON.stringify(result));
+          if (result) {
+            AsyncStorage.setItem(profileKey, JSON.stringify(removeNullPropertiesFromObject({ ...result })));
+          }
           return result;
         })
         .then((result) => {
@@ -150,7 +152,7 @@ export const loginFacebook = authToken => (dispatch) => {
       .then(response => response.json())
       .then((result) => {
         const { token, user } = result;
-        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject({ ...user, jwt: token })));
         registerDeviceForUser({ ...user, jwt: token });
         dispatch({ type: loginFacebookTypes.success, user });
       })
@@ -173,7 +175,7 @@ export const signInLocal = (email, password) => (dispatch) => {
       return response.json();
     }).then((result) => {
       const { token, user } = result;
-      AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+      AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject({ ...user, jwt: token })));
       registerDeviceForUser({ ...user, jwt: token });
       dispatch({ type: fetchSignInTypes.success, user });
     })
