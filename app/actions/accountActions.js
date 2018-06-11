@@ -151,9 +151,10 @@ export const loginFacebook = authToken => (dispatch) => {
       .postWithBody({ url: `${authBaseUrl}/auth/facebook/jwt`, body: { token: authToken } })
       .then(response => response.json())
       .then((result) => {
-        const { token, user } = result;
-        AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject({ ...user, jwt: token })));
-        registerDeviceForUser({ ...user, jwt: token });
+        const { token, user: userResult } = result;
+        const user = { ...userResult, jwt: token };
+        AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject(user)));
+        registerDeviceForUser(user);
         dispatch({ type: loginFacebookTypes.success, user });
       })
       .catch((error) => {
@@ -174,9 +175,10 @@ export const signInLocal = (email, password) => (dispatch) => {
 
       return response.json();
     }).then((result) => {
-      const { token, user } = result;
-      AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject({ ...user, jwt: token })));
-      registerDeviceForUser({ ...user, jwt: token });
+      const { token, user: userResult } = result;
+      const user = { ...userResult, jwt: token };
+      AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject(user)));
+      registerDeviceForUser(user);
       dispatch({ type: fetchSignInTypes.success, user });
     })
     .catch(error => dispatch({ type: fetchSignInTypes.error, error }));
