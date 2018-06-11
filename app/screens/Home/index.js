@@ -151,7 +151,7 @@ class Home extends Component {
 
   render() {
     if (
-      (this.state.users.user == null || this.state.users.user.id != null) &&
+      (this.state.users.user == null || this.state.users.user.id == null) &&
       this.state.isProcessing
     ) {
       return (

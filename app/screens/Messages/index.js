@@ -1,23 +1,49 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { getConversations, openConversation, sendMessage } from '../../actions/messagesActions';
 
-const mapStateToProps = state => ({
-  selectedConversationId: state.messagesReducer.selectedConversationId,
-  user: state.Users.user,
-  conversations: state.messagesReducer.conversations,
-});
+const mapStateToProps = (state) => {
+  return ({
+    selectedConversationId: state.MessagesReducer.selectedConversationId,
+    user: state.AccountReducer.user,
+    conversations: state.MessagesReducer.conversations,
+  });
+};
 
 const mapDispatchToProps = dispatch => ({
   onSendMessage: (user, conversationId, content) => { dispatch(sendMessage(user, conversationId, content)); },
   onOpenConversation: (currentUser, conversationId) => { dispatch(openConversation(currentUser, conversationId)); },
-  onGetConversations: (user) => { dispatch(getConversations(user)); },
+  loadConversations: (user) => { dispatch(getConversations(user)); },
 });
 
 class Messages extends Component {
+  static propTypes = {
+    loadConversations: PropTypes.func.isRequired,
+    onSendMessage: PropTypes.func.isRequired,
+    onOpenConversation: PropTypes.func.isRequired,
+    conversations: PropTypes.arrayOf(PropTypes.shape({
+      conversationId: PropTypes.number.isRequired,
+      users: PropTypes.arrayOf(PropTypes.object).isRequired,
+      lastMessage: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        content: PropTypes.string.isRequired,
+        userId: PropTypes.number.isRequired,
+        timeStamp: PropTypes.string.isRequired,
+      })),
+    })),
+    selectedConversationId: PropTypes.number,
+    user: PropTypes.object,
+  }
+
   componentDidMount() {
-    this.props.onGetConversations(this.props.user);
+    this.loadConversations();
+  }
+
+  loadConversations = () => {
+    this.props.loadConversations(this.props.user);
+    setTimeout(this.loadConversations, 5000);
   }
 
   render() {
