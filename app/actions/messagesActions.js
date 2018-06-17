@@ -12,7 +12,7 @@ export const sendMessage = (user, conversationId, content) => async (dispatch) =
 export const getConversations = currentUser => async (dispatch) => {
   dispatch({ type: MessageActionTypes.getConversations.processing });
   const conversations = await fetchConversations(currentUser);
-  const conversationsByUserId = conversations.reduce((map, c) => {
+  const conversationsById = conversations.reduce((map, c) => {
     const users = [...c.users].reduce((userMap, user) => { userMap[user.id] = user; return userMap; }, {});
     c.users = users;
     map[c.id] = {
@@ -22,7 +22,7 @@ export const getConversations = currentUser => async (dispatch) => {
     };
     return map;
   }, {});
-  dispatch({ type: MessageActionTypes.getConversations.success, conversations: conversationsByUserId });
+  dispatch({ type: MessageActionTypes.getConversations.success, conversations: conversationsById });
 };
 
 export const openConversation = (currentUser, conversationId) => async (dispatch) => {
