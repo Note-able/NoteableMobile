@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ActivityIndicator, AppState, NetInfo, Text, View } from 'react-native';
+import { ActivityIndicator, NetInfo, Text, View } from 'react-native';
 import { connect } from 'react-redux';
 import { TabNavigator } from 'react-navigation';
-import BackgroundFetch from 'react-native-background-fetch';
 
 import { Footer, SystemMessage } from '../../components';
 import { appScreens } from '../../screens';
@@ -19,9 +18,9 @@ import {
 
 import { startPlayer } from '../../actions/playerActions';
 
-import { getCurrentUser } from '../../actions/accountActions';
+import { getCurrentUser, getAlreadySignedInUser } from '../../actions/accountActions';
 
-import { networkConnectivityChange, runBackgroundRequests } from '../../actions/systemActions';
+import { networkConnectivityChange } from '../../actions/systemActions';
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
@@ -59,10 +58,10 @@ const mapDispatchToProps = dispatch => ({
   },
   accountActions: {
     getCurrentUser: () => dispatch(getCurrentUser()),
+    getAlreadySignedInUser: () => dispatch(getAlreadySignedInUser()),
   },
   systemActions: {
     networkConnectivityChange: reach => dispatch(networkConnectivityChange(reach)),
-    runBackgroundRequests: () => dispatch(runBackgroundRequests()),
   },
 });
 
@@ -85,23 +84,20 @@ class Home extends Component {
     isConnected: true,
     recordings: this.props.recordings,
     network: this.props.system.network,
-    appState: AppState.currentState,
   };
 
   componentDidMount() {
-    if (this.props.users.user == null) {
-      this.props.accountActions.getCurrentUser();
+    if (!this.props.users.user) {
+      this.props.accountActions.getAlreadySignedInUser();
     }
     NetInfo.addEventListener('change', this.handleConnectivityChange);
     NetInfo.fetch().done(reach => {
       this.setState({ isConnected: reach !== 'none' });
       this.props.systemActions.networkConnectivityChange(reach);
     });
-    AppState.addEventListener('change', this._handleAppStateChange);
   }
 
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this._handleAppStateChange);
+  componentWillUnmount() {\
     NetInfo.removeEventListener('change', this.handleConnectivityChange);
   }
 
@@ -117,18 +113,6 @@ class Home extends Component {
       recordings: nextProps.recordings,
     });
   }
-
-  _handleAppStateChange = nextAppState => {
-    if (this.state.appState.match(/active/) && nextAppState === 'background') {
-      BackgroundFetch.status(status => {
-        if (status === BackgroundFetch.STATUS_AVAILABLE) {
-          this.props.systemActions.runBackgroundRequests();
-        }
-      });
-    }
-
-    this.setState({ appState: nextAppState });
-  };
 
   handleConnectivityChange = reach => this.props.systemActions.networkConnectivityChange(reach);
 
