@@ -97,7 +97,7 @@ class Home extends Component {
     });
   }
 
-  componentWillUnmount() {\
+  componentWillUnmount() {
     NetInfo.removeEventListener('change', this.handleConnectivityChange);
   }
 
