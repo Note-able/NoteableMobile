@@ -1,7 +1,8 @@
 import RNFetchBlob from 'react-native-fetch-blob';
+import firebase from 'react-native-firebase';
 import { AsyncStorage } from 'react-native';
 import { AccountActionTypes } from './ActionTypes.js';
-import { fetchUtil, getPreferences } from '../util';
+import { fetchUtil, getPreferences, removeNullPropertiesFromObject } from '../util';
 import settings from '../settings.json';
 
 const { apiBaseUrl, authBaseUrl } = settings;
@@ -103,7 +104,9 @@ export const loadCurrentProfile = () => (
           return response.json();
         })
         .then(async (result) => {
-          AsyncStorage.setItem(profileKey, JSON.stringify(result));
+          if (result) {
+            AsyncStorage.setItem(profileKey, JSON.stringify(removeNullPropertiesFromObject({ ...result })));
+          }
           return result;
         })
         .then((result) => {
@@ -148,8 +151,10 @@ export const loginFacebook = authToken => (dispatch) => {
       .postWithBody({ url: `${authBaseUrl}/auth/facebook/jwt`, body: { token: authToken } })
       .then(response => response.json())
       .then((result) => {
-        const { token, user } = result;
-        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        const { token, user: userResult } = result;
+        const user = { ...userResult, jwt: token };
+        AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject(user)));
+        registerDeviceForUser(user);
         dispatch({ type: loginFacebookTypes.success, user });
       })
       .catch((error) => {
@@ -163,24 +168,20 @@ export const signInLocal = (email, password) => (dispatch) => {
 
   return fetchUtil
     .postWithBody({ url: `${authBaseUrl}/auth/local/jwt`, body: { username: email, password } })
-    .then(
-    (response) => {
+    .then((response) => {
       if (response.status < 200 || response.status >= 300) {
         throw new Error('Could not sign user in');
       }
 
       return response.json();
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
-  )
-    .then(
-    (result) => {
-      const { token, user } = result;
-      AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+    }).then((result) => {
+      const { token, user: userResult } = result;
+      const user = { ...userResult, jwt: token };
+      AsyncStorage.setItem(USER, JSON.stringify(removeNullPropertiesFromObject(user)));
+      registerDeviceForUser(user);
       dispatch({ type: fetchSignInTypes.success, user });
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
-  );
+    })
+    .catch(error => dispatch({ type: fetchSignInTypes.error, error }));
 };
 
 export const logout = () => async (dispatch) => {
@@ -303,4 +304,21 @@ export const getUserPreferences = () => async (dispatch) => {
   } catch (error) {
     dispatch({ type: getUserPreferencesTypes.error, error });
   }
+};
+
+const registerDeviceForUser = async (user) => {
+  const deviceToken = await firebase.messaging().getToken(); //.then((deviceToken) => {
+  console.log(deviceToken);
+  return fetchUtil.postWithBody({
+    url: `${apiBaseUrl}/users/${user.id}/devices`,
+    auth: user.jwt,
+    body: {
+      deviceToken,
+    },
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+  // });
 };

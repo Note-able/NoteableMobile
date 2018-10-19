@@ -16,7 +16,7 @@ const {
 } = AccountActionTypes;
 
 const defaultState = {
-  user: {},
+  user: null,
   profile: null,
   search: {
     query: {},

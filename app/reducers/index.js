@@ -4,6 +4,7 @@ import RecordingsReducer from './recordings';
 import PlayerReducer from './player';
 import SystemReducer from './system';
 import AccountReducer from './account';
+import MessagesReducer from './messages';
 
 const profileReducer = (state = { showPlayer: false }, { type }) => {
   switch (type) {
@@ -11,43 +12,6 @@ const profileReducer = (state = { showPlayer: false }, { type }) => {
       return { ...state, showPlayer: true };
     default:
       return { ...state };
-  }
-};
-
-const DEFAULT_MESSAGES_STATE = {
-  nav: {
-    list: true,
-  },
-};
-
-const messagesReducer = (
-  state = DEFAULT_MESSAGES_STATE,
-  { type, conversation, userName, conversations, message }
-) => {
-  switch (type) {
-    case 'HEADER_SEARCH':
-      return { ...state, nav: { search: true } };
-    case 'HEADER_LIST':
-      return { ...state, nav: { list: true } };
-    case 'MESSAGES/OPEN_CONVERSATION':
-      conversations = { ...state.conversations };
-      conversations[conversation.id].messages = conversation.messages;
-      return {
-        ...state,
-        nav: { conversation: true, name: userName },
-        conversations,
-        selectedConversationId: conversation.id,
-      };
-    case 'MESSAGES/GET_CONVERSATIONS':
-      return { ...state, conversations };
-    case 'MESSAGES/SEND_MESSAGE':
-      conversations = { ...state.conversations };
-      conversation = { ...conversations[state.selectedConversationId] };
-      conversation.messages.push(message);
-      conversations[conversation.id] = conversation;
-      return { ...state, conversations };
-    default:
-      return state;
   }
 };
 
@@ -83,10 +47,10 @@ export default combineReducers({
   RecordingsReducer,
   PlayerReducer,
   profileReducer,
-  messagesReducer,
   newsFeedReducer,
   eventsReducer,
   SystemReducer,
+  MessagesReducer,
 });
 
 /** eslint-enable */

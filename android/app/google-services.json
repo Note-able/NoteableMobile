@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "485363331976",
+    "firebase_url": "https://noteablemobile.firebaseio.com",
+    "project_id": "noteablemobile",
+    "storage_bucket": "noteablemobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485363331976:android:56a8c37104909634",
+        "android_client_info": {
+          "package_name": "com.noteablemobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485363331976-olv8nnqaodi5e088bvdhkg3ic5m6grkh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.noteablemobile",
+            "certificate_hash": "3507c9e587586a989c9fa01cac4c1c70db78517d"
+          }
+        },
+        {
+          "client_id": "485363331976-3r0rchlug3s7hsdj5c0s4m9f156ae6io.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHujNKEhJfaZoU4rf4RBVnKtn8gyxoyBI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485363331976-3r0rchlug3s7hsdj5c0s4m9f156ae6io.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

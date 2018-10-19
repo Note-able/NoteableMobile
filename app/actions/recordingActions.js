@@ -119,35 +119,36 @@ export const syncDownRecordings = () => async (dispatch, getState) => {
   }
 
   dispatch({ type: syncDownRecordingsTypes.processing });
-  return fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0)
-    .then((recordings) => {
-      realm.write(() => {
-        try {
-          recordings.forEach((x) => {
-            const rec = MapRecordingFromAPI(x);
-            const current = realm
-              .objects('Recording')
-              .filtered(`resourceId = ${rec.resourceId}`)[0];
-            const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
+  const recordings = await fetchRecordingsFromAPI(dispatch, [], 0, JSON.parse(user).jwt, 0);
+  try {
+    realm.write(() => {
+      try {
+        recordings.forEach((x) => {
+          const rec = MapRecordingFromAPI(x);
+          const current = realm
+            .objects('Recording')
+            .filtered(`resourceId = ${rec.resourceId}`)[0];
+          const id = current == null ? Schemas.GetId(realm.objects('Recording')) + 1 : current.id;
 
-            if (current != null && rec.dateModified >= current.dateModified) {
-              realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
-            } else if (current == null) {
-              realm.create('Recording', { ...rec, path: '', id }, true);
-            }
-          });
+          if (current != null && rec.dateModified >= current.dateModified) {
+            realm.create('Recording', { audioUrl: rec.audioUrl, id }, true);
+          } else if (current == null) {
+            realm.create('Recording', { ...rec, path: '', id }, true);
+          }
+        });
 
-          const result = [...validate(realm.objects('Recording').sorted('id', true))];
-          dispatch({
-            type: syncDownRecordingsTypes.success,
-            recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB),
-          });
-        } catch (e) {
-          dispatch({ type: syncDownRecordingsTypes.error, error: e.message });
-        }
-      });
-    })
-    .catch(error => dispatch({ type: syncDownRecordingsTypes.error, error: error.message }));
+        const result = [...validate(realm.objects('Recording').sorted('id', true))];
+        dispatch({
+          type: syncDownRecordingsTypes.success,
+          recordings: MapRecordingsToAssocArray(result, MapRecordingFromDB),
+        });
+      } catch (e) {
+        dispatch({ type: syncDownRecordingsTypes.error, error: e.message });
+      }
+    });
+  } catch (error) {
+    dispatch({ type: syncDownRecordingsTypes.error, error: error.message });
+  }
 };
 
 export const fetchRecordings = (filter, search) => (dispatch) => {

@@ -1,7 +1,8 @@
 {
   "extends": [
     "eslint:recommended",
-    "airbnb"
+    "airbnb",
+    "prettier"
   ],
   "parser": "babel-eslint",
   "parserOptions": {
