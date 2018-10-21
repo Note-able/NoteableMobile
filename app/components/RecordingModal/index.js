@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Text, TextInput, TouchableHighlight, View } from 'react-native';
 import styles from './styles';
 
-export default class RecordingModal extends Component {
+export default class RecordingModal extends React.PureComponent {
   static props = {
     cancel: PropTypes.func.isRequired,
     cancelText: PropTypes.string.isRequired,

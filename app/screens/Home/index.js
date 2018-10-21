@@ -25,7 +25,7 @@ import { networkConnectivityChange, runBackgroundRequests } from '../../actions/
 
 const App = TabNavigator(appScreens, {
   tabBarPosition: 'bottom',
-  initialRouteName: 'Profile',
+  initialRouteName: 'Record',
   tabBarOptions: {
     activeTintColor: 'blue',
     labelStyle: {
@@ -93,7 +93,7 @@ class Home extends Component {
       this.props.accountActions.getCurrentUser();
     }
     NetInfo.addEventListener('change', this.handleConnectivityChange);
-    NetInfo.fetch().done(reach => {
+    NetInfo.fetch().done((reach) => {
       this.setState({ isConnected: reach !== 'none' });
       this.props.systemActions.networkConnectivityChange(reach);
     });
@@ -118,9 +118,9 @@ class Home extends Component {
     });
   }
 
-  _handleAppStateChange = nextAppState => {
+  _handleAppStateChange = (nextAppState) => {
     if (this.state.appState.match(/active/) && nextAppState === 'background') {
-      BackgroundFetch.status(status => {
+      BackgroundFetch.status((status) => {
         if (status === BackgroundFetch.STATUS_AVAILABLE) {
           this.props.systemActions.runBackgroundRequests();
         }
@@ -132,7 +132,7 @@ class Home extends Component {
 
   handleConnectivityChange = reach => this.props.systemActions.networkConnectivityChange(reach);
 
-  getCurrentRouteName = navigationState => {
+  getCurrentRouteName = (navigationState) => {
     if (!navigationState) {
       return null;
     }
@@ -173,12 +173,12 @@ class Home extends Component {
     return (
       <View style={{ flex: 1, marginTop: -20, paddingTop: 20, backgroundColor: colors.shade10 }}>
         {(this.state.systemMessage == null || this.state.systemMessage.message == null) &&
-        !this.state.recordings.isProcessing ? null : (
-          <SystemMessage
-            message={this.state.systemMessage.message}
-            kind={this.state.systemMessage.kind}
-          />
-        )}
+          !this.state.recordings.isProcessing ? null : (
+            <SystemMessage
+              message={this.state.systemMessage.message}
+              kind={this.state.systemMessage.kind}
+            />
+          )}
         {this.state.isConnected ? null : (
           <SystemMessage message="No internet connection" kind="error" />
         )}

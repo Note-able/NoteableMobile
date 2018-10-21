@@ -60,7 +60,7 @@ const ToggleSetting = props => (
     <Switch
       onValueChange={props.onChange}
       value={props.value === 'true'}
-      onTintColor={colors.green}
+      trackColor={colors.green}
       style={styles.toggleControl}
     />
   </View>

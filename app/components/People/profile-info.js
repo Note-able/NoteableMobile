@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Permissions from 'react-native-permissions';
 import * as Animatable from 'react-native-animatable';
 import {
   ActivityIndicator,
@@ -81,7 +82,10 @@ class ProfileInfo extends Component {
     const stateKeys = Object.keys(this.state);
     const propsKeys = Object.keys(this.props).filter(key => typeof this.props[key] !== 'function');
 
-    return stateKeys.filter(key => this.state[key] !== nextState[key]).length !== 0 || propsKeys.filter(key => this.props[key] !== nextProps[key]).length !== 0;
+    return stateKeys.filter(key => this.state[key] !== nextState[key]).length !== 0 ||
+      propsKeys.filter(key => this.props[key] !== nextProps[key]).length !== 0 ||
+      stateKeys.length !== Object.keys(nextState).length ||
+      propsKeys.length !== Object.keys(nextProps).length;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -124,18 +128,19 @@ class ProfileInfo extends Component {
     });
 
     const hasLastName = this.state.editName.split(' ').length !== 1;
-    this.props.profile.saveProfile({
+    this.props.saveProfile({
       firstName: this.state.editName.split(' ')[0],
       lastName: hasLastName ? this.state.editName.split(' ')[1] : '',
       bio: this.state.editBio,
-      profileImage: this.state.editImage || this.props.profile.avatarUrl,
+      avatarUrl: this.state.editImage || this.props.profile.avatarUrl,
       coverImage: this.state.editCoverImage || this.props.profile.coverImage,
     });
   }
 
-  pickImage = (property) => {
+  pickImage = async (property) => {
     if (Platform.OS === 'ios') {
       this.setState({ isChoosingImage: true });
+
       if (ImagePickerIOS) {
         ImagePickerIOS.openSelectDialog(
           {},
@@ -165,18 +170,14 @@ class ProfileInfo extends Component {
           <TouchableOpacity onPress={() => this.pickImage('editCoverImage')} style={styles.edit.coverImageButton}>
             <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
           </TouchableOpacity>
-          {this.state.editCoverImage ?
-            <Image
-              source={{ uri: this.state.editCoverImage }}
-              style={styles.coverImage}
-            /> :
-            <View
-              style={[styles.coverImage, { backgroundColor: 'transparent' }]}
-            />}
+          <Image
+            source={{ uri: this.state.editCoverImage || this.state.profile.coverImage }}
+            style={styles.coverImage}
+          />
         </Animatable.View>
         <View style={styles.profileHeader}>
           <Animatable.View animation="fadeIn" duration={500} style={[styles.profileImageView, { backgroundColor: 'transparent' }]}>
-            {this.state.editImage && <Image source={{ uri: this.state.editImage }} style={styles.profileImage} />}
+            <Image source={{ uri: this.state.editImage || this.state.profile.avatarUrl }} style={styles.profileImage} />
             <TouchableOpacity onPress={() => this.pickImage('editImage')} style={[styles.profileImage, styles.edit.profileImage]}>
               <Icon name="photo-camera" size={32} style={{ width: 32, height: 32 }} color={colors.shade140} />
             </TouchableOpacity>
