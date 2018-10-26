@@ -25,6 +25,7 @@ export default class People extends Component {
 
   state = {
     search: null,
+    backgroundColor: '#ffffff',
   };
 
   componentWillReceiveProps(nextProps) {
@@ -147,6 +148,8 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     backgroundColor: colors.shade0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     backgroundColor: colors.shade0,

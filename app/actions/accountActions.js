@@ -161,26 +161,34 @@ export const loginFacebook = authToken => (dispatch) => {
 export const signInLocal = (email, password) => (dispatch) => {
   dispatch({ type: fetchSignInTypes.processing });
 
+  console.log('signin local');
   return fetchUtil
-    .postWithBody({ url: `${authBaseUrl}/auth/local/jwt`, body: { username: email, password } })
+    .postWithBody({
+      url: `${authBaseUrl}/auth/local/jwt`,
+      body: { username: email, password },
+    })
     .then(
-    (response) => {
-      if (response.status < 200 || response.status >= 300) {
-        throw new Error('Could not sign user in');
-      }
+      (response) => {
+        console.log(response);
+        if (response.status < 200 || response.status >= 300) {
+          throw new Error('Could not sign user in');
+        }
 
-      return response.json();
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
+        return response.json();
+      },
+      error => dispatch({ type: fetchSignInTypes.error, error }),
   )
     .then(
-    (result) => {
-      const { token, user } = result;
-      AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
-      dispatch({ type: fetchSignInTypes.success, user });
-    },
-    error => dispatch({ type: fetchSignInTypes.error, error }),
-  );
+      (result) => {
+        const { token, user } = result;
+        console.log(result);
+        AsyncStorage.setItem(USER, JSON.stringify({ ...user, jwt: token }));
+        dispatch({ type: fetchSignInTypes.success, user });
+      },
+      error => dispatch({ type: fetchSignInTypes.error, error }),
+  ).catch((error) => {
+    console.log(error);
+  });
 };
 
 export const logout = () => async (dispatch) => {
@@ -214,16 +222,21 @@ export const saveProfile = profile => (
     if (profile.lastName === AccountReducer.profile.lastName &&
       profile.firstName === AccountReducer.profile.firstName &&
       profile.bio === AccountReducer.profile.bio &&
-      profile.profileImage === AccountReducer.profile.avatarUrl
+      profile.avatarUrl === AccountReducer.profile.avatarUrl &&
+      profile.coverImage === AccountReducer.profile.coverImage
     ) {
       return null;
     }
 
     dispatch({ type: saveProfileTypes.processing });
+    let requests;
 
-    let avatarUrl = AccountReducer.profile.avatarUrl;
-    if (profile.profileImage !== AccountReducer.profile.avatarUrl) {
-      try {
+    try {
+      requests = await Promise.all(['avatarUrl', 'coverImage'].map(async (key) => {
+        if (profile[key] === AccountReducer.profile[key]) {
+          return null;
+        }
+
         const response = await RNFetchBlob.fetch(
           'POST',
           `${apiBaseUrl}/users/edit/picture/new`,
@@ -232,7 +245,7 @@ export const saveProfile = profile => (
             'Content-Type': 'multipart/form-data',
           }, [{
             name: 'file',
-            data: RNFetchBlob.wrap(profile.profileImage),
+            data: RNFetchBlob.wrap(profile[key]),
             filename: 'avatar-png.jpg',
           }]);
 
@@ -240,21 +253,31 @@ export const saveProfile = profile => (
           return dispatch({ type: saveProfileTypes.error, error: response.respInfo.status });
         }
 
-        avatarUrl = response.json().cloudStoragePublicUrl;
-      } catch (error) {
-        return dispatch({ type: saveProfileTypes.error, error: error.message });
-      }
+        const result = await response.json();
+        return { [key]: result.cloudStoragePublicUrl };
+      }));
+    } catch (error) {
+      return dispatch({ type: saveProfileTypes.error, error: error.message });
     }
+
+    let { avatarUrl, coverImage } = requests.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+    avatarUrl = avatarUrl || AccountReducer.profile.avatarUrl;
+    coverImage = coverImage || AccountReducer.profile.coverImage;
+
+    console.log(requests);
+
+    const updatedProfile = {
+      ...AccountReducer.profile,
+      ...profile,
+      avatarUrl,
+      coverImage,
+    };
 
     try {
       const response = await fetchUtil.postWithBody({
         url: `${apiBaseUrl}/users/${AccountReducer.user.id}/profile`,
         auth: AccountReducer.user.jwt,
-        body: {
-          ...AccountReducer.profile,
-          ...profile,
-          avatarUrl,
-        },
+        body: updatedProfile,
         headers: {
           accept: 'application/json',
           'Content-Type': 'application/json',
@@ -262,10 +285,11 @@ export const saveProfile = profile => (
       });
 
       if (response.status < 200 || response.status > 300) {
-        throw new Error('Update failed');
+        throw new Error(`Update failed${response.status}`);
       }
 
-      return dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile, avatarUrl } });
+      AsyncStorage.setItem(profileKey, JSON.stringify(updatedProfile));
+      return dispatch({ type: saveProfileTypes.success, profile: { ...AccountReducer.profile, ...profile, avatarUrl, coverImage } });
     } catch (error) {
       return dispatch({ type: saveProfileTypes.error, error: error.message });
     }

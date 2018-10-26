@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Animated, Easing, View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { AudioUtils } from 'react-native-audio';
@@ -15,7 +15,7 @@ import styles from './styles';
 
 const OPTIONS_WIDTH = 100;
 
-export default class MultiTrackMixer extends Component {
+export default class MultiTrackMixer extends React.PureComponent {
   static propTypes = {
     recordings: PropTypes.shape({
       local: PropTypes.object.isRequired,
@@ -33,13 +33,13 @@ export default class MultiTrackMixer extends Component {
     modal: { visible: false },
   };
 
-  selectTrack = recording => {
+  selectTrack = (recording) => {
     const { tracksToAdd } = this.state;
     tracksToAdd.push(recording);
     this.setState({ tracksToAdd });
   };
 
-  unselectTrack = recording => {
+  unselectTrack = (recording) => {
     const { tracksToAdd } = this.state;
     tracksToAdd.splice(tracksToAdd.findIndex(r => r.id === recording.id), 1);
     this.setState({ tracksToAdd });
@@ -47,7 +47,7 @@ export default class MultiTrackMixer extends Component {
 
   addTracks = () => {
     const { tracksToAdd } = this.state;
-    tracksToAdd.forEach(recording => {
+    tracksToAdd.forEach((recording) => {
       const splits = recording.path.split('/');
       const realPath = `${AudioUtils.DocumentDirectoryPath}/${splits[splits.length - 1]}`;
       MultiTrack.AddTrack(`${recording.id}`, realPath);
@@ -63,7 +63,7 @@ export default class MultiTrackMixer extends Component {
     this.setState({ tracksToAdd: [], modal: { visible: false } });
   };
 
-  removeTrack = recording => {
+  removeTrack = (recording) => {
     MultiTrack.RemoveTrack(`${recording.id}`);
     const { selectedRecordings } = this.state;
     const index = selectedRecordings.findIndex(r => r.id === recording.id);
@@ -71,7 +71,7 @@ export default class MultiTrackMixer extends Component {
     this.setState(state => ({ selectedRecordings, showOptions: null, [state.showOptions]: null }));
   };
 
-  createAnimations = recordingId => {
+  createAnimations = (recordingId) => {
     const animations = [];
     let oldOptions = null;
 
@@ -89,7 +89,7 @@ export default class MultiTrackMixer extends Component {
           easing: Easing.quad,
           toValue: 1,
           duration: 100,
-        })
+        }),
       );
     }
 
@@ -105,20 +105,20 @@ export default class MultiTrackMixer extends Component {
           easing: Easing.linear,
           toValue: 0,
           duration: 50,
-        })
+        }),
       );
     }
 
     Animated.parallel(animations).start();
   };
 
-  showOptions = recordingId => {
+  showOptions = (recordingId) => {
     if (this.state[recordingId] == null) {
       this.setState(
         {
           [recordingId]: new Animated.Value(0),
         },
-        () => this.createAnimations(recordingId)
+        () => this.createAnimations(recordingId),
       );
     } else {
       this.createAnimations(recordingId);
@@ -170,7 +170,7 @@ export default class MultiTrackMixer extends Component {
         <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.modalItems}>
           {recordings.order
             .filter(x => selectedRecordings.findIndex(r => r.id === x) === -1)
-            .map(recordingId => {
+            .map((recordingId) => {
               const recording = recordings.local[recordingId] || recordings.networked[recordingId];
               const selected = tracksToAdd.findIndex(x => x.id === recordingId) !== -1;
               return (
@@ -277,15 +277,15 @@ export default class MultiTrackMixer extends Component {
                   this.state[recording.id] == null
                     ? null
                     : {
-                        transform: [
-                          {
-                            translateX: this.state[recording.id].interpolate({
-                              inputRange: [0, 1],
-                              outputRange: [0, -1 * OPTIONS_WIDTH],
-                            }),
-                          },
-                        ],
-                      },
+                      transform: [
+                        {
+                          translateX: this.state[recording.id].interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, -1 * OPTIONS_WIDTH],
+                          }),
+                        },
+                      ],
+                    },
                 ]}
               >
                 <Recording
